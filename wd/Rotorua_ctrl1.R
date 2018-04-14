@@ -16,7 +16,11 @@ myDF <- bobs2df("Rotorua_200707-201712_RAW_R.bobs",metaD, useHydroYear = TRUE)
 newDF <- include_dates(myDF,metaData,startDate = "2008-01-01 00:00:00")
 newDF <- include_vars(myDF, metaData, varNames = c("tmp","do","wnd","pH"))
 newDF <- exclude_vars(myDF, metaData, varNames = c("pH","wndDir"))
-# newDF <- delete(newDF,metaData,tartDates = "2007-01-01 00:00:00", endDates = "2007-07-01 00:00:00", varNames = "Tmp")
+
+DFwithLog <- assign_na(myDF, metaD, startDate = "2007-01-01 00:00:00", endDate = "2009-07-01 00:00:00", varNames = "Tmp", logID = 1)
+DFwithLog <- assign_na(myDF, metaD, startDate = "2007-01-01 00:00:00", endDate = "2007-07-02 00:00:00", varNames = "Tmp", logID = 2)
+DFwithLog <- assign_na(DFwithLog, metaD, startDate = "2007-01-01 00:00:00", endDate = "2009-07-01 00:00:00", varNames = "Tmp", logID = 2)
+
 # 
 # # QAQC tasks
 # DFwithLog <- tmp_align(newDF,metaData,varNames = "TmpWtr,TmpDOs",dTPerctile = 0.2, wndSpdPerctile = 0.9, mkLog = TRUE)
@@ -28,4 +32,6 @@ newDF <- exclude_vars(myDF, metaData, varNames = c("pH","wndDir"))
 # DFwithLog <- Filter_stall(DFwithLog,metaData,filename = "Rotorua/Rotorua_vars.cnd", mkLog = TRUE)
 # lazyWrite(DFwithLog,metaData, writeLog = TRUE)
 # 
-# # not run
+# inside log write file use these
+# gsub("NA,", "", outLog, fixed = TRUE)
+# gsub(",NA", "", outLog, fixed = TRUE)# # not run

@@ -15,7 +15,19 @@ idElToModify <- function(DF_in, startDate, endDate, varNames){
   # if (missing(varNames)){
   #   varNames = "All"
   # }
-
+  
+  startDate <- as.POSIXct(
+    startDate,
+    origin = "1970-01-01 00:00:00",
+    tz = "Etc/GMT+12"
+    )  
+  
+  endDate <- as.POSIXct(
+    endDate,
+    origin = "1970-01-01 00:00:00",
+    tz = "Etc/GMT+12"
+  )
+  
   if (!is.na(startDate)) {
     
     # identify rows affected by the change
