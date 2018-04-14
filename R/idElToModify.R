@@ -1,0 +1,48 @@
+idElToModify <- function(DF_in, startDate, endDate, varNames){
+  # retun location information TF information of the data from the task information
+  # either taskDetails with full task information or character elements separated by spaces are required
+  #
+  # require startDate endDate taskDetails$Vars
+  #
+  # Usage
+  # outs <- idElToModify(DF_in, taskDetails)
+  #   rowLocs <- outs[[1]]
+  #   colLocs <- outs[[2]]
+  #
+  # outs <- idElToModify(DF_in, "tmp DO")
+  #   colLocs <- outs[[2]]
+  #
+  # if (missing(varNames)){
+  #   varNames = "All"
+  # }
+
+  if (!is.na(startDate)) {
+    
+    # identify rows affected by the change
+    delRows <- DF_in$DateTime >= startDate &
+      DF_in$DateTime <= endDate | 
+      is.na(DF_in$DateTime)
+    
+    # identify columns affected by the task
+    if (varNames == "All"){
+      delCols <- !grepl("DateTime",unlist(labels(DF_in)[2]))
+      
+    } else {
+      
+      # find vars applied and separate them (delimiter <- space)
+      colLabs <- unlist(as.character(varNames))
+      delCols <- grepl(paste(colLabs, collapse = "|"),unlist(labels(DF_in)[2]),ignore.case = TRUE)
+    }
+    
+  } else {
+    
+    # browser()
+    # when inputs are characters
+    delRows <- 0
+    
+    colLabs <- unlist(as.character(varNames))
+    delCols <- grepl(paste(colLabs, collapse = "|"),unlist(labels(DF_in)[2]),ignore.case = TRUE)
+  }
+  return(list(delRows,delCols))
+  
+} # end function
