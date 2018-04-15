@@ -64,7 +64,7 @@ filter_max <-  function(DF_in,  metaD, maxVal, varNames, startDate, endDate, cnd
   ######## end defaults ########
   
   ######## function ########
-  
+
   # list of variable names
   varList <- c("maxVal")
   

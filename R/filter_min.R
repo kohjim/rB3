@@ -13,7 +13,7 @@
 #' 
 #' 
 
-filter_max <-  function(DF_in,  metaD, minVal, varNames, startDate, endDate, cndFile, logID) {
+filter_min <-  function(DF_in,  metaD, minVal, varNames, startDate, endDate, cndFile, logID) {
   
   ######## log making 1 ######## 
   # check if DF is a list 
