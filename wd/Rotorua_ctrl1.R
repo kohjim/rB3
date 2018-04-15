@@ -18,7 +18,7 @@ newDF <- include_vars(myDF, metaData, varNames = c("tmp","do","wnd","pH"))
 newDF <- exclude_vars(myDF, metaData, varNames = c("pH","wndDir"))
 
 DFwithLog <- assign_na(myDF, metaD, startDate = "2007-01-01 00:00:00", endDate = "2009-07-01 00:00:00", varNames = "Tmp", logID = 1)
-DFwithLog <- assign_na(myDF, metaD, startDate = "2007-01-01 00:00:00", endDate = "2007-07-02 00:00:00", varNames = "Tmp", logID = 2)
+DFwithLog <- assign_na(DFwithLog, metaD, startDate = "2007-01-01 00:00:00", endDate = "2007-02-02 00:00:00", varNames = "Tmp", logID = 2)
 DFwithLog <- assign_na(DFwithLog, metaD, startDate = "2007-01-01 00:00:00", endDate = "2009-07-01 00:00:00", varNames = "Tmp", logID = 2)
 
 # 

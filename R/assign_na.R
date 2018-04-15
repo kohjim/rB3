@@ -13,28 +13,25 @@
 
 assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
   # This function removes data in specified dates. Require standard log file inputs.
-  #
-  # Example of log file
-  #
-  # [Label to apply], [function], [start date], [end date]
-  # All, Delete, 2007-08-29- 10:45:00, 2007-09-07- 11:15:00
-  # TmpWtr, Delete,2008-08-02- 19:00:00, 2008-08-02- 19:00:00 
-  #
-  
   #@  Chris McBride: chris@limnotrack.com , 2018-03-13  @#
   #@  Kohji Muraoka: kohji.muraoka@gmail.com @#
 
-  ######## check if DF is a list ######## 
+  ######## log making 1 ######## 
+  # check if DF is a list 
   # default: input log does not exist
+  
   log_exist <- FALSE
   inLog <- NULL
   
   if (!is.data.frame(DF_in)){
     inLog <- DF_in[[2]]
+    outLog <- inLog
     log_exist <- TRUE
     
     DF_in <- DF_in[[1]]
   }
+  ######## end log making 1 ######## 
+  
 
   ######## defaults ########
   if (missing(startDate)){
@@ -52,6 +49,8 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
   if (missing(logID)){
     logID <- NA
   }
+  ######## end defaults ########
+  
   
   ######## function ########
   # identify the elements in the array
@@ -64,48 +63,32 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
   
   # add NA to the elements
   DF_in[rowLocs,colLocs] <- NA
-
+  ######## end function ########
   
+  
+  ######## log making 2 ######## 
   if (!is.na(logID)){
     
     thisLog <- DF_in
     thisLog[,-1] <- NA
     thisLog[rowLocs,colLocs] <- logID
       
-    outLog <- mkLongLog(inLog,thisLog)
+    outLog <- mkLongLog(inLog,thisLog,logID)
     
-    # if (log_exist){
-    #   
-    #   browser()
-    #   
-    #   outLog <- inLog
-    #   outLog_NoDates <- outLog[,-1]
-    #   thisLog_NoDates <- thisLog[,-1]
-    #   
-    #   outLog_NoDates[!is.na(thisLog_NoDates)] <- 
-    #     paste(outLog_NoDates[!is.na(thisLog_NoDates)],
-    #           thisLog_NoDates[!is.na(thisLog_NoDates)],
-    #           sep=",")
-    #   
-    # } else {
-    #   
-    #   outLog <- thisLog
-    # }
   }
+  ######## end log making 2 ######## 
   
-  if (!is.na(logID)){
+  
+  ######## return with or without Log ########
+  if (!is.na(logID) | log_exist){
     
     return(list(DF_in,outLog))
-    
-  } else if (log_exist & is.na(logID)) {
-    
-    return(list(DF_in,inLog))
     
   } else {
     
     return(DF_in)
   }
-  
+  ######## end return with or without Log ########
   
   # gsub("NA,", "", outLog, fixed = TRUE)
   # gsub(",NA", "", outLog, fixed = TRUE)

@@ -5,29 +5,25 @@
 #' @import tidyr
 
 
-mkLongLog <- function(inLog,thisLog){
-  
-  browser()
+mkLongLog <- function(inLog, thisLog, logID){
+
   library(tidyr)
   
-  dfl <- gather(thisLog, key = var, 1,-DataTime)
+  thisLog_long <- gather(thisLog, key = varNames, value = thisLog, -DateTime)
   
-  # if (log_exist){
-  # 
-  #   browser()
-  # 
-  #   outLog <- inLog
-  #   outLog_NoDates <- outLog[,-1]
-  #   thisLog_NoDates <- thisLog[,-1]
-  # 
-  #   outLog_NoDates[!is.na(thisLog_NoDates)] <-
-  #     paste(outLog_NoDates[!is.na(thisLog_NoDates)],
-  #           thisLog_NoDates[!is.na(thisLog_NoDates)],
-  #           sep=",")
-  # 
-  # } else {
-  # 
-  #   outLog <- thisLog
-  # }
+  if (is.null(inLog)){
+    outLog <- thisLog_long
+    colnames(outLog)[3] <- logID
+    
+  } else {
+    outLog <- cbind(inLog,thisLog_long$thisLog)
+    colnames(outLog)[ncol(outLog)] <- logID
+  }
+  
+  return(outLog)
+  
+  # inside log write file use these
+  # gsub("NA,", "", outLog, fixed = TRUE)
+  # gsub(",NA", "", outLog, fixed = TRUE)# # not run
   
 }
