@@ -23,12 +23,12 @@ DFwithLog <- assign_na(DFwithLog, metaD, startDate = "2007-01-01 00:00:00", endD
 
 # 
 # # QAQC tasks
-DFwithLog <- tmp_align(DFwithLog,metaData,varNames = c("TmpWtr","TmpDOs"),dTPerctile = 0.2, wndSpdPerctile = 0.9, logID = 3)
-# DFwithLog <- Filter_max(DFwithLog,metaData,cndFile = "Rotorua/Rotorua_vars.cnd", mkLog = TRUE)
-# DFwithLog <- Filter_max(DFwithLog,metaData, maxVal = 18, varNames = Tmp, startDates = "2008-01-01 00:00:00", mkLog = TRUE)
+DFwithLog <- tmp_align(DFwithLog,metaD,varNames = c("TmpWtr","TmpDOs"),dTPerctile = 0.2, wndSpdPerctile = 0.9, logID = 4)
+DFwithLog <- filter_max(DFwithLog,metaD,cndFile = "Rotorua_vars.cnd", logID = 5)
+DFwithLog <- filter_max(DFwithLog,metaD, maxVal = 18, varNames = "Tmp", startDate = "2008-01-01 00:00:00", logID = 6)
 # lazyWrite(DFwithLog, writeLog = TRUE)
-# DFwithLog <- Filter_min(DFwithLog,metaData,cndFile = "Rotorua/Rotorua_vars.cnd", mkLog = TRUE)
-# DFwithLog <- Filter_min(DFwithLog,metaData,minVal = 12, varNames = Tmp, startDates = "2008-01-01 00:00:00", mkLog = TRUE)
-# DFwithLog <- Filter_stall(DFwithLog,metaData,filename = "Rotorua/Rotorua_vars.cnd", mkLog = TRUE)
+DFwithLog <- filter_min(DFwithLog,metaD,cndFile = "Rotorua_vars.cnd", logID = 7)
+DFwithLog <- filter_min(DFwithLog,metaD, minVal = 12, varNames = "Tmp", startDate = "2008-01-01 00:00:00", logID = 8)
+DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 9)
 # lazyWrite(DFwithLog,metaData, writeLog = TRUE)
 # 

@@ -30,6 +30,13 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
     
     DF_in <- DF_in[[1]]
   }
+  
+  if (missing(logID)){
+    logID <- NA
+  } else {
+    thisLog <- DF_in
+    thisLog[,-1] <- NA
+  }
   ######## end log making 1 ######## 
   
 
@@ -46,9 +53,6 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
     varArgs$Vars <- "All"
   }
   
-  if (missing(logID)){
-    logID <- NA
-  }
   ######## end defaults ########
   
   
@@ -68,13 +72,8 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
   
   ######## log making 2 ######## 
   if (!is.na(logID)){
-    
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
     thisLog[rowLocs,colLocs] <- logID
-      
     outLog <- mkLongLog(inLog,thisLog,logID)
-    
   }
   ######## end log making 2 ######## 
   

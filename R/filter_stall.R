@@ -1,52 +1,85 @@
-filter_stall <-  function(DF_in, taskInf) {
-  ######## import functions ########
-  source("modules/idElToModify.R")
-  source("modules/findModuleParams.R")
-  source("modules/readCndFile.R")
-  source("modules/mkTaskList.R")
+#' Assign NA to the specified dates range and variables
+#'
+#' This function assign NA to the specific dates range and variables
+#' 
+#' @param DF_in data frame input
+#' @param metaD metadata list
+#' @param startDate start date
+#' @param endDate endDate
+#' @param varNames list of variable names or keywords
+#' @keywords wrangling
+#' @export
+#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+
+filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID) {
+
+    ######## log making 1 ######## 
+  # check if DF is a list 
+  # default: input log does not exist
   
-  ######## makeVarsList ########
-  argNames <- c("StartDate","EndDate","VarNames","filename","numRepeats")
-  varArgs <- mkTaskList(taskInf,argNames,0)
-  varArgs$Vars <- varArgs$VarNames
-  varArgs$filename <- gsub(" ", "", varArgs$filename, fixed = TRUE)
-  # varArgs$Vars <- strsplit(as.character(varArgs$Vars),",")
+  log_exist <- FALSE
+  inLog <- NULL
+  
+  if (!is.data.frame(DF_in)){
+    inLog <- DF_in[[2]]
+    outLog <- inLog
+    log_exist <- TRUE
+    
+    DF_in <- DF_in[[1]]
+  } 
+  
+  if (missing(logID)){
+    logID <- NA
+  } else {
+    thisLog <- DF_in
+    thisLog[,-1] <- NA
+  }
+  ######## end log making 1 ######## 
+  
   
   ######## defaults ########
-  if (is.na(varArgs$StartDate)){
-    varArgs$StartDate <- DF_in$DateTime[1]
+  
+  if (missing(startDate)){
+    startDate <- DF_in$DateTime[1]
   }
   
-  if (is.na(varArgs$EndDate)){
-    varArgs$EndDate <- DF_in$DateTime[length(DF_in$DateTime)]
+  if (missing(endDate)){
+    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
   }
   
-  if (is.na(varArgs$Vars)){
-    varArgs$Vars <- "All"
+  if (missing(varNames)){
+    varNames <- "All"
   }
   
+  if (missing(cndFile)){
+    cndFile <- NULL
+  }
+  
+  if (missing(maxRep)){
+    maxRep <- NULL
+  }
+  
+  ######## end defaults ########
+
   ######## function ########
   # list of variable names
-  varList <- c("numRepeats") # number of points being stuck in the same number
+  varList <- c("maxRep") # number of points being stuck in the same number
   
   # col names for later use
   DFColNames <- colnames(DF_in[,])
-  
-  # get variables
-  # out <- findModuleParams(taskInf,"filename")
-  
-  if (!is.na(varArgs$filename)){
+
+  if (!is.null(cndFile)){
     isUseCndFile <- TRUE
-    condFilePath <- paste0("../data/",varArgs$filename)
+    condFilePath <- cndFile
     cnd <- readCndFile(condFilePath)
     
   } else {
     isUseCndFile <- FALSE
-    numRepeats <- varArgs$numRepeats
+    maxRep <- maxRep
   }
   
   # identify the elements in the array
-  outs.idElToModify <- idElToModify(DF_in, varArgs)
+  outs.idElToModify <- idElToModify(DF_in, startDate = startDate, endDate = endDate, varNames = varNames)
   
   # decompose the list
   # rowLocs <- outs.idElToModify[[1]]
@@ -68,21 +101,14 @@ filter_stall <-  function(DF_in, taskInf) {
       cndRowLocNum <- which(grepl(varList[1],rownames(cnd),ignore.case = TRUE))
       
       # identify conditions
-      numRepeats <- cnd[cndRowLocNum,cndColLocNum]
+      maxRep <- cnd[cndRowLocNum,cndColLocNum]
 
     } else {
 
     }
-    
-    
+
     ##### algorithm to identify repeats and remove ##### 
-    
-    ## DF for proof of concepts ##
-    # DF_in<- data.frame(ts = 1: 10, val = c(1,1,1,2,1,2,2,2,2,1)) 
-    # colLocsNums <- c(1,2) 
-    # i <- 2 
-    # numRepeats <- 3 
-    
+
     # DF_in column to modify
     thisDf <- data.frame(DF_in[,colLocsNums[i]])
     
@@ -97,7 +123,7 @@ filter_stall <-  function(DF_in, taskInf) {
                         neighbourComp, FUN=seq_along)
     
     # find repeats that exceeded use set max repeats
-    excessRepeatLocs <- which(repeatCounts >= numRepeats)
+    excessRepeatLocs <- which(repeatCounts >= maxRep)
     
     # identify all sequence locations that contains too many repeats
     thisDf$rowsToChange <- FALSE
@@ -110,9 +136,31 @@ filter_stall <-  function(DF_in, taskInf) {
     DF_in[thisDf$rowsToChange,colLocsNums[i]] <- NA
     
     rowLocs[,i] <- thisDf$rowsToChange[]
+    
+    ######## log making 2A ######## 
+    if (!is.na(logID)){
+      thisLog[thisDf$rowsToChange,colLocsNums[i]] <- logID
+    }
+    ######## end log making 2A ######## 
   }
 
   
-  return(list(DF_in,colLocs,rowLocs))
+  ######## log making 2B ######## 
+  if (!is.na(logID)){  
+    outLog <- mkLongLog(inLog,thisLog,logID)
+  }
+  ######## end log making 2B ######## 
+  
+  
+  ######## return with or without Log ########
+  if (!is.na(logID) | log_exist){
+    
+    return(list(DF_in,outLog))
+    
+  } else {
+    
+    return(DF_in)
+  }
+  ######## end return with or without Log ########
   
 } # end function

@@ -14,22 +14,6 @@
 tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID){
   # This function align temperature profiles by finding the times which are 
   # mixed and theoretically indicate identical temperatures
-  #
-  # Example of log file
-  #
-  # [Label to apply], [function], [start date], [end date]
-  # TmpWtr, Align, 2007-08-29- 10:45:00, 2007-09-07- 11:15:00
-  #
-  # browser()
-  # ######## import functions ########
-  # source("modules/idElToModify.R")
-  # source("modules/findModuleParams.R")
-  # source("modules/mkTaskList.R")
-  
-  # ######## makeVarsList ########
-  # argNames <- c("startDate","endDate","varNames","dTPerctile","wndSpdPerctile")
-  # varArgs <- mkTaskList(taskDetails,argNames,0)
-  # varArgs$Vars <- varArgs$varNames
   
   ######## log making 1 ######## 
   # check if DF is a list 
@@ -45,6 +29,14 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
     
     DF_in <- DF_in[[1]]
   }
+  
+  if (missing(logID)){
+    logID <- NA
+  } else {
+    thisLog <- DF_in
+    thisLog[,-1] <- NA
+  }
+  
   ######## end log making 1 ######## 
   
   ######## defaults ########
@@ -59,6 +51,8 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
   if (missing(varNames)){
     varNames <- "TmpWtr"
   }
+  
+  ######## end defaults ########
   
   ######## function ########
   # identify the elements in the array
@@ -172,13 +166,8 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
   
   ######## log making 2 ######## 
   if (!is.na(logID)){
-    
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
     thisLog[rowLocs,colLocs] <- logID
-    
     outLog <- mkLongLog(inLog,thisLog,logID)
-    
   }
   ######## end log making 2 ######## 
   
