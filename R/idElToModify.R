@@ -27,7 +27,7 @@ idElToModify <- function(DF_in, startDate, endDate, varNames){
     origin = "1970-01-01 00:00:00",
     tz = "Etc/GMT+12"
   )
-  
+
   if (!is.na(startDate)) {
     
     # identify rows affected by the change

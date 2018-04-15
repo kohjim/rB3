@@ -1,4 +1,17 @@
-tmp_align <- function(DF_in, taskDetails){
+#' Automatically remove cross thermister observation difference
+#'
+#' This function assign NA to the specific dates range and variables
+#' 
+#' @param DF_in data frame input
+#' @param metaD metadata list
+#' @param startDate start date
+#' @param endDate endDate
+#' @param varNames list of variable names or keywords
+#' @keywords wrangling
+#' @export
+#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+
+tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID){
   # This function align temperature profiles by finding the times which are 
   # mixed and theoretically indicate identical temperatures
   #
@@ -8,41 +21,56 @@ tmp_align <- function(DF_in, taskDetails){
   # TmpWtr, Align, 2007-08-29- 10:45:00, 2007-09-07- 11:15:00
   #
   # browser()
-  ######## import functions ########
-  source("modules/idElToModify.R")
-  source("modules/findModuleParams.R")
-  source("modules/mkTaskList.R")
+  # ######## import functions ########
+  # source("modules/idElToModify.R")
+  # source("modules/findModuleParams.R")
+  # source("modules/mkTaskList.R")
   
-  ######## makeVarsList ########
-  argNames <- c("StartDate","EndDate","VarNames","dTPerctile","wndSpdPerctile")
-  varArgs <- mkTaskList(taskDetails,argNames,0)
-  varArgs$Vars <- varArgs$VarNames
+  # ######## makeVarsList ########
+  # argNames <- c("startDate","endDate","varNames","dTPerctile","wndSpdPerctile")
+  # varArgs <- mkTaskList(taskDetails,argNames,0)
+  # varArgs$Vars <- varArgs$varNames
   
+  ######## log making 1 ######## 
+  # check if DF is a list 
+  # default: input log does not exist
+
+  log_exist <- FALSE
+  inLog <- NULL
+  
+  if (!is.data.frame(DF_in)){
+    inLog <- DF_in[[2]]
+    outLog <- inLog
+    log_exist <- TRUE
+    
+    DF_in <- DF_in[[1]]
+  }
+  ######## end log making 1 ######## 
   
   ######## defaults ########
-  if (is.na(varArgs$StartDate)){
-    varArgs$StartDate <- DF_in$DateTime[1]
+  if (missing(startDate)){
+    startDate <- DF_in$DateTime[1]
   }
   
-  if (is.na(varArgs$EndDate)){
-    varArgs$EndDate <- DF_in$DateTime[length(DF_in$DateTime)]
+  if (missing(endDate)){
+    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
   }
   
-  if (is.na(varArgs$Vars)){
-    varArgs$Vars <- "TmpWtr"
+  if (missing(varNames)){
+    varNames <- "TmpWtr"
   }
   
   ######## function ########
   # identify the elements in the array
-  outs.idElToModify <- idElToModify(DF_in, varArgs)
+  outs.idElToModify <- idElToModify(DF_in, startDate, endDate, varNames)
   
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   colLocs <- outs.idElToModify[[2]]
   
-  if (!is.na(varArgs$wndSpdPerctile)){ # with wind
+  if (!missing(wndSpdPerctile)){ # with wind
     # wind location
-    outs.idElToModify <- idElToModify(DF_in, as.data.frame("wndspd"))
+    outs.idElToModify <- idElToModify(DF_in, startDate, endDate, varNames = c("wndspd"))
     wndLocs <- outs.idElToModify[[2]]
     
     # assign data
@@ -70,8 +98,8 @@ tmp_align <- function(DF_in, taskDetails){
     # differences with over 90 percentile wind events
     #  (locs in dataLocs1 vector)
     mixedLocs_in_dataLocs1 <- which(
-      dTemps < quantile(dTemps, probs = as.numeric(varArgs$dTPerctile)) &
-        goodWspd > quantile(goodWspd, probs = as.numeric(varArgs$wndSpdPerctile))
+      dTemps < quantile(dTemps, probs = as.numeric(dTPerctile)) &
+        goodWspd > quantile(goodWspd, probs = as.numeric(wndSpdPerctile))
     )
     
   } else { # without wind
@@ -98,7 +126,7 @@ tmp_align <- function(DF_in, taskDetails){
     # differences with over 90 percentile wind events
     #  (locs in dataLocs1 vector)
     mixedLocs_in_dataLocs1 <- which(
-      dTemps < quantile(dTemps, probs = varArgs$dTPerctile)
+      dTemps < quantile(dTemps, probs = dTPerctile)
     )
   }
   
@@ -122,7 +150,7 @@ tmp_align <- function(DF_in, taskDetails){
     # satisfy both mixedLocs and noNALocs (locs in the original vector)
     locsToMakeModel <- intersect(mixedLocs, noNALocs)
     
-    if (!is_empty(locsToMakeModel)){
+    if (!is.integer(locsToMakeModel)){
       # satisfy both mixedLocs and noNALocs
       # goodTempToModel <- thisTemp_bak[intersect(mixedLocs, noNALocs)]
       
@@ -139,6 +167,31 @@ tmp_align <- function(DF_in, taskDetails){
   
   DF_in[rowLocs,colLocs] <- Temps
   
-  return(list(DF_in,colLocs,rowLocs))
+  ######## end function ######## 
+  
+  
+  ######## log making 2 ######## 
+  if (!is.na(logID)){
+    
+    thisLog <- DF_in
+    thisLog[,-1] <- NA
+    thisLog[rowLocs,colLocs] <- logID
+    
+    outLog <- mkLongLog(inLog,thisLog,logID)
+    
+  }
+  ######## end log making 2 ######## 
+  
+  
+  ######## return with or without Log ########
+  if (!is.na(logID) | log_exist){
+    
+    return(list(DF_in,outLog))
+    
+  } else {
+    
+    return(DF_in)
+  }
+  ######## end return with or without Log ########
   
 } # end function
