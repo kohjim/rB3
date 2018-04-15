@@ -1,3 +1,5 @@
+#' @export
+
 bobs2df <- function(filePath,metaD,useHydroYear){
   
   DF_in <-

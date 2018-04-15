@@ -1,3 +1,5 @@
+#' @export
+
 include_dates <-  function(DF_in, metaD, startDate, endDate) {
 
   ######## defaults ########

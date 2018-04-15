@@ -1,3 +1,5 @@
+#' @export
+
 readCndFile <- function(condFilePath){
   # read csv file which contains variable specific condition files
   # condFilePath should be relative to the wrapper file (Run_ file)

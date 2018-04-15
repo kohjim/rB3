@@ -3,13 +3,11 @@
 #' This function assign NA to the specific dates range and variables
 #' 
 #' @import tidyr
-
+#' @export
 
 mkLongLog <- function(inLog, thisLog, logID){
-
-  library(tidyr)
   
-  thisLog_long <- gather(thisLog, key = varNames, value = thisLog, -DateTime)
+  thisLog_long <- tidyr::gather(thisLog, key = varNames, value = thisLog, -DateTime)
   
   if (is.null(inLog)){
     outLog <- thisLog_long
