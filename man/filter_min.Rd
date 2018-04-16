@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_min.R
 \name{filter_min}
 \alias{filter_min}
-\title{Assign NA to the specified dates range and variables}
+\title{Remove small values}
 \usage{
 filter_min(DF_in, metaD, minVal, varNames, startDate, endDate, cndFile, logID)
 }
@@ -11,14 +11,20 @@ filter_min(DF_in, metaD, minVal, varNames, startDate, endDate, cndFile, logID)
 
 \item{metaD}{metadata list}
 
+\item{minVal}{minimum value permitted}
+
 \item{varNames}{list of variable names or keywords}
 
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
+
+\item{cndFile}{conditoin file path}
+
+\item{logID}{assign log ID}
 }
 \description{
-This function assign NA to the specific dates range and variables
+This function assign NA to the data smaller than the assigned minVal
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

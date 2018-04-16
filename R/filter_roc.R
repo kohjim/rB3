@@ -1,19 +1,21 @@
 #' Find values' rate of change exceeded maxRoc value and assign NA
 #'
 #' This function assign NA to the specific dates range and variables
-#' 
+
+#' @export
 #' @param DF_in data frame input
 #' @param metaD metadata list
+#' @param maxRoc rate of change per timestep
 #' @param startDate start date
-#' @param endDate endDate
+#' @param endDate end date
 #' @param varNames list of variable names or keywords
+#' @param cndFile condition file path
 #' @keywords wrangling
-#' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @examples newDF <- maxRoc(myDF,metaData,varNames = c("pH","wndDir"))
 #' 
 #' 
 
-maxRoc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cndFile, logID) {
+filter_roc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cndFile, logID) {
   
   ######## log making 1 ######## 
   # check if DF is a list 
@@ -65,7 +67,7 @@ maxRoc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cndFile
   
   ######## function ########
 
-  # list of variable names
+  # list of variable names in the cond file 
   varList <- c("maxRoc")
   
   # col names for later use

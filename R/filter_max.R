@@ -1,14 +1,17 @@
-#' Assign NA to the specified dates range and variables
+#' Remove large values
 #'
-#' This function assign NA to the specific dates range and variables
+#' This function assign NA to the data larger than the assigned maxVal
 #' 
+#' @export
 #' @param DF_in data frame input
 #' @param metaD metadata list
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
+#' @param minVal minimum value permitted
+#' @param cndFile conditoin file path
+#' @param logID assign log ID
 #' @keywords wrangling
-#' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 #' 
 #' 

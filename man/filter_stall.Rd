@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_stall.R
 \name{filter_stall}
 \alias{filter_stall}
-\title{Assign NA to the specified dates range and variables}
+\title{Remove repeated values}
 \usage{
 filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID)
 }
@@ -16,11 +16,19 @@ filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID)
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
+
+\item{cndFile}{conditoin file path}
+
+\item{logID}{assign log ID}
+
+\item{minVal}{minimum value permitted}
 }
 \description{
-This function assign NA to the specific dates range and variables
+This function assign NA to the repeated data more than maxRep times continuous
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+
+
 }
 \keyword{wrangling}

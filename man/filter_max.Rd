@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_max.R
 \name{filter_max}
 \alias{filter_max}
-\title{Assign NA to the specified dates range and variables}
+\title{Remove large values}
 \usage{
 filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID)
 }
@@ -16,9 +16,15 @@ filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID)
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
+
+\item{cndFile}{conditoin file path}
+
+\item{logID}{assign log ID}
+
+\item{minVal}{minimum value permitted}
 }
 \description{
-This function assign NA to the specific dates range and variables
+This function assign NA to the data larger than the assigned maxVal
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
