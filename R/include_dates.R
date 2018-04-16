@@ -1,4 +1,16 @@
+#' include_dates - define date ranges
+#'
+#' Specify dates to include in the later tasks. Outside of these dates are removed from the data
+#' 
 #' @export
+#' @param DF_in data frame input
+#' @param metaD metadata list
+#' @param startDate start date
+#' @param endDate endDate
+#' @keywords wrangling
+#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' 
+#' 
 
 include_dates <-  function(DF_in, metaD, startDate, endDate) {
 

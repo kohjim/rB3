@@ -1,3 +1,16 @@
+#' Identify elements locations for the specified variable and dates ranges
+#'
+#' This sub-function identifies elements of the data frame that satisfies dates range and/or variable names,
+#' 
+#' @export
+#' @param DF_in data frame input
+#' @param metaD metadata list
+#' @param startDate start date
+#' @param endDate endDate
+#' @keywords wrangling
+#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' 
+
 idElToModify <- function(DF_in, startDate, endDate, varNames){
   # retun location information TF information of the data from the task information
   # either taskDetails with full task information or character elements separated by spaces are required

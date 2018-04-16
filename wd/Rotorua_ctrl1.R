@@ -1,4 +1,4 @@
-# not run
+
 setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd")
 
 library(devtools)
@@ -32,5 +32,4 @@ lazyWriter(DFwithLog, fileName = "Rotorua_intermediate.bobs", logName = "Rotorua
 DFwithLog <- filter_min(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 7)
 DFwithLog <- filter_min(DFwithLog, metaD, minVal = 12, varNames = "Tmp", startDate = "2008-01-01 00:00:00", logID = 8)
 DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 9)
-# lazyWrite(DFwithLog,metaData, writeLog = TRUE)
-# 
+
