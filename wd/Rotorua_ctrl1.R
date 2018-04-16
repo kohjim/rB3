@@ -13,11 +13,14 @@ metaD <- list(lakeName = "Rotorua",lat = -38.4, lon = 176, timestep = 15)
 myDF <- bobs2df("Rotorua_200707-201712_RAW_R.bobs",metaD, useHydroYear = TRUE)
 
 ###### visual assistance ###### 
-shinyOut <- shinyView(myDF,varNames = "02050")
-shiny::shinyApp(ui = shinyOut[[1]], server = shinyOut[[2]])
+shinySetOut <- shinySet(myDF, varNames = "02050")
+shiny::shinyApp(ui = shinySetOut[[1]], server = shinySetOut[[2]])
 
-shinyOut <- shinyView(myDF,varNames = "wndspd")
-shiny::shinyApp(ui = shinyOut[[1]], server = shinyOut[[2]])
+shinySetOut <- shinySet(myDF, colNum = 15)
+shiny::shinyApp(ui = shinySetOut[[1]], server = shinySetOut[[2]])
+
+shinySetOut <- shinySet_nogg(myDF, colNum = 15,startDate = "2010/1/1")
+shiny::shinyApp(ui = shinySetOut[[1]], server = shinySetOut[[2]])
 ###### visual assistance ###### 
 
 # data wrangling

@@ -6,11 +6,13 @@
 #' @param DF_in data frame input
 #' @param startDate start date
 #' @param endDate endDate
+#' @param varNames name of the variable
+#' @param colNum location of the column
 #' @keywords wrangling
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 #' 
 
- shinyOut <- shinyView <- function(DF_in, startDate, endDate, varNames){
+shinySet <- function(DF_in, startDate, endDate, varNames, colNum){
   
   ######## log making 1 ######## 
   # check if DF is a list 
@@ -43,11 +45,19 @@
     varNames <- NULL
   }
   
+  if (missing(colNum)){
+    colNum <- NULL
+  }
+  
   ######## end defaults ########
   
   
   ######## function ######## 
   # identify the elements in the array
+  if (is.null(varNames)){
+    varNames <- colnames(DF_in[colNum])
+  }
+  
   outs.idElToModify <- idElToModify(DF_in, startDate = startDate, endDate = endDate, varNames = varNames)
   
   # decompose the list
@@ -73,9 +83,37 @@
   )
   
   server <- function(input, output) {
+    ranges <- reactiveValues(x = NULL, y = NULL)
+    
     output$plot1 <- shiny::renderPlot({
-      plot(DF_plot,type = "l") 
+      # plot(DF_plot, type = "p")
+      ggplot2::ggplot(DF_plot, ggplot2::aes(DF_plot[,1], DF_plot[,-1])) +
+        ggplot2::geom_point() +
+        ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
     })
+    
+    shiny::observeEvent(input$plot_dblclick, 
+                        {
+                          brush <- input$plot_brush
+                          if (!is.null(brush)) {
+                            ranges$x <- c(
+                              as.POSIXct(round(brush$xmin, 1),
+                                         origin = "1970-01-01 00:00:00",
+                                         format = "%Y-%m-%d %H:%M:%S",
+                                         tz = "Etc/GMT+12"),
+                              as.POSIXct(round(brush$xmax, 1),
+                                         origin = "1970-01-01 00:00:00",
+                                         format = "%Y-%m-%d %H:%M:%S",
+                                         tz = "Etc/GMT+12")
+                              )
+                            ranges$y <- c(brush$ymin, brush$ymax)
+                            
+                          } else {
+                            ranges$x <- NULL
+                            ranges$y <- NULL
+                          }
+                        }
+    )
     
     output$info <- shiny::renderText({
       xy_str <- function(e) {
@@ -89,33 +127,35 @@
                round(e$y, 1),
                "\n")
       }
+      
       xy_range_str <- function(e) {
         if(is.null(e)) return("NULL\n")
-        paste0("xmin = ",
+        paste0("     xmin = ",
                as.POSIXct(round(e$xmin, 1),
                           origin = "1970-01-01 00:00:00",
                           format = "%Y-%m-%d %H:%M:%S",
                           tz = "Etc/GMT+12"),
-               " | xmax = ",
+               " | ymin = ",
+               round(e$ymin, 1),
+               "\n",
+               "     xmax = ",
                as.POSIXct(round(e$xmax, 1),
                           origin = "1970-01-01 00:00:00",
                           format = "%Y-%m-%d %H:%M:%S",
                           tz = "Etc/GMT+12"), 
-               " | ymin = ",
-               round(e$ymin, 1),
                " | ymax = ",
                round(e$ymax, 1))
       }
       
       paste0(
-        "click: ", xy_str(input$plot_click),
-        "dblclick: ", xy_str(input$plot_dblclick),
-        "brush: ", xy_range_str(input$plot_brush)
+        "Click: ", xy_str(input$plot_click),
+        "Double Click: ", xy_str(input$plot_dblclick),
+        "Rectangle: \n", xy_range_str(input$plot_brush)
       )
     })
   }
-
-  shiny::shinyApp(ui = ui, server = server)
+  
+  # shiny::shinyApp(ui = ui, server = server)
   
   return(list(ui,server,DF_plot))
   ######## end Shiny ######## 
