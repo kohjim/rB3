@@ -97,16 +97,17 @@ shinySet <- function(DF_in, startDate, endDate, varNames, colNum){
                           brush <- input$plot_brush
                           if (!is.null(brush)) {
                             ranges$x <- c(
-                              as.POSIXct(round(brush$xmin, 1),
+                              as.POSIXct(round(brush$xmin - (brush$xmax-brush$xmin)*0.05, 1),
                                          origin = "1970-01-01 00:00:00",
                                          format = "%Y-%m-%d %H:%M:%S",
                                          tz = "Etc/GMT+12"),
-                              as.POSIXct(round(brush$xmax, 1),
+                              as.POSIXct(round(brush$xmax + (brush$xmax-brush$xmin)*0.05, 1),
                                          origin = "1970-01-01 00:00:00",
                                          format = "%Y-%m-%d %H:%M:%S",
                                          tz = "Etc/GMT+12")
                               )
-                            ranges$y <- c(brush$ymin, brush$ymax)
+                            ranges$y <- c(brush$ymin - (brush$ymax - brush$ymin)*0.05,
+                                          brush$ymax + (brush$ymax - brush$ymin)*0.05)
                             
                           } else {
                             ranges$x <- NULL
