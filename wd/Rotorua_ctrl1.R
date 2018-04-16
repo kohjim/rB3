@@ -12,6 +12,14 @@ metaD <- list(lakeName = "Rotorua",lat = -38.4, lon = 176, timestep = 15)
 # import data file
 myDF <- bobs2df("Rotorua_200707-201712_RAW_R.bobs",metaD, useHydroYear = TRUE)
 
+###### visual assistance ###### 
+shinyOut <- shinyView(myDF,varNames = "02050")
+shiny::shinyApp(ui = shinyOut[[1]], server = shinyOut[[2]])
+
+shinyOut <- shinyView(myDF,varNames = "wndspd")
+shiny::shinyApp(ui = shinyOut[[1]], server = shinyOut[[2]])
+###### visual assistance ###### 
+
 # data wrangling
 newDF <- include_dates(myDF,metaData,startDate = "2008-01-01 00:00:00")
 newDF <- include_vars(myDF, metaData, varNames = c("tmp","do","wnd","pH"))
