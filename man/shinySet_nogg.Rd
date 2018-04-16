@@ -18,7 +18,7 @@ shinySet_nogg(DF_in, startDate, endDate, varNames, colNum)
 \item{colNum}{location of the column}
 }
 \description{
-Plot single timeseries and return x and y informatoin in response to clicks
+Plot single timeseries and return x and y informatoin in response to clicks. No ggplot. No zooming.
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

@@ -1,6 +1,6 @@
 #' shiny plot - visually assist data transformation information
 #'
-#' Plot single timeseries and return x and y informatoin in response to clicks
+#' Plot single timeseries and return x and y informatoin in response to clicks. Use ggplot. Can zoom in.
 #' 
 #' @export
 #' @param DF_in data frame input
