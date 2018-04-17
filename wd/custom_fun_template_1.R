@@ -1,4 +1,4 @@
-#' Custom fun: convert DOsat -> DOmg
+#' Custom fun: template 1
 #'
 #' This custom function converts DOsat and temperature to DOmg
 #' 
@@ -6,17 +6,14 @@
 #' @param DF_in data frame input
 #' @param startDate start date
 #' @param endDate endDate
-#' @param DOmgColName column name of DOmg
-#' @param DOsatColName column name of DOsat
-#' @param TColName column name of TCOl
+#' @param varNames variable names or keywords
 #' @param logID assign log ID
 #' @param plotPath plot figure of before and after
 #' @keywords wrangling
 #' @examples newDF <- DOsat2DOmg_ZebraTechDOpto(DF_in = myDF,DOmgColName = "DOconc_d00050", DOsatColName = "DOpsat_d00050", TColName = "TmpDOs_d00050")
 #' 
 #' 
-
-DOsat2DOmg_ZebraTechDOpto <- function(DF_in,startDate,endDate,DOmgColName, DOsatColName, TColName, logID, plotPath){
+custom_fun_template_1 <- function(DF_in,metaD,startDate,endDate,varNames,logID,plotPath){
   
   ######## log making 1 ######## 
   # check if DF is a list (i.e. with log)
@@ -33,7 +30,7 @@ DOsat2DOmg_ZebraTechDOpto <- function(DF_in,startDate,endDate,DOmgColName, DOsat
     DF_in <- DF_in[[1]]
   }
   
-  DF_bak <- DF_in
+  DF_bak <- DF_in # to be used in plotDiff
   
   if (missing(logID)){
     logID <- NA
@@ -42,7 +39,6 @@ DOsat2DOmg_ZebraTechDOpto <- function(DF_in,startDate,endDate,DOmgColName, DOsat
     thisLog[,-1] <- NA
   }
   ######## end log making 1 ######## 
-  
   
   ######## set defaults ######## 
   if (missing(startDate)){
@@ -53,68 +49,50 @@ DOsat2DOmg_ZebraTechDOpto <- function(DF_in,startDate,endDate,DOmgColName, DOsat
     endDate <- DF_in$DateTime[length(DF_in$DateTime)]
   }
   
-  if (missing(plotPath)){
-    plotPath <- NULL
+  if (missing(varNames)){
+    varNames <- "All"
   }
+  
   ######## end set defaults ######## 
   
   
-  ######## identify locs ######## 
-  # idElToModify does not care about the order so require running three times individually
-  # DO mg
-  outs.idElToModify <- idElToModify(
-    DF_in, 
-    startDate = startDate, 
-    endDate = endDate, 
-    varNames = c(DOmgColName)
-    )
+  
+  ######## find elements to modify ######## 
+  
+  outs.idElToModify <- idElToModify(DF_in,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    varNames = varNames)
+  # decompose the list
+  rowLocs <- outs.idElToModify[[1]]
+  rowLocsNums <- which(rowLocs)
   colLocs <- outs.idElToModify[[2]]
-  DOmgColLoc <- which(colLocs)
+  colLocsNums <- which(colLocs)
   
-  # DO sat
-  outs.idElToModify <- idElToModify(
-    DF_in, 
-    startDate = startDate, 
-    endDate = endDate, 
-    varNames = c(DOsatColName)
-  )
-  colLocs <- outs.idElToModify[[2]]
-  DOsatColLoc <- which(colLocs)
-  DOsat <- DF_in[,DOsatColLoc]
-  
-  # temperature
-  outs.idElToModify <- idElToModify(
-    DF_in, 
-    startDate = startDate, 
-    endDate = endDate, 
-    varNames = c(TColName)
-  )
-  colLocs <- outs.idElToModify[[2]]
-  TColLoc <- which(colLocs)
-  t <- DF_in[,TColLoc]
-  
-  ######## end identify locs ######## 
+  ######## find elements to modify ######## 
   
   
-  ######## conversion ######## 
-  DF_in[,DOmgColLoc] <- 
-    (exp(-139.34411+
-           ((157570.1*(1/( t +273.15)))+
-              (-66423080*((1/( t +273.15))^2))+
-              (12438000000*((1/( t +273.15))^3))+
-              (-862194900000*((1/( t +273.15))^4)))
-        )
-    ) * DOsat *0.01
-  ######## end conversion ######## 
+  
+  ########          ########
+  ######## function ######## 
+
+  # write function here
+  
+  
+  
+ 
+  ######## end function ######## 
+  ########              ########
+  
   
   
   ######## save plot diff ######## 
   if (!is.null(plotPath)){  
     plotDiff(DF_bak, DF_in,
-             colNum = DOmgColLoc,
+             colNum = colLocsNums,
              plotPath = plotPath,
              custom_dpi = 150,
-             taskName = "DOsat2DOmg")
+             taskName = "taskName")   ######### Change name here (figure's title will contain this info)
   }
   ######## save plot diff ######## 
   
