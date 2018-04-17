@@ -18,7 +18,7 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
   
   ########## defaults ##########
   if (missing(varNames) & missing(colNum)){
-    varNames <- "All"
+    colNum <- c(2:length(DF_pre))
   } else if (missing(colNum)){
     outs.idElToModify <- idElToModify(DF_pre, varNames = varNames)
     colLocs <- outs.idElToModify[[2]]

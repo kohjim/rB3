@@ -46,4 +46,5 @@ DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID 
 
 ## with plot diff
 DFwithLog <- filter_min(myDF, metaD, cndFile = "Rotorua_vars.cnd", logID = 7, plotPath = "filter_min")
+plotDiff(myDF, DFwithLog[[1]], plotPath = "allChanges", custom_dpi = 150)
 ##

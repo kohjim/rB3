@@ -11,7 +11,7 @@ idElToModify(DF_in, startDate, endDate, varNames)
 
 \item{startDate}{start date}
 
-\item{endDate}{endDate}
+\item{endDate}{end date}
 
 \item{metaD}{metadata list}
 }
