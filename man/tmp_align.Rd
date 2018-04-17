@@ -5,7 +5,7 @@
 \title{Automatically remove cross thermister observation difference}
 \usage{
 tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile,
-  wndSpdPerctile, logID)
+  wndSpdPerctile, logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

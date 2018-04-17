@@ -11,6 +11,7 @@
 #' @param minVal minimum value permitted
 #' @param cndFile conditoin file path
 #' @param logID assign log ID
+#' @param plotPath plot figure of before and after
 #' @keywords wrangling
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 #' 

@@ -1,5 +1,12 @@
 
+# import custom functions from customFun folder
+#     DOsat2DOmg_ZebraTechDOpto.R
+#     [WRC_plot.R]?
+setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd/customFun")
+lapply(list.files(pattern = "[.]R$", recursive = TRUE), source)
+
 setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd")
+
 
 library(devtools)
 
@@ -48,3 +55,7 @@ DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID 
 DFwithLog <- filter_min(myDF, metaD, cndFile = "Rotorua_vars.cnd", logID = 7, plotPath = "filter_min")
 plotDiff(myDF, DFwithLog[[1]], plotPath = "allChanges", custom_dpi = 150)
 ##
+
+
+## DO conv
+newDF <- DOsat2DOmg_ZebraTechDOpto(DF_in = myDF,DOmgColName = "DOconc_d00050", DOsatColName = "DOpsat_d00050", TColName = "TmpDOs_d00050")

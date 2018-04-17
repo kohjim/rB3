@@ -4,7 +4,8 @@
 \alias{filter_max}
 \title{Remove large values}
 \usage{
-filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID)
+filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID,
+  plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}
@@ -20,6 +21,8 @@ filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID)
 \item{cndFile}{conditoin file path}
 
 \item{logID}{assign log ID}
+
+\item{plotPath}{plot figure of before and after}
 
 \item{minVal}{minimum value permitted}
 }

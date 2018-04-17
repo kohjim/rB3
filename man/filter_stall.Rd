@@ -4,7 +4,8 @@
 \alias{filter_stall}
 \title{Remove repeated values}
 \usage{
-filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID)
+filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID,
+  plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}
@@ -20,6 +21,8 @@ filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID)
 \item{cndFile}{conditoin file path}
 
 \item{logID}{assign log ID}
+
+\item{plotPath}{plot figure of before and after}
 
 \item{minVal}{minimum value permitted}
 }

@@ -10,6 +10,7 @@
 #' @param endDate end date
 #' @param varNames list of variable names or keywords
 #' @param cndFile condition file path
+#' @param plotPath plot figure of before and after
 #' @keywords wrangling
 #' @examples newDF <- maxRoc(myDF,metaData,varNames = c("pH","wndDir"))
 #' 

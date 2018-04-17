@@ -4,7 +4,7 @@
 \alias{assign_na}
 \title{Assign NA to the specified dates range and variables}
 \usage{
-assign_na(DF_in, metaD, startDate, endDate, varNames, logID)
+assign_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}
@@ -16,6 +16,8 @@ assign_na(DF_in, metaD, startDate, endDate, varNames, logID)
 \item{endDate}{endDate}
 
 \item{varNames}{list of variable names or keywords}
+
+\item{plotPath}{plot figure of before and after}
 }
 \description{
 This function assign NA to the specific dates range and variables

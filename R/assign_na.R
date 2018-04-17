@@ -7,6 +7,7 @@
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
+#' @param plotPath plot figure of before and after
 #' @keywords wrangling
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

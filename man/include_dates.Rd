@@ -4,7 +4,7 @@
 \alias{include_dates}
 \title{include_dates - define date ranges}
 \usage{
-include_dates(DF_in, metaD, startDate, endDate)
+include_dates(DF_in, metaD, startDate, endDate, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

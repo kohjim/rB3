@@ -4,7 +4,8 @@
 \alias{filter_roc}
 \title{Find values' rate of change exceeded maxRoc value and assign NA}
 \usage{
-filter_roc(DF_in, metaD, maxRoc, varNames, startDate, endDate, cndFile, logID)
+filter_roc(DF_in, metaD, maxRoc, varNames, startDate, endDate, cndFile, logID,
+  plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}
@@ -20,6 +21,8 @@ filter_roc(DF_in, metaD, maxRoc, varNames, startDate, endDate, cndFile, logID)
 \item{endDate}{end date}
 
 \item{cndFile}{condition file path}
+
+\item{plotPath}{plot figure of before and after}
 }
 \description{
 This function assign NA to the specific dates range and variables

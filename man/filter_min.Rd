@@ -23,6 +23,8 @@ filter_min(DF_in, metaD, minVal, varNames, startDate, endDate, cndFile, logID,
 \item{cndFile}{conditoin file path}
 
 \item{logID}{assign log ID}
+
+\item{plotPath}{plot figure of before and after}
 }
 \description{
 This function assign NA to the data smaller than the assigned minVal
