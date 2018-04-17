@@ -57,7 +57,7 @@ shinySet <- function(DF_in, startDate, endDate, varNames, colNum){
   if (is.null(varNames)){
     varNames <- colnames(DF_in[colNum])
   }
-  
+
   outs.idElToModify <- idElToModify(DF_in, startDate = startDate, endDate = endDate, varNames = varNames)
   
   # decompose the list

@@ -6,7 +6,7 @@
 #' @param DF_in data frame input
 #' @param metaD metadata list
 #' @param startDate start date
-#' @param endDate endDate
+#' @param endDate end date
 #' @keywords wrangling
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 #' 
@@ -44,10 +44,10 @@ idElToModify <- function(DF_in, startDate, endDate, varNames){
   if (!is.na(startDate)) {
     
     # identify rows affected by the change
-    delRows <- DF_in$DateTime >= startDate &
-      DF_in$DateTime <= endDate | 
+    delRows <- (DF_in$DateTime >= startDate &
+      DF_in$DateTime <= endDate) | 
       is.na(DF_in$DateTime)
-    
+
     # identify columns affected by the task
     if (varNames == "All"){
       delCols <- !grepl("DateTime",unlist(labels(DF_in)[2]))
