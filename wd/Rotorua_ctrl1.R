@@ -47,7 +47,7 @@ DFwithLog <- filter_max(DFwithLog, metaD, maxVal = 18, varNames = "Tmp", startDa
 
 lazyWriter(DFwithLog, fileName = "Rotorua_intermediate.bobs", logName = "Rotorua_log.RData")
 
-DFwithLog <- filter_min(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 7)
+DFwithLog <- filter_min(myDF, metaD, cndFile = "Rotorua_vars.cnd", logID = 7)
 DFwithLog <- filter_min(DFwithLog, metaD, minVal = 12, varNames = "Tmp", startDate = "2008-01-01 00:00:00", logID = 8)
 DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 9)
 

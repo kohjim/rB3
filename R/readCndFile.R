@@ -1,6 +1,11 @@
+#' read .cnd file
+#'
+#' This sub-function read .cnd file for different condition settings for each variables.
+#' @param condFilePath condition file path (filename)
+#' @param rowNameList what variables to read. c("Variables",...)
 #' @export
 
-readCndFile <- function(condFilePath){
+readCndFile <- function(condFilePath,rowNameList){
   # read csv file which contains variable specific condition files
   # condFilePath should be relative to the wrapper file (Run_ file)
   
@@ -12,16 +17,18 @@ readCndFile <- function(condFilePath){
                           sep = ",")
   
   # accepted row names 
-  rowNameList <- c("Variables",
-                   "Plot_labels", 
-                   "maxVal", 
-                   "minVal", 
-                   "Filter_RoC", 
-                   "maxRep", 
-                   "Filter_outlier_window",
-                   "Filter_outlier_SD", 
-                   "Sensor_model", 
-                   "Sensor_serial")
+  if (missing(rowNameList)){
+    rowNameList <- c("Variables",
+                     "Plot_labels", 
+                     "maxVal", 
+                     "minVal", 
+                     "Filter_RoC", 
+                     "maxRep", 
+                     "Filter_outlier_window",
+                     "Filter_outlier_SD", 
+                     "Sensor_model", 
+                     "Sensor_serial")
+  }
   
   #
   rowNameList_exist <- "Variables"

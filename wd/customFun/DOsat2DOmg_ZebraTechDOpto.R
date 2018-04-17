@@ -11,7 +11,7 @@
 #' @param TColName column name of TCOl
 #' @param logID assign log ID
 #' @param plotPath plot figure of before and after
-#' @keywords wrangling
+#' @keywords customFun
 #' @examples newDF <- DOsat2DOmg_ZebraTechDOpto(DF_in = myDF,DOmgColName = "DOconc_d00050", DOsatColName = "DOpsat_d00050", TColName = "TmpDOs_d00050")
 #' 
 #' 
