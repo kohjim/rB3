@@ -12,8 +12,10 @@
 #' 
 #' 
 
-include_dates <-  function(DF_in, metaD, startDate, endDate) {
-
+include_dates <-  function(DF_in, metaD, startDate, endDate, plotPath) {
+  
+  DF_bak <- DF_in
+  
   ######## defaults ########
   if (missing(startDate)){
     startDate <- DF_in$DateTime[1]
@@ -61,6 +63,12 @@ include_dates <-  function(DF_in, metaD, startDate, endDate) {
   
   # add NA to the elements
   DF_in <- DF_in[rowLocs,]
+  
+  ######## save plot diff ######## 
+  if (!is.null(plotPath)){  
+    plotDiff(DF_bak, DF_in, colNum = colLocsNums, plotPath = plotPath, custom_dpi = 150, taskName = "include_dates")
+  }
+  ######## save plot diff ######## 
   
   return(DF_in)
   

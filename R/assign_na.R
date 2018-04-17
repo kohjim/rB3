@@ -11,7 +11,7 @@
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
+assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID, plotPath) {
   # This function removes data in specified dates. Require standard log file inputs.
   #@  Chris McBride: chris@limnotrack.com , 2018-03-13  @#
   #@  Kohji Muraoka: kohji.muraoka@gmail.com @#
@@ -30,6 +30,8 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID) {
     
     DF_in <- DF_in[[1]]
   }
+  
+  DF_bak <- DF_in
   
   if (missing(logID)){
     logID <- NA

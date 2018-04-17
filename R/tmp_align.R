@@ -11,7 +11,7 @@
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID){
+tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath){
   # This function align temperature profiles by finding the times which are 
   # mixed and theoretically indicate identical temperatures
   
@@ -29,6 +29,8 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
     
     DF_in <- DF_in[[1]]
   }
+  
+  DF_bak <- DF_in
   
   if (missing(logID)){
     logID <- NA
@@ -171,6 +173,12 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
   }
   ######## end log making 2 ######## 
   
+  
+  ######## save plot diff ######## 
+  if (!is.null(plotPath)){  
+    plotDiff(DF_bak, DF_in, colNum = colLocsNums, plotPath = plotPath, custom_dpi = 150, taskName = "tmp_align")
+  }
+  ######## save plot diff ######## 
   
   ######## return with or without Log ########
   if (!is.na(logID) | log_exist){

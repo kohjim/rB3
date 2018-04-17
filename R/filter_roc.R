@@ -15,7 +15,7 @@
 #' 
 #' 
 
-filter_roc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cndFile, logID) {
+filter_roc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cndFile, logID, plotPath) {
   
   ######## log making 1 ######## 
   # check if DF is a list 
@@ -31,6 +31,8 @@ filter_roc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cnd
     
     DF_in <- DF_in[[1]]
   } 
+  
+  DF_bak <- DF_in
   
   if (missing(logID)){
     logID <- NA
@@ -159,6 +161,12 @@ filter_roc <-  function(DF_in,  metaD, maxRoc, varNames, startDate, endDate, cnd
     outLog <- mkLongLog(inLog,thisLog,logID)
   }
   ######## end log making 2B ######## 
+  
+  ######## save plot diff ######## 
+  if (!is.null(plotPath)){  
+    plotDiff(DF_bak, DF_in, colNum = colLocsNums, plotPath = plotPath, custom_dpi = 150, taskName = "filter_roc")
+  }
+  ######## save plot diff ######## 
 
   ######## return with or without Log ########
   if (!is.na(logID) | log_exist){
