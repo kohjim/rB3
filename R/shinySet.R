@@ -145,13 +145,36 @@ shinySet <- function(DF_in, startDate, endDate, varNames, colNum){
                           format = "%Y-%m-%d %H:%M:%S",
                           tz = "Etc/GMT+12"), 
                " | ymax = ",
-               round(e$ymax, 1))
+               round(e$ymax, 1),
+               "\n")
       }
+      
+      xy_example_1 <- function(e) {
+        if(is.null(e)) return("NULL\n")
+        paste0("     DF_out <- assign_na(DF_in, metaD,\n",
+               "           startDate = \"",
+               as.POSIXct(round(e$xmin, 1),
+                          origin = "1970-01-01 00:00:00",
+                          format = "%Y-%m-%d %H:%M:%S",
+                          tz = "Etc/GMT+12"),
+                "\",\n           endDate = \"",
+               as.POSIXct(round(e$xmax, 1),
+                          origin = "1970-01-01 00:00:00",
+                          format = "%Y-%m-%d %H:%M:%S",
+                          tz = "Etc/GMT+12"),
+                "\",\n           varNames = \"",
+               as.character(colnames(myDF[2])),
+                "\")"
+        )
+        }
+      
+      
       
       paste0(
         "Click: ", xy_str(input$plot_click),
         "Double Click: ", xy_str(input$plot_dblclick),
-        "Rectangle: \n", xy_range_str(input$plot_brush)
+        "Rectangle: \n", xy_range_str(input$plot_brush),
+        "Example 1: \n", xy_example_1(input$plot_brush)
       )
     })
   }
