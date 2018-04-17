@@ -44,3 +44,6 @@ DFwithLog <- filter_min(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 
 DFwithLog <- filter_min(DFwithLog, metaD, minVal = 12, varNames = "Tmp", startDate = "2008-01-01 00:00:00", logID = 8)
 DFwithLog <- filter_stall(DFwithLog, metaD, cndFile = "Rotorua_vars.cnd", logID = 9)
 
+## with plot diff
+DFwithLog <- filter_min(myDF, metaD, cndFile = "Rotorua_vars.cnd", logID = 7, plotPath = "filter_min")
+##

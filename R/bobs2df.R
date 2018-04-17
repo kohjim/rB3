@@ -1,4 +1,15 @@
+#' Buoy observation to data frame
+#'
+#' Import csv data into data frame
+#' 
 #' @export
+#' @param filePath file path
+#' @param metaD meta data
+#' @param useHydroYear expand dataset to hydroyear limits
+#' @keywords fileIO
+#' @examples myDF <- bobs2df("Rotorua.bobs",metaD, useHydroYear = TRUE)
+#' 
+#' 
 
 bobs2df <- function(filePath,metaD,useHydroYear){
   
