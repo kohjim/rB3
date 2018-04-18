@@ -16,11 +16,11 @@ Modules can be classified by their functionalities: (1) file I/O functions, (2) 
 
 ### Data wrangling
 
-#### Data modification
+### Data modification
 
-#### sub-functions / utilities
+### sub-functions / utilities
 
-#### Custom functions
+### Custom functions
 
 ```
 test
@@ -36,7 +36,7 @@ Require:
 Vars, StartDate, EndDate, Value1 = percentile temperature differences, Value2 = percentile wind speed
 ```
 
-#### Radiation_max
+## Module categories
 
 ### Output (longformat) contents control
 #### Sensor_model

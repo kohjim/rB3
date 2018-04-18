@@ -1,15 +1,18 @@
 Package: rB3
-Title: What the Package Does (one line, title case)
+Title: Data wrangling and QA/QC of high-frequency buoy observations
 Date: 2018-04-12
 Version: 0.0.0.5000
 Authors@R: c(
 	person("Kohji", "Muraoka", email = "kohji.muraoka@gmail.com" , role = c("aut", "cre")),
-	person("Chris", "McBride", email = "chris@limnotrack.com" , role = c("aut")),
 	person("Chris", "McBride", email = "chris@limnotrack.com" , role = c("aut"))
 	)
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1)
-License: What license is it under?
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Suggests:
+    ggplot2,
+	tidyr,
+	shiny
