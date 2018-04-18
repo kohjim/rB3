@@ -1,5 +1,5 @@
 Package: rB3
-Title: Data wrangling and QA/QC of high-frequency buoy observations
+Title: Data handling tool for high-frequency lake monitoring buoy observations
 Date: 2018-04-12
 Version: 0.0.0.5000
 Authors@R: c(
@@ -14,5 +14,5 @@ LazyData: true
 RoxygenNote: 6.0.1
 Suggests:
     ggplot2,
-	tidyr,
-	shiny
+    tidyr,
+    shiny

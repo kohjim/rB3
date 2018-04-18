@@ -52,6 +52,10 @@ custom_fun_template_1 <- function(DF_in,metaD,startDate,endDate,varNames,logID,p
     varNames <- "All"
   }
   
+  if (missing(plotPath)){
+    plotPath <- NULL
+  }
+  
   ######## end set defaults ######## 
   
   
