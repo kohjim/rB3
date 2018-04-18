@@ -1,6 +1,6 @@
 #' Interpolate na values
 #'
-#' Assign linearly interpolated numbers for na when na is repeated less than maxRep number of time.
+#' Assign linearly interpolated numbers for na when na is repeated less than maxRep number of times.
 #' 
 #' @export
 #' @param DF_in data frame input
@@ -11,10 +11,10 @@
 #' @param logID assign log ID
 #' @param plotPath plot figure of before and after
 #' @keywords QA/QC
-#' @examples newDF <- custom_fun_template_1(DF_in,metaD,startDate,endDate,varNames,logID,plotPath)
+#' @examples newDF <- interp_na(DF_in, maxRep = 4)
 #' 
 
-interp_na <- function(DF_in, metaD, startDate, endDate, varNames,logID, plotPath, maxRep){
+interp_na <- function(DF_in, startDate, endDate, varNames,logID, plotPath, maxRep){
   
   ######## log making 1 ######## 
   # check if DF is a list (i.e. with log)

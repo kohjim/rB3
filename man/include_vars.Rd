@@ -18,5 +18,6 @@ This function specifies variables to be included for later changes.
 }
 \examples{
 newDF <- include_vars(myDF,metaData,varNames = c("tmp","do","wnd","pH"))
+
 }
 \keyword{wrangling}

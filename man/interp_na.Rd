@@ -4,7 +4,7 @@
 \alias{interp_na}
 \title{Interpolate na values}
 \usage{
-interp_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath, maxRep)
+interp_na(DF_in, startDate, endDate, varNames, logID, plotPath, maxRep)
 }
 \arguments{
 \item{DF_in}{data frame input}
@@ -22,10 +22,10 @@ interp_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath, maxRep)
 \item{maxRep}{maximum repeated NA}
 }
 \description{
-Assign linearly interpolated numbers for na when na is repeated less than maxRep number of time.
+Assign linearly interpolated numbers for na when na is repeated less than maxRep number of times.
 }
 \examples{
-newDF <- custom_fun_template_1(DF_in,metaD,startDate,endDate,varNames,logID,plotPath)
+newDF <- interp_na(DF_in, maxRep = 4)
 
 }
 \keyword{QA/QC}

@@ -1,13 +1,14 @@
 #' Specify what variables to include
 #'
 #' This function specifies variables to be included for later changes.
+#' 
 #' @param DF_in data frame input
 #' @param metaD metadata list
 #' @param varNames list of variable names or keywords
 #' @keywords wrangling
 #' @export
 #' @examples newDF <- include_vars(myDF,metaData,varNames = c("tmp","do","wnd","pH"))
-
+#' 
 
 include_vars <-  function(DF_in, metaD, varNames) {
 

@@ -2,25 +2,29 @@
 % Please edit documentation in R/lazyWriter.R
 \name{lazyWriter}
 \alias{lazyWriter}
-\title{Assign NA to the specified dates range and variables}
+\title{Simple table writing function}
 \usage{
-lazyWriter(DF_in, fileName, logName)
+lazyWriter(DF_in, fileName, logName, startDate, endDate, varNames)
 }
 \arguments{
 \item{DF_in}{data frame input}
 
-\item{metaD}{metadata list}
+\item{fileName}{filename (path) that csv file will be saved as}
+
+\item{logName}{filename (path) that Rdata log file will be saved as}
 
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
 
 \item{varNames}{list of variable names or keywords}
+
+\item{metaD}{metadata list}
 }
 \description{
-This function assign NA to the specific dates range and variables
+Write table csv file. Also write logName file in Rdata format.
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+newDF <- lazyWriter(DF_in,fileName)
 }
 \keyword{wrangling}

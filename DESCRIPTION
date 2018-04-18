@@ -1,5 +1,5 @@
 Package: rB3
-Title: Data handling tool for high-frequency lake monitoring buoy observations
+Title: Data handling tools for high-frequency lake monitoring buoy observations
 Date: 2018-04-12
 Version: 0.0.0.5000
 Authors@R: c(
