@@ -22,10 +22,10 @@ interp_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath, maxRep)
 \item{maxRep}{maximum repeated NA}
 }
 \description{
-Assign interpolated numbers for na when na is repeated less than maxRep number of time.
+Assign linearly interpolated numbers for na when na is repeated less than maxRep number of time.
 }
 \examples{
 newDF <- custom_fun_template_1(DF_in,metaD,startDate,endDate,varNames,logID,plotPath)
 
 }
-\keyword{customFun}
+\keyword{QA/QC}

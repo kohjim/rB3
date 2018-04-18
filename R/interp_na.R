@@ -1,6 +1,6 @@
 #' Interpolate na values
 #'
-#' Assign interpolated numbers for na when na is repeated less than maxRep number of time.
+#' Assign linearly interpolated numbers for na when na is repeated less than maxRep number of time.
 #' 
 #' @export
 #' @param DF_in data frame input
@@ -10,7 +10,7 @@
 #' @param maxRep maximum repeated NA
 #' @param logID assign log ID
 #' @param plotPath plot figure of before and after
-#' @keywords customFun
+#' @keywords QA/QC
 #' @examples newDF <- custom_fun_template_1(DF_in,metaD,startDate,endDate,varNames,logID,plotPath)
 #' 
 
