@@ -1,4 +1,4 @@
-#' shiny plot - visually assist data transformation information
+#' shiny plot - visually assist data transformation process
 #'
 #' Plot single timeseries and return x and y informatoin in response to clicks. No ggplot. No zooming.
 #' 

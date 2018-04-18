@@ -2,7 +2,7 @@
 % Please edit documentation in R/shinySet_nogg.R
 \name{shinySet_nogg}
 \alias{shinySet_nogg}
-\title{shiny plot - visually assist data transformation information}
+\title{shiny plot - visually assist data transformation process}
 \usage{
 shinySet_nogg(DF_in, startDate, endDate, varNames, colNum)
 }

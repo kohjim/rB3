@@ -2,7 +2,7 @@
 % Please edit documentation in R/shinySet.R
 \name{shinySet}
 \alias{shinySet}
-\title{shiny plot - visually assist data transformation information}
+\title{shiny plot - visually assist data transformation process}
 \usage{
 shinySet(DF_in, startDate, endDate, varNames, colNum)
 }
