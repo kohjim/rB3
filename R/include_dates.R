@@ -7,9 +7,9 @@
 #' @param metaD metadata list
 #' @param startDate start date
 #' @param endDate endDate
+#' @param plotPath path of the figures (e.g. figures/datesInclude_). If missing, does not plot
 #' @keywords wrangling
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
-#' 
+#' @examples newDF <- include_dates(DF_in = myDF,metaD = metaData,startDate = "2010/1/1")
 #' 
 
 include_dates <-  function(DF_in, metaD, startDate, endDate, plotPath) {
@@ -23,6 +23,10 @@ include_dates <-  function(DF_in, metaD, startDate, endDate, plotPath) {
   
   if (missing(endDate)){
     endDate <- DF_in$DateTime[length(DF_in$DateTime)]
+  }
+  
+  if (missing(plotPath)){
+    plotPath <- NULL
   }
   
   VarNames <- "All"
@@ -60,6 +64,7 @@ include_dates <-  function(DF_in, metaD, startDate, endDate, plotPath) {
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   colLocs <- outs.idElToModify[[2]]
+  colLocsNums <- which(outs.idElToModify[[2]])
   
   # add NA to the elements
   DF_in <- DF_in[rowLocs,]
