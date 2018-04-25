@@ -6,10 +6,12 @@
 #' @param metaD metadata list
 #' @param startDate start date
 #' @param endDate endDate
-#' @param varNames list of variable names or keywords
+#' @param varNames list of variable names or keywords (e.g. varNames = "tmpwtr")
+#' @param dTPerctile percentile of temperature variation to determine mixed periods
+#' @param wndSpdPerctile percentile of windspeed to make assure mixed periods (optional). wndspd values will be used
 #' @keywords wrangling
 #' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @examples newDF <- tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath)
 
 tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath){
   # This function align temperature profiles by finding the times which are 

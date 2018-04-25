@@ -16,12 +16,16 @@ tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile,
 
 \item{endDate}{endDate}
 
-\item{varNames}{list of variable names or keywords}
+\item{varNames}{list of variable names or keywords (e.g. varNames = "tmpwtr")}
+
+\item{dTPerctile}{percentile of temperature variation to determine mixed periods}
+
+\item{wndSpdPerctile}{percentile of windspeed to make assure mixed periods (optional). wndspd values will be used}
 }
 \description{
 This function assign NA to the specific dates range and variables
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+newDF <- tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath)
 }
 \keyword{wrangling}

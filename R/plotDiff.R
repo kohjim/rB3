@@ -15,7 +15,7 @@
 #' 
 
 plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName){
-  
+
   ########## defaults ##########
   if (missing(varNames) & missing(colNum)){
     colNum <- c(2:length(DF_pre))
@@ -44,7 +44,7 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
     
     # browser()
     for (i in colNum){
-      thisColLoc <- colNum[i]
+      thisColLoc <- i
       thisColName <- colnames(DF_pre[i])
       
       DF_plot <- DF_pre[,c(1,i)]

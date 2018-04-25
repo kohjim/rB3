@@ -2,10 +2,10 @@
 # import custom functions from customFun folder
 #     DOsat2DOmg_ZebraTechDOpto.R
 #     [WRC_plot.R]?
-setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd/customFun")
-lapply(list.files(pattern = "[.]R$", recursive = TRUE), source)
-
 setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd")
+lapply(paste0("customFun/",
+              list.files(path = "customFun", pattern = "[.]R$", recursive = TRUE)),
+       source)
 
 library(devtools)
 
@@ -65,3 +65,8 @@ newDF <- interp_na(DF_in = myDF, metaD, maxRep = 5)
 
 
 lazyWriter(DF_in = myDF, fileName = "Rotorua_intermediate.bobs", startDate = "2010/1/1", endDate = "2010/7/1", varNames = c("tmp","DO"))
+
+
+## drift correction
+install("../../rB3")
+newDF <- fix_drift(DF_in = myDF, startDate = "2008/1/1", endDate = "2010/7/1", colNum = 2, offsets = c(0,-10), span = c(30,1000), logID = 5, plotPath = "figures/Rotorua_")

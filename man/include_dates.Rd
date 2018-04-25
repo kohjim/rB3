@@ -14,13 +14,14 @@ include_dates(DF_in, metaD, startDate, endDate, plotPath)
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
+
+\item{plotPath}{path of the figures (e.g. figures/datesInclude_). If missing, does not plot}
 }
 \description{
 Specify dates to include in the later tasks. Outside of these dates are removed from the data
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
-
+newDF <- include_dates(DF_in = myDF,metaD = metaData,startDate = "2010/1/1")
 
 }
 \keyword{wrangling}
