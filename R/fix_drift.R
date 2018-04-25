@@ -86,6 +86,8 @@ fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offset
     
   } else {
     
+    colLocs <- !as.logical(1:length(outs.idElToModify[[2]]))
+    colLocs[colNum] <- TRUE
     colLocsNums <- colNum
   }
   
@@ -127,7 +129,7 @@ fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offset
       # drift correction without magnitude variance
       new_vector <- (this_vector - lowerLim_vector) + offsets[1]
     }
-    
+
     # assign new values
     DF_in[rowLocsNums,colLocsNums[i]] <- new_vector
   }

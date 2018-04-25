@@ -69,4 +69,4 @@ lazyWriter(DF_in = myDF, fileName = "Rotorua_intermediate.bobs", startDate = "20
 
 ## drift correction
 install("../../rB3")
-newDF <- fix_drift(DF_in = myDF, startDate = "2008/1/1", endDate = "2010/7/1", colNum = 2, offsets = c(0,-10), span = c(30,1000), logID = 5, plotPath = "figures/Rotorua_")
+newDF <- fix_drift(DF_in = myDF, startDate = "2008/1/1", endDate = "2010/7/1", colNum = 2, offsets = c(0,5), span = c(30,35), logID = 5, plotPath = "figures/Rotorua_")
