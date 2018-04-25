@@ -9,12 +9,13 @@
 #' @param varNames list of variable names or keywords to plot
 #' @param colNum column number to plot
 #' @param plotPath path of the images to be saved
+#' @param isScatter if TRUE, plot scatter with lines
 #' @keywords fileIO
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 #' 
 #' 
 
-plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName){
+plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName, isScatter){
   
   ########## defaults ##########
   if (missing(varNames) & missing(colNum)){
@@ -35,6 +36,10 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
   
   if (missing(taskName)){
     taskName <- NULL
+  }
+  
+  if (missing(isScatter)){
+    isScatter <- FALSE
   }
   ########## end defaults ##########
   
@@ -57,9 +62,24 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
       # par(mar=c(1,1,1,1))
       
       # plot DF1
-      plot(DF_plot[,1:2],
-           type = "l",
-           col = "black")
+      if (!isScatter){
+        
+        plot(DF_plot[,1:2],
+             type = "l",
+             col = "black")
+        
+      } else {
+        
+        # scatter with line plot (slow)
+        plot(DF_plot[,1:2],
+             type = "o",
+             col = "black",
+             pch = 0,
+             cex = 0.1)
+        
+      }
+      
+      par(new = T) # second plot is going to get added to first
       
       tryCatch({
         ColLoc_out <- which(colnames(DF_post)==thisColName)
@@ -68,11 +88,26 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
         # transparent red
         tpRed <- rgb(1,0,0,alpha=0.75) 
         
-        # plot DF2
-        lines(DF_plot2,
-              col=tpRed,
-              pch=20)
         
+        # plot DF2
+        if (!isScatter){
+          
+          plot(DF_plot2,
+               col = tpRed,
+               type = "l",
+               axes = FALSE)
+          
+        } else {
+          
+          # scatter with line (slow)
+          plot(DF_plot2,
+               col = tpRed,
+               type = "l",
+               pch = 1,
+               cex = 0.1,
+               axes = FALSE)
+          
+        }
       }, error = function(e) {
         
       })
