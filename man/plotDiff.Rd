@@ -4,7 +4,8 @@
 \alias{plotDiff}
 \title{Sub-module to plot two timeseries affected by the changes}
 \usage{
-plotDiff(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName)
+plotDiff(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName,
+  isScatter)
 }
 \arguments{
 \item{DF_pre}{data frame 1}
@@ -17,10 +18,12 @@ plotDiff(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName)
 
 \item{plotPath}{path of the images to be saved}
 
+\item{isScatter}{if TRUE, plot scatter with lines}
+
 \item{metaD}{metadata list}
 }
 \description{
-Sub-funciton to plot two timeseries (called from modules)
+Sub-module to plot two timeseries (called from modules)
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

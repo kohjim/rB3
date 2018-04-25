@@ -1,6 +1,6 @@
 #' Sub-module to plot two timeseries affected by the changes
 #'
-#' Sub-funciton to plot two timeseries (called from modules)
+#' Sub-module to plot two timeseries (called from modules)
 #' 
 #' @export
 #' @param DF_pre data frame 1
