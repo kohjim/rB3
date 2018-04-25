@@ -15,7 +15,7 @@
 #' 
 
 plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName){
-  
+
   ########## defaults ##########
   if (missing(varNames) & missing(colNum)){
     colNum <- c(2:length(DF_pre))
@@ -39,46 +39,35 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
   ########## end defaults ##########
   
   ########## function ##########
-  
+
   if (length(colNum) > 0){
     
+    # browser()
     for (i in colNum){
       thisColLoc <- i
-      
       thisColName <- colnames(DF_pre[i])
+      
       DF_plot <- DF_pre[,c(1,i)]
-      
-      # open file
-      png(filename = paste0(plotPath,taskName,"_",i,"_",thisColName,".png"),
-          width = 1500, 
-          height = 1000,
-          res = custom_dpi)
-      
-      # par(mar=c(1,1,1,1))
-      
-      # plot DF1
-      plot(DF_plot[,1:2],
-           type = "l",
-           col = "black")
+      DF_plot$gp <- "in"
       
       tryCatch({
         ColLoc_out <- which(colnames(DF_post)==thisColName)
-        DF_plot2 <- DF_post[,c(1,ColLoc_out)]
+        thisDF_out <- DF_post[,c(1,ColLoc_out)]
+        thisDF_out$gp <- "out"
         
-        # transparent red
-        tpRed <- rgb(1,0,0,alpha=0.75) 
-        
-        # plot DF2
-        lines(DF_plot2,
-              col=tpRed,
-              pch=20)
+        DF_plot <- rbind(DF_plot,thisDF_out)
         
       }, error = function(e) {
         
       })
       
-      # close file and save the image
-      dev.off() 
+      f1 <- ggplot2::ggplot(DF_plot, ggplot2::aes(x = DF_plot[,1],y = DF_plot[,2]))
+      f1  + ggplot2::geom_line(ggplot2::aes(color = gp),size = 0.1)
+      
+      ggplot2::ggsave(
+        paste0(plotPath,taskName,"_",i,"_",thisColName,".png"),
+        dpi = custom_dpi
+      )
     }
   }
   ########## end function ##########
