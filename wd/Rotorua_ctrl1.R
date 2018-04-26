@@ -64,7 +64,7 @@ newDF <- DOsat2DOmg_ZebraTechDOpto(DF_in = myDF,DOmgColName = "DOconc_d00050", D
 newDF <- interp_na(DF_in = myDF, metaD, maxRep = 5)
 
 
-lazyWriter(DF_in = myDF, fileName = "Rotorua_intermediate.bobs", startDate = "2010/1/1", endDate = "2010/7/1", varNames = c("tmp","DO"))
+lazyWriter(DF_in = newDF, fileName = "Rotorua_intermediate.bobs", startDate = "2010/1/1", endDate = "2010/7/1", varNames = c("tmp","DO"))
 
 
 ## drift correction

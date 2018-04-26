@@ -56,8 +56,12 @@ lazyWriter <- function(DF_in, fileName, logName, startDate, endDate, varNames){
   DF_out <- as.data.frame(DF_in[rowLocsNums,c(1,colLocsNums)])
   
   ######## end defaults ########
-
-  write.table(DF_out,fileName, sep = ",", eol = "\r\n", append = FALSE, row.names = FALSE)
+  # browser()
+  write.table(DF_out,fileName,
+              sep = ",",
+              append = FALSE,
+              row.names = FALSE,
+              quote = FALSE)
   
   if (writeLog){
     save(inLog, file=logName)
