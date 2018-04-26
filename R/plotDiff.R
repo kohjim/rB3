@@ -87,25 +87,22 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
         
         # transparent red
         tpRed <- rgb(1,0,0,alpha=0.75) 
-        
-        
+
         # plot DF2
         if (!isScatter){
           
-          plot(DF_plot2,
+          lines(DF_plot2,
                col = tpRed,
-               type = "l",
-               axes = FALSE)
+               type = "l")
           
         } else {
           
           # scatter with line (slow)
-          plot(DF_plot2,
+          points(DF_plot2,
                col = tpRed,
-               type = "l",
+               type = "o",
                pch = 1,
-               cex = 0.1,
-               axes = FALSE)
+               cex = 0.1)
           
         }
       }, error = function(e) {
