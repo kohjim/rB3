@@ -78,6 +78,8 @@ To be updated
 ## References
 Horsburgh, J. S., S. L. Reeder, A. S. Jones, and J. Meline. 2015. Open source software for visualization and quality control of continuous hydrologic and water quality sensor data. Environ. Model. Softw. 70: 32–44. doi:10.1016/j.envsoft.2015.04.002
 
+Ruan, G., Hanson, P. C., Dugan, H. A., & Plale, B. 2017. Mining lake time series using symbolic representation. Ecological Informatics, 39, 10-22.
+
 Read, J. S., D. P. Hamilton, I. D. Jones, K. Muraoka, L. A. Winslow, R. Kroiss, C. H. Wu, and E. Gaiser. 2011. Derivation of lake mixing and stratification indices from high-resolution lake buoy data. Environ. Model. Softw. 26: 1325–1336. doi:10.1016/j.envsoft.2011.05.006
 
 Winslow, L. A., J. A. Zwart, R. D. Batt, H. A. Duggan, R. I. Woolway, J. R. Corman, P. C. Hanson, and J. S. Read. 2016. LakeMetabolizer: an R package for estimating lake metabolism from free-water oxygen using diverse statistical models. Inl. waters 6.
