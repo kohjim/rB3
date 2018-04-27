@@ -5,7 +5,6 @@
 #' @export
 #' @param DF_pre data frame 1
 #' @param DF_post data frame 2
-#' @param metaD metadata list
 #' @param varNames list of variable names or keywords to plot
 #' @param colNum column number to plot
 #' @param plotPath path of the images to be saved
