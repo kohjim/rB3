@@ -71,7 +71,7 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
         
         # scatter with line plot (slow)
         plot(DF_plot[,1:2],
-             type = "o",
+             type = "p",
              col = "black",
              pch = 0,
              cex = 0.1)
@@ -99,7 +99,7 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
           # scatter with line (slow)
           points(DF_plot2,
                col = tpRed,
-               type = "o",
+               type = "p",
                pch = 1,
                cex = 0.1)
           

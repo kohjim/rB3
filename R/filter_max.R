@@ -67,6 +67,10 @@ filter_max <-  function(DF_in,  metaD, maxVal, varNames, startDate, endDate, cnd
     maxVal <- NULL
   }
   
+  if (missing(plotPath)){
+    plotPath <- NULL
+  }
+  
   ######## end defaults ########
   
   ######## function ########
