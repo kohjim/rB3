@@ -140,13 +140,15 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
     excessRepeatLocs <- which(repeatCounts >= maxRep & !is.na(thisDf[,1]))
     
     # identify all sequence locations that contains too many repeats
-    
+
     thisDf$rowsToChange <- FALSE
-    for (j in 1:length(excessRepeatLocs)){
-      thisDf$rowsToChange[
-        neighbourComp == neighbourComp[excessRepeatLocs[j]]] <- TRUE
-    }
+    thisDf$rowsToChange[which(neighbourComp %in% neighbourComp[excessRepeatLocs])] <- TRUE
     
+    # for (j in 1:length(excessRepeatLocs)){
+    #   thisDf$rowsToChange[
+    #     neighbourComp == neighbourComp[excessRepeatLocs[j]]] <- TRUE
+    # }
+
     # outside user date range = do not modify
     thisDf$rowsToChange[-rowLocsNums] <- FALSE
 

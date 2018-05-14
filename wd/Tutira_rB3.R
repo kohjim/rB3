@@ -27,8 +27,10 @@ metaD <- list(lakeName = "Tutira",lat = -39.227760, lon = 176.893728, timestep =
 
 # import your starting data file
 myDF <- bobs2df("Tutira_200901_201801_RAW.bobs",metaD, useHydroYear = TRUE)
-myDF <- include_dates(myDF,metaD,  startDate = "2009-01-09", endDate = "2009-01-10")
-newDF <- filter_stall(myDF, metaD, cndFile = "Tutira_vars.cnd", endDate = "2009-01-09 16:30:0")
+newDF <- include_dates(myDF,metaD,  startDate = "2009-01-09", endDate = "2009-01-10")
+newDF <- include_vars(myDF,metaD,  varNames = "Tmp")
+newDF <- filter_stall(newDF, metaD, cndFile = "Tutira_vars.cnd")
+newDF <- filter_stall(newDF, metaD, cndFile = "Tutira_vars.cnd", endDate = "2009-01-09 16:30:0")
 
 #**********************************************************************************************************#
 ###### INVESTIGATE YOUR DATA INTERACTIVELY USING SHINY ###### 
