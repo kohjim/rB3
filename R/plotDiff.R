@@ -51,7 +51,7 @@ plotDiff <- function(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, ta
       
       thisColName <- colnames(DF_pre[i])
       DF_plot <- DF_pre[,c(1,i)]
-      
+      browser()
       # open file
       png(filename = paste0(plotPath,taskName,"_",i,"_",thisColName,".png"),
           width = 1500, 

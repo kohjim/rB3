@@ -45,15 +45,15 @@ assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID, plotPat
 
   ######## defaults ########
   if (missing(startDate)){
-    varArgs$StartDate <- DF_in$DateTime[1]
+    startDate <- DF_in$DateTime[1]
   }
   
   if (missing(endDate)){
-    varArgs$EndDate <- DF_in$DateTime[length(DF_in$DateTime)]
+    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
   }
   
   if (missing(varNames)){
-    varArgs$Vars <- "All"
+    varNames <- "All"
   }
   
   ######## end defaults ########

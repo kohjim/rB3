@@ -67,6 +67,10 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
     maxRep <- NULL
   }
   
+  if (missing(plotPath)){
+    plotPath <- NULL
+  }
+  
   ######## end defaults ########
 
   ######## function ########
@@ -85,12 +89,14 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
     isUseCndFile <- FALSE
     maxRep <- maxRep
   }
-  
-  # identify the elements in the array
+
+    # identify the elements in the array
   outs.idElToModify <- idElToModify(DF_in, startDate = startDate, endDate = endDate, varNames = varNames)
   
   # decompose the list
-  # rowLocs <- outs.idElToModify[[1]]
+  rowLocs_bak <- outs.idElToModify[[1]]
+  rowLocsNums <- which(rowLocs_bak)
+  
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
   
@@ -109,7 +115,7 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
       cndRowLocNum <- which(grepl(varList[1],rownames(cnd),ignore.case = TRUE))
       
       # identify conditions
-      maxRep <- cnd[cndRowLocNum,cndColLocNum]
+      maxRep <- as.numeric(as.character(cnd[cndRowLocNum,cndColLocNum]))
 
     } else {
 
@@ -121,25 +127,30 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
     thisDf <- data.frame(DF_in[,colLocsNums[i]])
     
     # compare with the next element and if true assign same ID
-    neighbourComp <- with(thisDf, 
-                          cumsum(
-                            c(TRUE,
-                              thisDf[-1L,1] != thisDf[-length(thisDf[,1]),1])
-                          ))
-    # count each repeats
+    neighbourComp <- c(TRUE,thisDf[-1L,1] != thisDf[-length(thisDf[,1]),1])
+    neighbourComp[is.na(thisDf[,1])] <- TRUE
+    neighbourComp[is.na(neighbourComp)] <- TRUE
+    
+    neighbourComp <- with(thisDf, cumsum(neighbourComp))
+
     repeatCounts <- ave(seq_along(thisDf[,1]), 
                         neighbourComp, FUN=seq_along)
     
     # find repeats that exceeded use set max repeats
-    excessRepeatLocs <- which(repeatCounts >= maxRep)
+    excessRepeatLocs <- which(repeatCounts >= maxRep & !is.na(thisDf[,1]))
     
     # identify all sequence locations that contains too many repeats
+    
     thisDf$rowsToChange <- FALSE
     for (j in 1:length(excessRepeatLocs)){
       thisDf$rowsToChange[
         neighbourComp == neighbourComp[excessRepeatLocs[j]]] <- TRUE
     }
     
+    # outside user date range = do not modify
+    thisDf$rowsToChange[-rowLocsNums] <- FALSE
+    
+    browser()
     # replace by NA
     DF_in[thisDf$rowsToChange,colLocsNums[i]] <- NA
     
