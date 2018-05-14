@@ -149,8 +149,7 @@ filter_stall <-  function(DF_in, metaD, maxRep, varNames, startDate, endDate, cn
     
     # outside user date range = do not modify
     thisDf$rowsToChange[-rowLocsNums] <- FALSE
-    
-    browser()
+
     # replace by NA
     DF_in[thisDf$rowsToChange,colLocsNums[i]] <- NA
     
