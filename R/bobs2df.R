@@ -20,7 +20,7 @@ bobs2df <- function(filePath,metaD,useHydroYear){
     as.POSIXct(DF_in$DateTime,
                origin = "1970-01-01 00:00:00",
                format = "%Y-%m-%d %H:%M:%S",
-               tz = "Etc/GMT+12")
+               tz = "UTC")
   
   timestep <- metaD$timestep
   
@@ -33,7 +33,7 @@ bobs2df <- function(filePath,metaD,useHydroYear){
     as.POSIXct(DF_in$DateTime,
                origin = "1970-01-01 00:00:00",
                format = "%Y-%m-%d %H:%M:%S",
-               tz = "Etc/GMT+12")
+               tz = "UTC")
   
   
   ######## expand dataframe to full hydrological years ######## 
@@ -59,12 +59,12 @@ bobs2df <- function(filePath,metaD,useHydroYear){
           as.POSIXct(
             paste0(YrStart, "-07-01 00:00:00"),
             origin = "1970-01-01 00:00:00",
-            tz = "Etc/GMT+12"
+            tz = "UTC"
           ),
           as.POSIXct(
             paste0(YrEnd, "-06-30 23:45:00"),
             origin = "1970-01-01 00:00:00",
-            tz = "Etc/GMT+12"
+            tz = "UTC"
           ),
           timestep * 60
         )
@@ -81,12 +81,12 @@ bobs2df <- function(filePath,metaD,useHydroYear){
         as.POSIXct(
           paste0(YrStart, "-07-01 00:00:00"),
           origin = "1970-01-01 00:00:00",
-          tz = "Etc/GMT+12"
+          tz = "UTC"
         ),
         as.POSIXct(
           paste0(YrEnd, "-06-30 23:45:00"),
           origin = "1970-01-01 00:00:00",
-          tz = "Etc/GMT+12"
+          tz = "UTC"
         ),
         timestep * 60
       ))
