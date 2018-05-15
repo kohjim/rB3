@@ -49,7 +49,7 @@ idElToModify <- function(DF_in, startDate, endDate, varNames){
       is.na(DF_in$DateTime)
 
     # identify columns affected by the task
-    if (varNames == "All"){
+    if (varNames[1] == "All"){
       delCols <- !grepl("DateTime",unlist(labels(DF_in)[2]))
       
     } else {
