@@ -4,12 +4,11 @@
 \alias{assign_na}
 \title{Assign NA to the specified dates range and variables}
 \usage{
-assign_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath)
+assign_na(rB3in, startDate, endDate, varNames, minVal, maxVal, logID, Reason,
+  showPlot, savePlot)
 }
 \arguments{
-\item{DF_in}{data frame input}
-
-\item{metaD}{metadata list}
+\item{rB3in}{rB3 object input}
 
 \item{startDate}{start date}
 
@@ -17,10 +16,18 @@ assign_na(DF_in, metaD, startDate, endDate, varNames, logID, plotPath)
 
 \item{varNames}{list of variable names or keywords}
 
-\item{plotPath}{plot figure of before and after}
+\item{minVal}{delete value greater than or equal to}
+
+\item{maxVal}{delete value less than or equal to}
+
+\item{logID}{write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code}
+
+\item{showPlot}{display figure in plots window (TRUE/FALSE)}
+
+\item{savePlot}{save figure to a path (TRUE/FALSE)}
 }
 \description{
-This function assign NA to the specific dates range and variables
+This function assigns NA to the selected subset of dates and variables
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

@@ -19,8 +19,6 @@ plotDiff(DF_pre, DF_post, varNames, colNum, plotPath, custom_dpi, taskName,
 \item{plotPath}{path of the images to be saved}
 
 \item{isScatter}{if TRUE, plot scatter with lines}
-
-\item{metaD}{metadata list}
 }
 \description{
 Sub-module to plot two timeseries (called from modules)
