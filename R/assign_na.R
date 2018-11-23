@@ -1,104 +1,121 @@
 #' Assign NA to the specified dates range and variables
 #'
-#' This function assign NA to the specific dates range and variables
-#' 
-#' @param DF_in data frame input
-#' @param metaD metadata list
+#' This function assigns NA to the selected subset of dates and variables
+#'
+#' @param rB3in rB3 object input
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
-#' @param plotPath plot figure of before and after
+#' @param minVal delete value greater than or equal to
+#' @param maxVal delete value less than or equal to
+#' @param logID write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code
+#' @param showPlot display figure in plots window (TRUE/FALSE)
+#' @param savePlot save figure to a path (TRUE/FALSE)
 #' @keywords wrangling
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-assign_na <- function(DF_in, metaD, startDate, endDate, varNames, logID, plotPath) {
-  # This function removes data in specified dates. Require standard log file inputs.
-  #@  Chris McBride: chris@limnotrack.com , 2018-03-13  @#
-  #@  Kohji Muraoka: kohji.muraoka@gmail.com @#
-
-  ######## log making 1 ######## 
-  # check if DF is a list 
-  # default: input log does not exist
-  
-  log_exist <- FALSE
-  inLog <- NULL
-  
-  if (!is.data.frame(DF_in)){
-    inLog <- DF_in[[2]]
-    outLog <- inLog
-    log_exist <- TRUE
-    
-    DF_in <- DF_in[[1]]
-  }
-  
-  DF_bak <- DF_in
-  
-  if (missing(logID)){
-    logID <- NA
-  } else {
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
-  }
-  ######## end log making 1 ######## 
-  
+assign_na <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, logID, Reason, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
-    startDate <- DF_in$DateTime[1]
+    startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
-  
+
   if (missing(endDate)){
-    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
+    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
   }
-  
+
   if (missing(varNames)){
     varNames <- "All"
   }
-  
-  ######## end defaults ########
-  
-  
-  ######## function ########
-  # identify the elements in the array
 
-  outs.idElToModify <- idElToModify(DF_in, startDate, endDate, varNames)
-  
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+
+  if (missing(Reason)){
+    Reason <- "Not specified"
+  }
+
+  if (missing(savePlot)) {
+    savePlot <- NULL
+  }
+
+  if (missing(minVal)){
+    minVal <- -100000000000
+  }
+
+  if (missing(maxVal)){
+    maxVal <- 100000000000
+  }
+
+  if (missing(logID)){
+    logID <- NA
+  }
+
+  ######## end defaults ########
+
+
+  ######## function ########
+
+  # write to the logKey
+
+  writeLog(rB3in, logID = logID, Reason = Reason, funName = "assign_na")
+
+########### assign_na to qcDF based on input args
+
+  # identify the elements in the array, to be modified
+  outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
+
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
+  rowLocsNums <- which(rowLocs)
   colLocs <- outs.idElToModify[[2]]
-  
-  # add NA to the elements
-  DF_in[rowLocs,colLocs] <- NA
-  ######## end function ########
-  
-  
-  ######## log making 2 ######## 
-  if (!is.na(logID)){
-    thisLog[rowLocs,colLocs] <- logID
-    outLog <- mkLongLog(inLog,thisLog,logID)
+  colLocsNums <- which(colLocs)
+
+ # apply locations to qcDF
+  df <- rB3in[["qcDF"]]
+
+  # col names for later use
+  DFColNames <- colnames(df)
+
+  for (i in 1:length(colLocsNums)){
+
+    # name of the column to be changed
+    # thisColName <- DFColNames[colLocsNums[i]]
+
+    # find conditional location in the df
+    rowsToChange <- which(df[,colLocsNums[i]] >= as.numeric(as.character(minVal)) &
+                            df[,colLocsNums[i]] <= as.numeric(as.character(maxVal)) )
+
+    rowsToChange <- intersect(rowLocsNums,rowsToChange)
+
+    # replace by new value
+    df[rowsToChange,colLocsNums[i]] <- NA
+
+    ### write to same portion of logDF
+    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
+
+    }
+
+   rB3plot <- rB3in
+
+   rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
+   rB3plot[["qcDF"]] <- df
+
+  # generate plot, if specified
+
+    if (showPlot == TRUE | !is.null(savePlot)) {
+      prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+                  srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
+    }
+
+  rB3in[["qcDF"]] <- df
+
+
+
+    ######## end function ########
+
+    return(rB3in)
   }
-  ######## end log making 2 ######## 
-  
-  
-  ######## return with or without Log ########
-  if (!is.na(logID) | log_exist){
-    
-    return(list(DF_in,outLog))
-    
-  } else {
-    
-    return(DF_in)
-  }
-  ######## end return with or without Log ########
-  
-  # gsub("NA,", "", outLog, fixed = TRUE)
-  # gsub(",NA", "", outLog, fixed = TRUE)
-  
-  # make log file
-  # a <- data.frame(NA,2,3,4)
-  # b <- data.frame(2,3,4,5)
-  # cc <- paste(a,b, sep=",")
-  # gsub("NA,", "", c, fixed = TRUE)
-  
-} # end function
