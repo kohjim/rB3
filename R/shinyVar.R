@@ -1,8 +1,8 @@
-#' shinyVar - visually assist data transformation process                         {rB3}
+#' Interactive data visualisation
 #'
-#' Plot single timeseries of source and quality controlled data. Can zoom in (dbl-click).
-#'   Return x and y information in response to clicks.
-#'   Exmaple code is generated for removing (set to NA) the highlighted area of the pot
+#' Plot single timeseries of source and quality controlled data. Can zoom in (dbl-click). \cr
+#'   Return x and y information in response to clicks. \cr
+#'   Example code is generated for removing (set to NA) the highlighted area of the plot
 #'
 #' @export
 #' @param rB3in rB3 object to be displayed
@@ -16,7 +16,7 @@
 #' @examples shinySetOut <- shinySet(newDF, varNames = "TmpWtr.d00500", endDate = '2018-07-01')
 #'
 
-shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, qcColour){
+shinyVar <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, qcColour){
 
   ######## defaults ########
   if (missing(startDate)){
@@ -83,10 +83,10 @@ shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, 
   }
 
   srcGeom <- ggplot2::geom_point(ggplot2::aes(x = DateTime, y = src, color = "Unmodified data"), size = 0.2)
-  qcGeom <- ggplot2::geom_point(ggplot2::aes(x = DateTime, y = qc, color = "Quality cotrolled data"), size = 0.2)
+  qcGeom <- ggplot2::geom_point(ggplot2::aes(x = DateTime, y = qc, color = "Quality controlled data"), size = 0.2)
   srcKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour))
-  qcKey <- ggplot2::scale_colour_manual("",values = c("Quality cotrolled data"=qcColour))
-  dualKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour, "Quality cotrolled data"=qcColour))
+  qcKey <- ggplot2::scale_colour_manual("",values = c("Quality controlled data"=qcColour))
+  dualKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour, "Quality controlled data"=qcColour))
 
   varPlot <-
 
@@ -123,8 +123,17 @@ shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, 
     output$plot1 <- shiny::renderPlot({
 
       if (is.null(srcColour)) {
-        varPlot + qcGeom + qcKey
-      } else { varPlot + srcGeom + qcGeom + dualKey
+        varPlot +
+          qcGeom +
+          qcKey +
+          ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
+
+      } else {
+        varPlot +
+          srcGeom +
+          qcGeom +
+          dualKey +
+          ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
       }
 
     })
@@ -188,7 +197,7 @@ shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, 
 
       xy_example_1 <- function(e) {
         if(is.null(e)) return("NULL\n")
-        paste0(rB3name, " <- assign_na(", rB3name, ", varNames = \"",
+        paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
                as.character(varNames),
                "\",  \n          startDate = \"",
                as.POSIXct(round(e$xmin, 1),
@@ -202,7 +211,7 @@ shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, 
                round(e$ymin, 1),
                ", maxVal = ",
                round(e$ymax, 1),
-               ', logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
+               ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
         )
         }
 

@@ -32,6 +32,6 @@ rB3agg2 <- assignVal(rB3agg2, varNames = c('TmpWtr.d00050','TmpWtr.d00150'),
                      newVal = NA, logID = "Shiny", Reason = "Manual removal", showPlot = T)
 
 
-rB3agg2 <- interp_na(rB3agg2, varNames = c('TmpWtr.d00050','TmpWtr.d00150'),  
+rB3agg2 <- interp_na(rB3agg2, varNames = c('TmpWtr.d00050'),  
                      maxRep = 100000, 
-                     logID = "NA", Reason = "Interp", showPlot = T)
+                     logID = "Test", Reason = "Interp", showPlot = T)

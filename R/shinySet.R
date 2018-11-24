@@ -181,6 +181,7 @@ shinySet <- function(DF_in, startDate, endDate, varNames, colNum){
   
   # shiny::shinyApp(ui = ui, server = server)
   
-  return(list(ui,server,DF_plot))
+   shiny::shinyApp(ui = shinySetOut[[1]], server = shinySetOut[[2]])
+   
   ######## end Shiny ######## 
 }

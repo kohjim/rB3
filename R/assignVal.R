@@ -1,6 +1,6 @@
-#' Assign NA to the specified dates range and variables
+#' Assign a value or NA to the specified dates range and variables
 #'
-#' This function assigns NA to the selected subset of dates and variables
+#' Specify subset of dates, values and variables to modify
 #'
 #' @param rB3in rB3 object input
 #' @param startDate start date
@@ -35,7 +35,7 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
   }
 
   if (missing(Reason)){
-    Reason <- "Not specified"
+    Reason <- "Assign"
   }
 
   if (missing(savePlot)) {

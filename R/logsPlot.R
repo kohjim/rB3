@@ -1,6 +1,6 @@
-#' logsPlot
+#' Produce a plot summarising QC changes
 #'
-#' This function plots variables on a faceted ggplot
+#' Source and qualitly controlled data are shown, along with coloured indication of any quality control changes made (logIDs)
 #'
 #' @export
 #' @param rB3in rB3 object input
@@ -82,23 +82,30 @@ logsPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour,
     plotSrc <- tidyr::gather(plotSrc,var, src, 2:ncol(plotSrc))
 
     plotAll$logs <- plotLogs$logs
-       plotAll$logs <- ifelse(is.na(plotAll$logs), "No change", plotAll$logs)
+       # plotAll$logs <- ifelse(is.na(plotAll$logs), "No change", plotAll$logs)
 
     plotAll$src <- plotSrc$src
+
+        hVal <- min(plotAll[,c(3,5)],na.rm = T) * 0.8
+    plotAll$logInd <- ifelse(!is.na(plotAll$logs), hVal, NA)
 
 
     browser()
   varPlot <-
 
    ggplot2::ggplot(plotAll) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = logs), size = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = logs), size = 0.2) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src), color = 'grey', size = 0.2) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc), color = 'blue', size = 0.2) +
+    ggplot2::geom_point(data = plotAll[!is.na(plotAll$logs),],
+                        ggplot2::aes(x = DateTime, y = hVal, color = logs), na.rm = T, size = 1) +
     ggplot2::ylab("Value") +
     ggplot2::xlab(NULL) +
     ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m"),
                      # breaks = scales::date_breaks("1 years"),
                      limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
                      expand = c(0, 0)) +
+    ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(size=5, alpha = 1))) +
+    ggplot2::labs(color='Log ID entries') +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
     ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y') +
     ggplot2::theme_bw() +

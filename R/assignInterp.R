@@ -1,6 +1,6 @@
-#' interpolate the specified dates range and variables
+#' Interpolate the date range given for the variables specified
 #'
-#' This function interpolates gaps within the selected subset of dates and variables
+#' Linearly interpolates gaps (NAs) within the selected subset of dates and variables
 #'
 #' @param rB3in rB3 object input
 #' @param startDate start date
@@ -45,7 +45,7 @@ assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, sho
   }
 
   if (missing(logID)){
-    logID <- "assignInterp"
+    logID <- "Interp"
   }
 
   ######## end defaults ########
@@ -76,10 +76,13 @@ assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, sho
 
   for (i in 1:length(colLocsNums)){
 
+    logEntries <- rB3in[["logDF"]] [rowLocsNums,colLocsNums[i]]
+    logEntries <- ifelse(is.na(df[rowLocsNums,colLocsNums[i]]), logID, logEntries)
+
     df[rowLocsNums,colLocsNums[i]] <- forecast::na.interp ( df[rowLocsNums,colLocsNums[i]] )
 
     ### write to same portion of logDF
-    rB3in[["logDF"]] [rowLocsNums,colLocsNums[i]] <- logID
+    rB3in[["logDF"]] [rowLocsNums,colLocsNums[i]] <- logEntries
 
     }
 

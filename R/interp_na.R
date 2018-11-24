@@ -141,17 +141,18 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
           thisDF[(flip.ee[j]-1):(ee[j]+1),1] <- approx.out$y
           
           
-          # ##### log of this column 2 #####
-          # if (!is.na(logID)){
-          #   thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
-          # }
-          # ##### log of this column 2 #####
+          ##### log of this column 2 #####
+          if (!is.na(logID)){
+            # thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
+            rB3in[["logDF"]] [(flip.ee[j]):(ee[j]),colLocsNums[i]]  <- logID
+          }
+          ##### log of this column 2 #####
         }
       }
     }
 
     DF_in[rowLocsNums,colLocsNums[i]] <- thisDF
-    
+
     # ##### log 2 #####
     # if (!is.na(logID)){
     #   thisLog[rowLocsNums,colLocsNums[i]] <- thisDF_log

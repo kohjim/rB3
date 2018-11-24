@@ -1,12 +1,13 @@
-#' Remove values that exceed rate of change - replace with NA
+#' Detect and remove outliers based on running mean with standard deviation
 #'
-#' Specify a maximum ROC manually, or read from the 'ctrls' (which have been read from source dataset headers)
+#' Specify a time window, and number of SD allowed manually, or read from the 'ctrls' (which have been read from source dataset headers)
 #'
 #' @param rB3in rB3 object input
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
-#' @param maxRoc apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'crtls'
+#' @param avgWindow time in hrs to calculate running mean and SD
+#' @param nSD number of stdard deviations about mean which is considered an outlier
 #' @param logID write an operation identifier to the log frames, default = NA
 #' @param showPlot display figure in plots window (TRUE/FALSE)
 #' @param savePlot save figure to a path (TRUE/FALSE)
@@ -14,7 +15,7 @@
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot, savePlot) {
+filterMsd <- function(rB3in, startDate, endDate, varNames, avgWindow, nSD, logID, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
@@ -37,19 +38,23 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPl
     savePlot <- NULL
   }
 
-  if (missing(maxRoc)){
-    maxRoc <- TRUE
+  if (missing(avgWindow)){
+    avgWindow <- 24
+  }
+
+  if (missing(nSD)){
+    nSD <- 3
   }
 
   if (missing(logID)){
-    logID <- "R.O.C"
+    logID <- "MeanSD"
   }
 
   ######## end defaults ########
 
 
   ######## function ########
-lagDiff <- 1
+
 
   ########### assign_na to qcDF based on input args
 
@@ -69,25 +74,52 @@ lagDiff <- 1
   DFColNames <- colnames(df)
 
   # write to the logKey
-  rB3in <- writeLog(rB3in = rB3in, logID = logID, funName = "filterRoc", Reason = "Exceeds max rate of change" )
+  rB3in <- writeLog(rB3in = rB3in, logID = logID, funName = "MeanSD", Reason = "Exceeds Mean +/- n(SDs)" )
+  browser()
 
+  nrowCtrls <- as.numeric(as.character(nrow(rB3in[["ctrls"]]) ))
 
   # set filter thresholds for repeated values
-  if (is.numeric(maxRoc)) {
-    filts <- rep(maxRoc,nrow(rB3in[["ctrls"]]))
+  # if (is.numeric(avgWindow))  {
+
+  if (is.numeric(avgWindow)){
+    aa <- 3
+
+    tester <- rep(avgWindow,nrow(rB3in[["ctrls"]]))
   } else {
-    filts <- rB3in[["ctrls"]]$maxRoc }
+    tester <- rB3in[["ctrls"]]$filterMean }
+
+  if (3 > 2){
+    aa <- 3
+    } else {
+    aa <- 4}
+
+
+  means <- ifelse(is.numeric(avgWindow),  rep(avgWindow,nrowCtrls) , rB3in[["ctrls"]]$filterMean )
+  SDs <- ifelse(is.numeric(nSD),  rep(nSD,nrowCtrls) , rB3in[["ctrls"]]$filterSD )
+
+  means <- if (is.numeric(avgWindow))  data.frame(rep(avgWindow,nrowCtrls) )  else  2
 
 
   for (i in 1:length(colLocsNums)){
     # name of the column to be changed
     thisColName <- DFColNames[colLocsNums[i]]
 
-    # find conditioned location in the df
-    rowsToChange <- which(abs(diff(df[,colLocsNums[i]], lagDiff)) > as.numeric(as.character(filts[(colLocsNums[i]- 1)])))
+    # find conditional locations in the df
+    rowsToChange <- df[rowLocsNums,colLocsNums[i]]
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
-    # replace by NA
+    # working df
+    varDF <- df[ rowsToChange, c(1,colLocsNums[i]) ]
+
+    # find time window for var (numeric in seconds)
+    varWindow <- as.numeric(as.character(pers[(colLocsNums[i]- 1)]) )
+
+    # find location of first measurement after time window has elapsed
+    firstMeas <- varDF[1, "DateTime"]
+    firstWindow <- varDF[varDF$DateTime > firstMeas + varWindow * 3600,"DateTime"]
+
+
     df[rowsToChange,colLocsNums[i]] <- NA
 
     rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID

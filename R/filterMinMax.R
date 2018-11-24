@@ -1,6 +1,6 @@
 #' Assign NA based on filter values from the "ctrls" data frame
 #'
-#' This function assigns NA to the selected subset of dates and variables
+#' Assigns NA to the selected subset of dates and variables
 #'
 #' @param rB3in rB3 object input
 #' @param startDate start date
@@ -47,7 +47,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
   }
 
   if (missing(logID)){
-    logID <- "filterMinMax"
+    logID <- "filter"
   }
 
   ######## end defaults ########
@@ -90,7 +90,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
     # write to the logKey
 
     if (filterMin != FALSE) {
-    rB3in <- writeLog(rB3in, logID, funName = "filterMin", Reason = "Value < min allowed")
+    rB3in <- writeLog(rB3in, paste0(logID,"_min") , funName = "filterMin", Reason = "Value < min allowed")
     }
 
     # find locations
@@ -126,7 +126,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
 
 
     if (filterMax != FALSE) {
-      rB3in <- writeLog(rB3in, logID, funName = "filterMax", Reason = "Value > max allowed")
+      rB3in <- writeLog(rB3in, paste0(logID,"_max"), funName = "filterMax", Reason = "Value > max allowed")
     }
 
 

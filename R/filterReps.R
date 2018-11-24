@@ -1,6 +1,6 @@
-#' Assign NA based on filter values from the "ctrls" data frame
+#' Remove consecutive repeated values
 #'
-#' This function assigns NA to those values which are repeats, beyond a specified limit of allowable consecutive identical values
+#'Specify maximum number of allowable consecutive identical values, or read from the 'ctrls' (which have been read from source dataset headers)
 #'
 #' @param rB3in rB3 object input
 #' @param startDate start date
@@ -42,7 +42,7 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   }
 
   if (missing(logID)){
-    logID <- "filterReps"
+    logID <- "Repeats"
   }
 
   ######## end defaults ########
@@ -69,7 +69,6 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
 
     # write to the logKey
   rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
-
 
   # set filter thresholds for repeated values
   if (is.numeric(maxReps)) {
