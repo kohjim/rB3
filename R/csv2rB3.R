@@ -54,7 +54,7 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country, copySrc) {
 
   # make copy for log entries
   logDF <- srcDF
-  logDF[2:nrow(logDF),2:ncol(logDF)] <- NA
+  logDF[1:nrow(logDF),2:ncol(logDF)] <- NA
 
   # make dataframe of controls
 

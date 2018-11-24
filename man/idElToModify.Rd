@@ -18,4 +18,8 @@ idElToModify(rB3in, startDate, endDate, varNames)
 \description{
 This sub-function identifies elements of the data frame that satisfies dates range and/or variable names,
 }
+\examples{
+idElToModify(rB3in, startDate = '2015-07-01', endDate = '2016-06-30', varNames = 'All')
+
+}
 \keyword{wrangling}

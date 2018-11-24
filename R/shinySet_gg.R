@@ -1,13 +1,14 @@
-#' shiny plot - visually assist data transformation process
+#' shinyVar - visually assist data transformation process                         {rB3}
 #'
-#' Plot single timeseries of pre and post. Return x and y information in response to clicks. Can zoom in (dbl-click).
-#'   exmaple code is generated for removing (set to NA) the highlighted area of the pot
+#' Plot single timeseries of source and quality controlled data. Can zoom in (dbl-click).
+#'   Return x and y information in response to clicks.
+#'   Exmaple code is generated for removing (set to NA) the highlighted area of the pot
 #'
 #' @export
 #' @param rB3in rB3 object to be displayed
 #' @param startDate start date for plot
 #' @param endDate end date for plot
-#' @param varNames name of the variable
+#' @param varNames name of the (single!) variable to be plotted
 #' @param colNum location of the column, alternative to varNames
 #' @param srcColour colour of the unmodified data (leave out to plot only quality controlled data)
 #' @param qcColour colour of the quality controlled data (leave out to plot only unmodified/raw data)
@@ -15,7 +16,7 @@
 #' @examples shinySetOut <- shinySet(newDF, varNames = "TmpWtr.d00500", endDate = '2018-07-01')
 #'
 
-shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, qcColour){
+shinyVar <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, qcColour){
 
   ######## defaults ########
   if (missing(startDate)){
@@ -189,7 +190,7 @@ shinySet_gg <- function(rB3in, startDate, endDate, varNames, colNum, srcColour, 
         if(is.null(e)) return("NULL\n")
         paste0(rB3name, " <- assign_na(", rB3name, ", varNames = \"",
                as.character(varNames),
-               "\",         startDate = \"",
+               "\",  \n       startDate = \"",
                as.POSIXct(round(e$xmin, 1),
                           origin = "1970-01-01 00:00:00",
                           format = "%Y-%m-%d %H:%M:%S"),

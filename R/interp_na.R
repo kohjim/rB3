@@ -3,7 +3,6 @@
 #' Assign linearly interpolated numbers for na when na is repeated less than maxRep number of times.
 #' 
 #' @export
-#' @param DF_in data frame input
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames variable names or keywords
@@ -14,79 +13,66 @@
 #' @examples newDF <- interp_na(DF_in, maxRep = 4)
 #' 
 
-interp_na <- function(DF_in, startDate, endDate, varNames,logID, plotPath, maxRep){
-  
-  ######## log making 1 ######## 
-  # check if DF is a list (i.e. with log)
-  # default: input log does not exist
-  
-  log_exist <- FALSE
-  inLog <- NULL
-  
-  if (!is.data.frame(DF_in)){
-    inLog <- DF_in[[2]]
-    outLog <- inLog
-    log_exist <- TRUE
-    
-    DF_in <- DF_in[[1]]
-  }
-  
-  DF_bak <- DF_in # to be used in plotDiff
-  
-  if (missing(logID)){
-    logID <- NA
-  } else {
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
-  }
-  ######## end log making 1 ######## 
+interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason, showPlot, savePlot){
   
   ######## set defaults ######## 
   if (missing(startDate)){
-    startDate <- DF_in$DateTime[1]
+    startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
   
   if (missing(endDate)){
-    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
+    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
   }
   
   if (missing(varNames)){
     varNames <- "All"
   }
   
-  if (missing(plotPath)){
-    plotPath <- NULL
-  }
-  
   if (missing(maxRep)){
     maxRep <- 2
   }
   
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+  
+  if (missing(savePlot)) {
+    savePlot <- NULL
+  }
+  
+  if (missing(logID)){
+    logID <- NA
+  }
+
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
+  
   ######## end set defaults ######## 
-  
-  
   
   ######## find elements to modify ######## 
   
-  outs.idElToModify <- idElToModify(DF_in,
-                                    startDate = startDate,
-                                    endDate = endDate,
-                                    varNames = varNames)
+  # extract data
+  DF_in <- rB3in[["qcDF"]]
+  
+  outs.idElToModify <- idElToModify(
+    rB3in,
+    startDate = startDate,
+    endDate = endDate,
+    varNames = varNames)
+  
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   rowLocsNums <- which(rowLocs)
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
   
-  ######## find elements to modify ######## 
-  
+  ######## end find elements to modify ######## 
   
   
   ########          ########
   ######## function ######## 
-
   
-  for (i in 1:length(colLocsNums)){#colLocsNums
+  for (i in 1:length(colLocsNums)){ #colLocsNums
 
     # DF_in column to modify
     thisDF <- data.frame(DF_in[rowLocsNums,colLocsNums[i]])
@@ -94,6 +80,7 @@ interp_na <- function(DF_in, startDate, endDate, varNames,logID, plotPath, maxRe
     ##### log of this column 1 #####
     thisDF_log <- thisDF
     thisDF_log[,1] <- NA
+    
     ##### log of this column 1 #####
     
     
@@ -130,9 +117,8 @@ interp_na <- function(DF_in, startDate, endDate, varNames,logID, plotPath, maxRe
     
     ##### end algorithm to identify NA chunks ##### 
     
-    
     ##### interpolation ##### 
-    if (!(nrow(thisDF) == nrow(is.na.thisDF))){ # do nothing if there are no data
+    if (!(nrow(thisDF) == sum(is.na(thisDF)))){ # do nothing if there are no data
       for (j in 1:length(ee)){
 
         if (flip.ee[j] == 1){
@@ -155,51 +141,56 @@ interp_na <- function(DF_in, startDate, endDate, varNames,logID, plotPath, maxRe
           thisDF[(flip.ee[j]-1):(ee[j]+1),1] <- approx.out$y
           
           
-          ##### log of this column 2 #####
-          if (!is.na(logID)){
-            thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
-          }
-          ##### log of this column 2 #####
+          # ##### log of this column 2 #####
+          # if (!is.na(logID)){
+          #   thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
+          # }
+          # ##### log of this column 2 #####
         }
       }
     }
 
     DF_in[rowLocsNums,colLocsNums[i]] <- thisDF
     
-    ##### log 2 #####
-    if (!is.na(logID)){
-      thisLog[rowLocsNums,colLocsNums[i]] <- thisDF_log
-    }
-    ##### log 2 #####
+    # ##### log 2 #####
+    # if (!is.na(logID)){
+    #   thisLog[rowLocsNums,colLocsNums[i]] <- thisDF_log
+    # }
+    # ##### log 2 #####
     
     ##### end interpolation ##### 
   }
   
  
+  ##### plots #######
+  
+  rB3plot <- rB3in
+  
+  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
+  rB3plot[["qcDF"]] <- DF_in
+  
+  
+  # generate plot, if specified
+  
+  if (showPlot == TRUE | !is.null(savePlot)) {
+    prePostPlot(rB3plot,
+                startDate,
+                endDate,
+                varNames = varNames,
+                srcColour = 'grey',
+                preColour = 'red',
+                qcColour = 'blue',
+                showPlot = showPlot,
+                savePlot = savePlot,
+                dpi = 200)
+  }
+  
+  ##### end plots #######
+  
+  # return rB3 obj
+  rB3in[["qcDF"]] <- DF_in
+  
+  return(rB3in)
+  
   ######## end function ######## 
-  ########              ########
-  
-  
-  
-  ######## save plot diff ######## 
-  if (!is.null(plotPath)){  
-    plotDiff(DF_bak, DF_in,
-             colNum = colLocsNums,
-             plotPath = plotPath,
-             custom_dpi = 150,
-             taskName = "taskName")   ######### Change name here (figure's title will contain this info)
-  }
-  ######## save plot diff ######## 
-  
-  
-  ######## return with or without Log ########
-  if (!is.na(logID) | log_exist){
-    
-    return(list(DF_in,outLog))
-    
-  } else {
-    
-    return(DF_in)
-  }
-  ######## end return with or without Log ########
 }

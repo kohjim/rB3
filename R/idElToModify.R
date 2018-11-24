@@ -8,7 +8,7 @@
 #' @param endDate end date
 #' @param varNames variable names that will be selected
 #' @keywords wrangling
-#' @examples idElToModify(rB3in, startDate = '2015-07-01', endDate = '2016-06-30, varNames = 'All')
+#' @examples idElToModify(rB3in, startDate = '2015-07-01', endDate = '2016-06-30', varNames = 'All')
 #'
 
 idElToModify <- function(rB3in, startDate, endDate, varNames){

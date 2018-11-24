@@ -15,103 +15,110 @@
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
 filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot, savePlot) {
-
+  
   ######## defaults ########
   if (missing(startDate)){
     startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
-
+  
   if (missing(endDate)){
     endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
   }
-
+  
   if (missing(varNames)){
     varNames <- "All"
   }
-
+  
   if (missing(showPlot)){
     showPlot <- FALSE
   }
-
+  
   if (missing(savePlot)) {
     savePlot <- NULL
   }
-
+  
   if (missing(maxRoc)){
     maxRoc <- TRUE
   }
-
+  
   if (missing(logID)){
     logID <- NA
   }
-
+  
   ######## end defaults ########
-
-
+  
+  
   ######## function ########
-lagDiff <- 1
-
+  lagDiff <- 1
+  
   ########### assign_na to qcDF based on input args
-
+  
   # identify the elements in the array, to be modified
-  outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
-
+  outs.idElToModify <- idElToModify(
+    rB3in,
+    startDate = startDate,
+    endDate = endDate,
+    varNames = varNames)
+  
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   rowLocsNums <- which(rowLocs)
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
-
+  
   # apply locations to qcDF
   df <- rB3in[["qcDF"]]
-
+  
   # col names for later use
   DFColNames <- colnames(df)
-
+  
   # write to the logKey
+  rbind(logKey,  logEntry)
   writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
-
-
+  
   # set filter thresholds for repeated values
   if (is.numeric(maxRoc)) {
     filts <- rep(maxRoc,nrow(rB3in[["ctrls"]]))
   } else {
-    filts <- rB3in[["ctrls"]]$maxRoc }
-
-
+    filts <- rB3in[["ctrls"]]$maxRoc 
+  }
+  
+  
   for (i in 1:length(colLocsNums)){
     # name of the column to be changed
     thisColName <- DFColNames[colLocsNums[i]]
-
+    
     # find conditioned location in the df
     rowsToChange <- which(abs(diff(df[,colLocsNums[i]], lagDiff)) > as.numeric(as.character(filts[(colLocsNums[i]- 1)])))
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
-
+    
     # replace by NA
     df[rowsToChange,colLocsNums[i]] <- NA
-
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
-
+    
+    rB3in[["logDF"]][rowsToChange,colLocsNums[i]] <- logID
+    
   }
-  ##### plotting #######
-
+  
+  ##### plots #######
+  
   rB3plot <- rB3in
-
+  
   rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
   rB3plot[["qcDF"]] <- df
-
+  
   # generate plot, if specified
-
+  
   if (showPlot == TRUE | !is.null(savePlot)) {
     prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
   }
-
+  
+  ##### end plots #######
+  
+  # return rB3 obj
   rB3in[["qcDF"]] <- df
-
-
-
-  ######## end function ########
-
+  
   return(rB3in)
+  
+  ######## end function ######## 
 }

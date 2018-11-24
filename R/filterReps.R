@@ -42,7 +42,7 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   }
 
   if (missing(logID)){
-    logID <- NA
+    logID <- "filterReps"
   }
 
   ######## end defaults ########
@@ -68,7 +68,7 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   DFColNames <- colnames(df)
 
     # write to the logKey
-  writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
+  rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
 
 
   # set filter thresholds for repeated values

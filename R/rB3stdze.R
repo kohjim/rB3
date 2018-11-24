@@ -122,7 +122,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, methodAgg, pul
     }
 
   rB3out[["logDF"]] <- rB3out[["srcDF"]]
-     rB3out[["logDF"]] [2:nrow(rB3out[["logDF"]]),2:ncol(rB3out[["logDF"]])] <- NA
+     rB3out[["logDF"]] [1:nrow(rB3out[["logDF"]]),2:ncol(rB3out[["logDF"]])] <- NA
 
   }
 

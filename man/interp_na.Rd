@@ -4,22 +4,21 @@
 \alias{interp_na}
 \title{Interpolate na values}
 \usage{
-interp_na(DF_in, startDate, endDate, varNames, logID, plotPath, maxRep)
+interp_na(rB3in, startDate, endDate, varNames, maxRep, logID, showPlot,
+  savePlot)
 }
 \arguments{
-\item{DF_in}{data frame input}
-
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
 
 \item{varNames}{variable names or keywords}
 
+\item{maxRep}{maximum repeated NA}
+
 \item{logID}{assign log ID}
 
 \item{plotPath}{plot figure of before and after}
-
-\item{maxRep}{maximum repeated NA}
 }
 \description{
 Assign linearly interpolated numbers for na when na is repeated less than maxRep number of times.

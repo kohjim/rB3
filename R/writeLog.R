@@ -30,30 +30,23 @@ writeLog <- function(rB3in, logID, funName, Reason) {
 
   logKey <- rB3in[["logKey"]]
 
-  #   autoID <- 1
-  #   if ( length(logKey$logID)  != 0 ) {
-  #   autoID <- as.numeric( max(logKey$logID) + 1 )
-  #   }
-  #
-  # # set logID (checking for numeric else set to NA)
-  # if (logID == 'auto') {
-  # logID <- autoID
-  # } else if (is.numeric(logID) ) {
-  #   logID <- logID
-  # } else { logID <- NA}
-
   # write to logKey if valid logID is available
-  logEntry <- c(logID, funName, Reason)
-
-    logKey <-  rbind(logKey,  logEntry)
+    logKey <-  rbind(logKey,  c(logID, funName, Reason) )
        names(logKey) <- c("logID","Function","Reason")
 
     # force to character
-    # logKey$logID <- as.character(logKey$logID)
+    for (n in names(logKey)) {
+
+       logKey[,n] <- as.character(logKey[,n])
+
+    }
+
 
     # compact into unique log enries
     logKey <- logKey[!duplicated(logKey),]
 
     rB3in[["logKey"]] <- logKey
+
+    return(rB3in)
 
   }

@@ -47,7 +47,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
   }
 
   if (missing(logID)){
-    logID <- NA
+    logID <- "filterMinMax"
   }
 
   ######## end defaults ########
@@ -90,7 +90,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
     # write to the logKey
 
     if (filterMin != FALSE) {
-    writeLog(rB3in, logID, funName = "filterMin", Reason = "Value < min allowed")
+    rB3in <- writeLog(rB3in, logID, funName = "filterMin", Reason = "Value < min allowed")
     }
 
     # find locations
@@ -104,7 +104,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
     df[rowsToChange,colLocsNums[i]] <- NA
 
     ### write to same portion of logDF
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
+    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- paste0(logID,'_min')
 
     }
   }
@@ -126,7 +126,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
 
 
     if (filterMax != FALSE) {
-      writeLog(rB3in, logID, funName = "filterMin", Reason = "Value < min allowed")
+      rB3in <- writeLog(rB3in, logID, funName = "filterMax", Reason = "Value > max allowed")
     }
 
 
@@ -141,7 +141,7 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
       df[rowsToChange,colLocsNums[i]] <- NA
 
       ### write to same portion of logDF
-      rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
+      rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- paste0(logID,'_max')
 
     }
   }
