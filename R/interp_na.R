@@ -142,10 +142,10 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
           
           
           ##### log of this column 2 #####
-          if (!is.na(logID)){
+          # if (!is.na(logID)){
             # thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
             rB3in[["logDF"]] [(flip.ee[j]):(ee[j]),colLocsNums[i]]  <- logID
-          }
+          # }
           ##### log of this column 2 #####
         }
       }

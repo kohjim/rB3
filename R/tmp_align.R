@@ -2,73 +2,76 @@
 #'
 #' This function assign NA to the specific dates range and variables
 #' 
-#' @param DF_in data frame input
-#' @param metaD metadata list
+#' @param rB3in data frame input
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords (e.g. varNames = "tmpwtr")
 #' @param dTPerctile percentile of temperature variation to determine mixed periods
 #' @param wndSpdPerctile percentile of windspeed to make assure mixed periods (optional). wndspd values will be used
-#' @keywords wrangling
+#' @keywords QA/Qc
 #' @export
-#' @examples newDF <- tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath)
+#' @examples newDF <- tmp_align(rB3in, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, Reason, showPlot, savePlot)
 
-tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath){
+tmp_align <- function(rB3in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, Reason, showPlot, savePlot){
   # This function align temperature profiles by finding the times which are 
   # mixed and theoretically indicate identical temperatures
   
-  ######## log making 1 ######## 
-  # check if DF is a list 
-  # default: input log does not exist
-
-  log_exist <- FALSE
-  inLog <- NULL
-  
-  if (!is.data.frame(DF_in)){
-    inLog <- DF_in[[2]]
-    outLog <- inLog
-    log_exist <- TRUE
-    
-    DF_in <- DF_in[[1]]
-  }
-  
-  DF_bak <- DF_in
-  
-  if (missing(logID)){
-    logID <- NA
-  } else {
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
-  }
-  
-  ######## end log making 1 ######## 
-  
   ######## defaults ########
   if (missing(startDate)){
-    startDate <- DF_in$DateTime[1]
+    startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
   
   if (missing(endDate)){
-    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
+    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
   }
   
   if (missing(varNames)){
     varNames <- "TmpWtr"
   }
   
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+  
+  if (missing(savePlot)) {
+    savePlot <- NULL
+  }
+  
+  if (missing(logID)){
+    logID <- NA
+  }
+  
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
   ######## end defaults ########
   
   ######## function ########
+  
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
+  
   # identify the elements in the array
-  outs.idElToModify <- idElToModify(DF_in, startDate, endDate, varNames)
+  outs.idElToModify <- idElToModify(
+    rB3in,
+    startDate = startDate,
+    endDate = endDate,
+    varNames = varNames)
   
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   colLocs <- outs.idElToModify[[2]]
   
+  # extract DF
+  DF_in <- rB3in[["qcDF"]]
+  
   if (!missing(wndSpdPerctile)){ # with wind
     # wind location
-    outs.idElToModify <- idElToModify(DF_in, startDate, endDate, varNames = c("wndspd"))
+    outs.idElToModify <- idElToModify(
+      rB3in,
+      startDate,
+      endDate, 
+      varNames = c("wndspd"))
+    
     wndLocs <- outs.idElToModify[[2]]
     
     # assign data
@@ -148,7 +151,7 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
     # satisfy both mixedLocs and noNALocs (locs in the original vector)
     locsToMakeModel <- intersect(mixedLocs, noNALocs)
     
-    if (!is.integer(locsToMakeModel)){
+    if (is.integer(locsToMakeModel)){
       # satisfy both mixedLocs and noNALocs
       # goodTempToModel <- thisTemp_bak[intersect(mixedLocs, noNALocs)]
       
@@ -162,35 +165,42 @@ tmp_align <- function(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wn
       Temps[noNALocs,i] <- predict.lm(myModel,list(x=thisTemp_bak[noNALocs]))
     }
   }
-  
+
   DF_in[rowLocs,colLocs] <- Temps
   
   ######## end function ######## 
   
-  
-  ######## log making 2 ######## 
-  if (!is.na(logID)){
-    thisLog[rowLocs,colLocs] <- logID
-    outLog <- mkLongLog(inLog,thisLog,logID)
-  }
-  ######## end log making 2 ######## 
-  
-  
-  ######## save plot diff ######## 
-  if (!is.null(plotPath)){  
-    plotDiff(DF_bak, DF_in, colNum = colLocsNums, plotPath = plotPath, custom_dpi = 150, taskName = "tmp_align")
-  }
-  ######## save plot diff ######## 
-  
-  ######## return with or without Log ########
-  if (!is.na(logID) | log_exist){
+  rB3in[["logDF"]][rowLocs,colLocs] <- logID
     
-    return(list(DF_in,outLog))
-    
-  } else {
-    
-    return(DF_in)
+  ##### plots #######
+  
+  rB3plot <- rB3in
+  
+  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
+  rB3plot[["qcDF"]] <- DF_in
+  
+  
+  # generate plot, if specified
+  
+  if (showPlot == TRUE | !is.null(savePlot)) {
+    prePostPlot(rB3plot,
+                startDate,
+                endDate,
+                varNames = varNames,
+                srcColour = 'grey',
+                preColour = 'red',
+                qcColour = 'blue',
+                showPlot = showPlot,
+                savePlot = savePlot,
+                dpi = 200)
   }
-  ######## end return with or without Log ########
+  
+  ##### end plots #######
+  
+  # return rB3 obj
+  rB3in[["qcDF"]] <- DF_in
+  
+  return(rB3in)
+  
   
 } # end function
