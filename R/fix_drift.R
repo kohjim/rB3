@@ -6,7 +6,7 @@
 #' new_value(t) = (value(t) - offset(t)) / span(t) * initial_span + initial_offset
 #' 
 #' @export
-#' @param DF_in data frame input
+#' @param rB3in data frame input
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames variable names or keywords
@@ -17,40 +17,16 @@
 #' @keywords customFun
 #' @examples newDF <- fix_drift(DF_in = myDF, startDate = "2007/1/1", endDate = "2007/7/1", colNum = 15, offsets = c(1,3), span = c(5,6), logID = 5, plotPath = "figures/Rotorua_")
 #' 
-fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offsets, spans, logID, plotPath){
+fix_drift <- function(rB3in, startDate, endDate, varNames, colNum, offsets, spans, logID, Reason, showPlot, savePlot){
   
-  ######## log making 1 ######## 
-  # check if DF is a list (i.e. with log)
-  # default: input log does not exist
-  
-  log_exist <- FALSE
-  inLog <- NULL
-  
-  if (!is.data.frame(DF_in)){
-    inLog <- DF_in[[2]]
-    outLog <- inLog
-    log_exist <- TRUE
-    
-    DF_in <- DF_in[[1]]
-  }
-  
-  DF_bak <- DF_in # to be used in plotDiff
-  
-  if (missing(logID)){
-    logID <- NA
-  } else {
-    thisLog <- DF_in
-    thisLog[,-1] <- NA
-  }
-  ######## end log making 1 ######## 
   
   ######## set defaults ######## 
   if (missing(startDate)){
-    startDate <- DF_in$DateTime[1]
+    startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
   
   if (missing(endDate)){
-    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
+    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
   }
   
   if (missing(varNames)){
@@ -71,10 +47,12 @@ fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offset
   
   ######## find elements to modify ######## 
   
-  outs.idElToModify <- idElToModify(DF_in,
-                                    startDate = startDate,
-                                    endDate = endDate,
-                                    varNames = varNames)
+  outs.idElToModify <- idElToModify(
+    rB3in,
+    startDate = startDate,
+    endDate = endDate,
+    varNames = varNames)
+  
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   rowLocsNums <- which(rowLocs)
@@ -91,10 +69,14 @@ fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offset
     colLocsNums <- colNum
   }
   
+  # extract DF
+  DF_in <- rB3in[["qcDF"]]
+  
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "fix_drift", Reason = "Drift values fixed" )
+  
   ######## find elements to modify ######## 
-  
-  
-  
+
   ########          ########
   ######## function ######## 
 
@@ -132,39 +114,41 @@ fix_drift <- function(DF_in, metaD, startDate, endDate, varNames, colNum, offset
 
     # assign new values
     DF_in[rowLocsNums,colLocsNums[i]] <- new_vector
+    
+    rB3in[["logDF"]][rowLocsNums,colLocsNums[i]] <- logID
   }
   
  
   ######## end function ######## 
   ########              ########
   
-  ######## save plot diff ######## 
-  if (!is.null(plotPath)){  
-    plotDiff(DF_bak, DF_in,
-             colNum = colLocsNums,
-             plotPath = plotPath,
-             custom_dpi = 150,
-             taskName = "fix_drift")   ######### Change name here (figure's title will contain this info)
+  ##### plots #######
+  
+  rB3plot <- rB3in
+  
+  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
+  rB3plot[["qcDF"]] <- DF_in
+  
+  
+  # generate plot, if specified
+  
+  if (showPlot == TRUE | !is.null(savePlot)) {
+    prePostPlot(rB3plot,
+                startDate,
+                endDate,
+                varNames = varNames,
+                srcColour = 'grey',
+                preColour = 'red',
+                qcColour = 'blue',
+                showPlot = showPlot,
+                savePlot = savePlot,
+                dpi = 200)
   }
-  ######## save plot diff ######## 
   
+  ##### end plots #######
   
-  ######## log making 2 ######## 
-  if (!is.na(logID)){
-    thisLog[rowLocs,colLocs] <- logID
-    outLog <- mkLongLog(inLog,thisLog,logID)
-  }
-  ######## end log making 2 ######## 
+  # return rB3 obj
+  rB3in[["qcDF"]] <- DF_in
   
-  
-  ######## return with or without Log ########
-  if (!is.na(logID) | log_exist){
-    
-    return(list(DF_in,outLog))
-    
-  } else {
-    
-    return(DF_in)
-  }
-  ######## end return with or without Log ########
+  return(rB3in)
 }
