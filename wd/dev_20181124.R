@@ -42,4 +42,8 @@ rB3agg2 <- tmp_align(rB3agg2,
 
 
 ##
+install("../../rB3")
+library(rB3)
+shinyrB3(rB3agg2, isPlotSrc = TRUE)
+
 shinyVar(rB3agg2, varNames = "TmpWtr.d00050", srcColour = 'red')

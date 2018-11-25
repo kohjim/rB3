@@ -16,7 +16,7 @@
 #' @examples shinySetOut <- shinySet(newDF, varNames = "TmpWtr.d00500", endDate = '2018-07-01')
 #'
 
-shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
+shinyrB3 <- function(rB3in, startDate, endDate){
 
   ######## defaults ########
   if (missing(startDate)){
@@ -32,10 +32,8 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
   qcColour <- 'black'
   
   srcColour <- 'red'
-  
-  if (missing(srcColour)){
-    isPlotSrc <- FALSE
-  }
+
+  isPlotSrc <- FALSE
 
   ######## end defaults ########
 
@@ -44,34 +42,6 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
 
   # find name of input rB3object, to be used for example function
   rB3name <- deparse(substitute(rB3in))
-  
-  ######## AES #########
-  # ######## find elements to modify ########
-  # outs.idElToModify <- idElToModify(rB3in,
-  #                                   startDate = startDate,
-  #                                   endDate = endDate,
-  #                                   varNames = rownames(rB3agg2[['ctrls']])[1])
-  # # decompose the list
-  # rowLocs <- outs.idElToModify[[1]]
-  # rowLocsNums <- which(rowLocs)
-  # colLocs <- outs.idElToModify[[2]]
-  # colLocsNums <- which(colLocs)
-  # 
-  # ####### MAKE A FACETED GGPLOT ################
-  # 
-  # plotQC <- rB3in[["qcDF"]][rowLocsNums,c(1,colLocsNums)]
-  # colnames(plotQC) <- c("DateTime",plotLabels[colLocsNums - 1])
-  # plotAll <- tidyr::gather(plotQC,var, qc, 2:ncol(plotQC))
-  # 
-  # if (!is.null(srcColour)) {
-  #   plotSrc <- rB3in[["srcDF"]][rowLocsNums,c(1,colLocsNums)]
-  #   colnames(plotSrc) <- c("DateTime",plotLabels[colLocsNums - 1])
-  #   plotSrc <- tidyr::gather(plotSrc,var, value, 2:ncol(plotSrc))
-  # 
-  #   plotAll$src <- plotSrc$value
-  # 
-  # } else { plotAll$src <- NA
-  # }
   
   varNames = rownames(rB3agg2[['ctrls']])[1] # default
   
@@ -124,15 +94,29 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
   
   ui <- shiny::fluidPage(
     shiny::fluidRow(
+      
+    ),
+    
+    shiny::fluidRow(
       shiny::column(
-        6,
+        4,
         selectInput(
           "varNames",
-          "variable",
+          NULL,
           rownames(rB3agg2[['ctrls']])
+        )
+      ),
+      
+      shiny::column(
+        4,
+        checkboxInput(
+          "isPlotSrc",
+          "Plot src",
+          value = FALSE
         )
       )
     ),
+    
     shiny::fluidRow(
       shiny::column(
         12,
@@ -144,21 +128,13 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
         )
       )
     ),
+    
     shiny::verbatimTextOutput("info")
   )
 
   server <- function(input, output) {
     ranges <- reactiveValues(x = NULL, y = NULL)
 
-    # shiny::reactive(
-    #   plotAll <- shiny_mkDF(
-    #     rB3in = rB3in,
-    #     startDate = startDate,
-    #     endDate = endDate,
-    #     varNames = input$varNames,
-    #     isPlotSrc = isPlotSrc)
-    # )
-    
     output$plot1 <- shiny::renderPlot({
       
       plotAll <- shiny_mkDF(
@@ -166,7 +142,7 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
         startDate = startDate,
         endDate = endDate,
         varNames = input$varNames,
-        isPlotSrc = isPlotSrc)
+        isPlotSrc = input$isPlotSrc)
       
       varPlot <-
         ggplot2::ggplot(plotAll) +
@@ -187,7 +163,7 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
         ggplot2::theme_bw() +
         ggplot2::theme(legend.position = "bottom")
       
-      if (is.null(srcColour)) {
+      if (!input$isPlotSrc) {
         varPlot +
           qcGeom +
           qcKey +
@@ -200,31 +176,32 @@ shinyrB3 <- function(rB3in, startDate, endDate, isPlotSrc){
           dualKey +
           ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
       }
-
+      
     })
-
-    shiny::observeEvent(input$plot_dblclick,
-                        {
-                          brush <- input$plot_brush
-                          if (!is.null(brush)) {
-                            ranges$x <- c(
-                              as.POSIXct(round(brush$xmin - (brush$xmax-brush$xmin)*0.05, 1),
-                                         origin = "1970-01-01 00:00:00",
-                                         format = "%Y-%m-%d %H:%M:%S",
-                                         tz = "UTC"),
-                              as.POSIXct(round(brush$xmax + (brush$xmax-brush$xmin)*0.05, 1),
-                                         origin = "1970-01-01 00:00:00",
-                                         format = "%Y-%m-%d %H:%M:%S",
-                                         tz = "UTC")
-                              )
-                            ranges$y <- c(brush$ymin - (brush$ymax - brush$ymin)*0.05,
-                                          brush$ymax + (brush$ymax - brush$ymin)*0.05)
-
-                          } else {
-                            ranges$x <- NULL
-                            ranges$y <- NULL
-                          }
-                        }
+    
+    shiny::observeEvent(
+      input$plot_dblclick,
+      {
+        brush <- input$plot_brush
+        if (!is.null(brush)) {
+          ranges$x <- c(
+            as.POSIXct(round(brush$xmin - (brush$xmax-brush$xmin)*0.05, 1),
+                       origin = "1970-01-01 00:00:00",
+                       format = "%Y-%m-%d %H:%M:%S",
+                       tz = "UTC"),
+            as.POSIXct(round(brush$xmax + (brush$xmax-brush$xmin)*0.05, 1),
+                       origin = "1970-01-01 00:00:00",
+                       format = "%Y-%m-%d %H:%M:%S",
+                       tz = "UTC")
+          )
+          ranges$y <- c(brush$ymin - (brush$ymax - brush$ymin)*0.05,
+                        brush$ymax + (brush$ymax - brush$ymin)*0.05)
+          
+        } else {
+          ranges$x <- NULL
+          ranges$y <- NULL
+        }
+      }
     )
 
     output$info <- shiny::renderText({

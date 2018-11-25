@@ -27,7 +27,9 @@ shiny_mkDF <- function(rB3in, startDate, endDate, varNames, isPlotSrc){
     
     plotAll$src <- plotSrc$value
     
-  } else { plotAll$src <- NA
+  } else { 
+    
+    plotAll$src <- NA
   }
   
   return(plotAll)
