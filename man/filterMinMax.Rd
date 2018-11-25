@@ -27,7 +27,7 @@ filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax, logID,
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
 }
 \description{
-This function assigns NA to the selected subset of dates and variables
+Assigns NA to the selected subset of dates and variables
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

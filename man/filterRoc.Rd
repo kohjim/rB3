@@ -2,7 +2,7 @@
 % Please edit documentation in R/filterRoc.R
 \name{filterRoc}
 \alias{filterRoc}
-\title{Assign NA based on filter values from the "ctrls" data frame}
+\title{Remove values that exceed rate of change - replace with NA}
 \usage{
 filterRoc(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot,
   savePlot)
@@ -25,7 +25,7 @@ filterRoc(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot,
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
 }
 \description{
-This function removes vals that exceed rate of change
+Specify a maximum ROC manually, or read from the 'ctrls' (which have been read from source dataset headers)
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

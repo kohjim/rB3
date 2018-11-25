@@ -65,6 +65,7 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
 ########### assign_na to qcDF based on input args
 
+
   # identify the elements in the array, to be modified
   outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
 
@@ -74,22 +75,29 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
- # apply locations to qcDF
+  # copy qcDF to working DF
   df <- rB3in[["qcDF"]]
+
+  # make blank df for highlighting in plots
+  hlDF <- df
+  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
   # col names for later use
   DFColNames <- colnames(df)
 
+
+
+
   for (i in 1:length(colLocsNums)){
 
     # name of the column to be changed
-    # thisColName <- DFColNames[colLocsNums[i]]
-
-    # find conditional location in the df
     rowsToChange <- which(df[,colLocsNums[i]] >= as.numeric(as.character(minVal)) &
                             df[,colLocsNums[i]] <= as.numeric(as.character(maxVal)) )
 
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
+
+    ### write to same portion of logDF
+    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
 
 
  if (is.numeric(newVal)) {
@@ -110,26 +118,51 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
     ### write to same portion of logDF
     rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
 
+
+
     }
 
-
-   rB3plot <- rB3in
-
-   rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
-   rB3plot[["qcDF"]] <- df
-
-  # generate plot, if specified
-
-    if (showPlot == TRUE | !is.null(savePlot)) {
-      prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
-                  srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
-    }
-
+  # copy working df to source df
   rB3in[["qcDF"]] <- df
 
+  ##### plotting #######
+
+  rB3plot <- rB3in
+  rB3plot[["hlDF"]] <- hlDF
+
+  # if showPlot == TRUE, generate prompt and ask to accept
+  if (showPlot == TRUE | !is.null(savePlot)) {
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+                srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
 
-    ######## end function ########
+    if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-    return(rB3in)
-  }
+      if (!is.null(savePlot)) {
+
+
+        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                        height = 1.2 * length(unique(plotAll$var)),
+                        width = 7.5,
+                        dpi = dpi)
+      }
+
+      # write the changes
+      rB3in[["qcDF"]] <- df
+
+      # write to the logKey
+      rB3in <- writeLog(rB3in, logID, funName = "assignVal", Reason = "Interpolation of missing data" )
+
+      # return the modified rB3 object
+      return(rB3in)
+
+      # ..or don't
+    } else {}
+
+  }   # end showPlot loop
+
+  # always return changes if no showPlot
+  return(rB3in)
+
+  ######## end function ########
+}

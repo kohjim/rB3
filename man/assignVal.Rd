@@ -2,7 +2,7 @@
 % Please edit documentation in R/assignVal.R
 \name{assignVal}
 \alias{assignVal}
-\title{Assign NA to the specified dates range and variables}
+\title{Assign a value or NA to the specified dates range and variables}
 \usage{
 assignVal(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal, logID,
   Reason, showPlot, savePlot)
@@ -27,7 +27,7 @@ assignVal(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal, logID,
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
 }
 \description{
-This function assigns NA to the selected subset of dates and variables
+Specify subset of dates, values and variables to modify
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

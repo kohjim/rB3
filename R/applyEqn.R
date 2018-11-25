@@ -1,54 +1,50 @@
-#' Interpolate the date range given for the variables specified
+#' applyEqn
 #'
-#' Linearly interpolates gaps (NAs) within the selected subset of dates and variables
+#' This custom function applies a quadratic transformation to a specifed data range
+#' of the format newVal = oldVal*coeffA^2 + oldVal*coeffB + coeffC
 #'
+#' @export
 #' @param rB3in rB3 object input
 #' @param startDate start date
 #' @param endDate endDate
-#' @param varNames list of variable names or keywords
-#' @param logID write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code
-#' @param showPlot display figure in plots window (TRUE/FALSE)
-#' @param savePlot save figure to a path (TRUE/FALSE)
-#' @keywords wrangling
-#' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @param coeffs a vector of coefficients, from 0 to nth order (e.g., c(2,3,4,5) == 5x^3 + 4x^2 + 3x + 2)
+#' @param plotPath plot figure of before and after
+#' @keywords customFun
+#' @examples newDF <- DOsat2DOmg_ZebraTechDOpto(DF_in = myDF,DOmgColName = "DOconc_d00050", DOsatColName = "DOpsat_d00050", TColName = "TmpDOs_d00050")
+#'
+#'
 
-assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, showPlot, savePlot) {
+applyEqn <- function(DF_in,startDate,endDate,varNames, coeffs, logID, showPlot, savePlot){
 
-  ######## defaults ########
+
+  ######## set defaults ########
   if (missing(startDate)){
-    startDate <- rB3in[["qcDF"]]$DateTime[1]
+    startDate <- DF_in$DateTime[1]
   }
 
   if (missing(endDate)){
-    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
+    endDate <- DF_in$DateTime[length(DF_in$DateTime)]
   }
 
-  if (missing(varNames)){
-    varNames <- "All"
+  if (missing(coeffs)){
+    coeffs <- NA
   }
 
   if (missing(showPlot)){
     showPlot <- FALSE
   }
 
-  if (missing(Reason)){
-    Reason <- "Interpolation of missing data"
-  }
-
-  if (missing(showPlot)) {
-    showPlot <- FALSE
-  }
-
-   if (missing(savePlot)) {
+  if (missing(savePlot)) {
     savePlot <- NULL
   }
 
   if (missing(logID)){
-    logID <- "Interp"
+    logID <- "driftCorr"
   }
 
-  ######## end defaults ########
+
+    ######## end set defaults ########
+
 
   # identify the elements in the array, to be modified
   outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
@@ -66,27 +62,26 @@ assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, sho
   hlDF <- df
   hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
-  # col names for later use
-  DFColNames <- colnames(df)
 
-
-
+  ####
 
   for (i in 1:length(colLocsNums)){
 
-    # find the periods that will be interped to hlDF
-    changeRows <- is.na(df[rowLocsNums,colLocsNums[i]])
 
-    # interpolate the working DF
-    df[rowLocsNums,colLocsNums[i]] <- forecast::na.interp ( df[rowLocsNums,colLocsNums[i]] )
+  for (z in 1:length(coeffs)){
+    df[rowLocsNums,colLocsNums[i]]  <- df[rowLocsNums,colLocsNums[i]] + coeffs[z] * df[rowLocsNums,colLocsNums[i]] ^(z-1)
+  }
 
-    # write the hlDF with interpolated values
-    hlDF[changeRows,colLocsNums[i]] <- df[changeRows,colLocsNums[i]]
+}
 
-    ### write to same portion of logDF
-    rB3in[["logDF"]] [changeRows,colLocsNums[i]] <- logID
+  #>> make changes
 
-    }
+  ## write drift-corrected data to highlighting DF
+  hlDF[rowLocsNums,colLocsNums] <- df[rowLocsNums,colLocsNums]
+
+  ### write to same portion of logDF
+  rB3in[["logDF"]] [rowLocsNums,colLocsNums] <- logID
+
 
   # copy working df to source df
   rB3in[["qcDF"]] <- df
@@ -117,7 +112,7 @@ assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, sho
       rB3in[["qcDF"]] <- df
 
       # write to the logKey
-      rB3in <- writeLog(rB3in, logID, funName = "assignInterp", Reason = "Interpolation of missing data" )
+      rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
 
       # return the modified rB3 object
       return(rB3in)

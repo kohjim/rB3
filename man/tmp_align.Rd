@@ -4,13 +4,11 @@
 \alias{tmp_align}
 \title{Automatically remove cross thermister observation difference}
 \usage{
-tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile,
-  wndSpdPerctile, logID, plotPath)
+tmp_align(rB3in, metaD, startDate, endDate, varNames, dTPerctile,
+  wndSpdPerctile, logID, Reason, showPlot, savePlot)
 }
 \arguments{
-\item{DF_in}{data frame input}
-
-\item{metaD}{metadata list}
+\item{rB3in}{data frame input}
 
 \item{startDate}{start date}
 
@@ -26,6 +24,6 @@ tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile,
 This function assign NA to the specific dates range and variables
 }
 \examples{
-newDF <- tmp_align(DF_in, metaD, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, plotPath)
+newDF <- tmp_align(rB3in, startDate, endDate, varNames, dTPerctile, wndSpdPerctile, logID, Reason, showPlot, savePlot)
 }
-\keyword{wrangling}
+\keyword{QA/Qc}

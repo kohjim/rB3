@@ -158,13 +158,36 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
   if (showPlot == TRUE | !is.null(savePlot)) {
     prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
-  }
 
-  rB3in[["qcDF"]] <- df
+
+    if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
+
+      if (!is.null(savePlot)) {
+
+        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                        height = 1.2 * length(unique(plotAll$var)),
+                        width = 7.5,
+                        dpi = dpi)
+      }
+
+
+      rB3in[["qcDF"]] <- df
+
+      return(rB3in)
+
+    } else {}
+
+
+
+
+  }   # close showPlot loop
+
+
+  return(rB3in)
 
 
 
   ######## end function ########
 
-  return(rB3in)
+
 }

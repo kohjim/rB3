@@ -2,7 +2,7 @@
 % Please edit documentation in R/assignInterp.R
 \name{assignInterp}
 \alias{assignInterp}
-\title{interpolate the specified dates range and variables}
+\title{Interpolate the date range given for the variables specified}
 \usage{
 assignInterp(rB3in, startDate, endDate, varNames, logID, Reason, showPlot,
   savePlot)
@@ -23,7 +23,7 @@ assignInterp(rB3in, startDate, endDate, varNames, logID, Reason, showPlot,
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
 }
 \description{
-This function interpolates gaps within the selected subset of dates and variables
+Linearly interpolates gaps (NAs) within the selected subset of dates and variables
 }
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))

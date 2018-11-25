@@ -42,14 +42,13 @@ tmp_align <- function(rB3in, metaD, startDate, endDate, varNames, dTPerctile, wn
   }
   
   # write to the logKey
-  writeLog(rB3in, logID, funName = "tmp_align", Reason = "Temperature values aligned" )
-  
-  # extract DF
-  DF_in <- rB3in[["qcDF"]]
-  
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
   ######## end defaults ########
   
   ######## function ########
+  
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
   
   # identify the elements in the array
   outs.idElToModify <- idElToModify(
@@ -62,6 +61,8 @@ tmp_align <- function(rB3in, metaD, startDate, endDate, varNames, dTPerctile, wn
   rowLocs <- outs.idElToModify[[1]]
   colLocs <- outs.idElToModify[[2]]
   
+  # extract DF
+  DF_in <- rB3in[["qcDF"]]
   
   if (!missing(wndSpdPerctile)){ # with wind
     # wind location

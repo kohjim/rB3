@@ -4,11 +4,11 @@
 \alias{fix_drift}
 \title{Fix linear drift (for sensor maintenance calibration)}
 \usage{
-fix_drift(DF_in, metaD, startDate, endDate, varNames, colNum, offsets, spans,
-  logID, plotPath)
+fix_drift(rB3in, startDate, endDate, varNames, colNum, offsets, spans, logID,
+  Reason, showPlot, savePlot)
 }
 \arguments{
-\item{DF_in}{data frame input}
+\item{rB3in}{data frame input}
 
 \item{startDate}{start date}
 

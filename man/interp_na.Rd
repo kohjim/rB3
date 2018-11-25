@@ -4,7 +4,7 @@
 \alias{interp_na}
 \title{Interpolate na values}
 \usage{
-interp_na(rB3in, startDate, endDate, varNames, maxRep, logID, showPlot,
+interp_na(rB3in, startDate, endDate, varNames, maxRep, logID, Reason, showPlot,
   savePlot)
 }
 \arguments{

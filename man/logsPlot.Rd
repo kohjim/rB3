@@ -2,7 +2,7 @@
 % Please edit documentation in R/logsPlot.R
 \name{logsPlot}
 \alias{logsPlot}
-\title{logsPlot}
+\title{Produce a plot summarising QC changes}
 \usage{
 logsPlot(rB3in, startDate, endDate, varNames, plotLabels, srcColour, showPlot,
   savePlot, dpi)
@@ -25,7 +25,7 @@ logsPlot(rB3in, startDate, endDate, varNames, plotLabels, srcColour, showPlot,
 \item{savePlot}{save figure to this path ('folder/start_of_file_name')}
 }
 \description{
-This function plots variables on a faceted ggplot
+Source and qualitly controlled data are shown, along with coloured indication of any quality control changes made (logIDs)
 }
 \examples{
 newDF <- gg_facetVar(rB3in = stdDF, metaD = metaD, varNames = wqVars, srcColour = 'red',

@@ -35,3 +35,11 @@ rB3agg2 <- assignVal(rB3agg2, varNames = c('TmpWtr.d00050','TmpWtr.d00150'),
 rB3agg2 <- interp_na(rB3agg2, varNames = c('TmpWtr.d00050'),  
                      maxRep = 100000, 
                      logID = "Test", Reason = "Interp", showPlot = T)
+
+rB3agg2 <- tmp_align(rB3agg2,  
+                     dTPerctile = 0.2, 
+                     logID = "TestAlign", Reason = "Interp", showPlot = T)
+
+
+##
+shinyVar(rB3agg2, varNames = "TmpWtr.d00050", srcColour = 'red')

@@ -16,7 +16,7 @@
 #' @examples newDF <- gg_facetVar(rB3in = stdDF, metaD = metaD, varNames = wqVars, srcColour = 'red',
 #'               qcColour = 'black', savePlot = 'figures/RAW_WQ_',  dpi = 400)
 #'
-prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, preColour, qcColour, showPlot, savePlot, dpi) {
+prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, hlColour, qcColour, showPlot, savePlot, dpi) {
 
   ######## set defaults ########
   if (missing(startDate)){
@@ -43,8 +43,8 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
       srcColour <- NULL
   }
 
-  if (missing(preColour)){
-    preColour <- NULL
+  if (missing(hlColour)){
+    hlColour <- NULL
   }
 
   if (missing(qcColour)){
@@ -64,7 +64,6 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
     dpi <- 300
   }
 
-  ######## end set defaults ########
 
   ######## find rows & cols to plot ########
   outs.idElToModify <- idElToModify(rB3in,
@@ -78,7 +77,6 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
   colLocsNums <- which(colLocs)
 
 
-
   ####### MAKE A FACETED GGPLOT ################
 
   plotQC <- rB3in[["qcDF"]][,c(1,colLocsNums)]
@@ -86,34 +84,26 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
   plotAll <- tidyr::gather(plotQC,var, qc, 2:ncol(plotQC))
 
 
-    plotPre <- rB3in[["preDF"]][,c(1,colLocsNums)]
-    colnames(plotPre) <- c("DateTime",plotLabels[colLocsNums - 1])
-    plotPre <- tidyr::gather(plotPre,var, pre, 2:ncol(plotPre))
+  plotHl <- rB3in[["hlDF"]][,c(1,colLocsNums)]
+    colnames(plotHl) <- c("DateTime",plotLabels[colLocsNums - 1])
+    plotHl <- tidyr::gather(plotHl,var, hl, 2:ncol(plotHl))
 
 
     plotSrc <- rB3in[["srcDF"]][,c(1,colLocsNums)]
     colnames(plotSrc) <- c("DateTime",plotLabels[colLocsNums - 1])
     plotSrc <- tidyr::gather(plotSrc,var, src, 2:ncol(plotSrc))
 
-    plotAll$pre <- plotPre$pre
+    plotAll$hl <- plotHl$hl
     plotAll$src <- plotSrc$src
 
+   # generate plot
+   print(
 
-  srcGeom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"), size = 0.2)
-  preGeom <-
-  qcGeom <-
-  # srcKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour))
-  # qcKey <- ggplot2::scale_colour_manual("",values = c("Quality cotrolled data"=qcColour))
-
-
-  varPlot <-
-
-   ggplot2::ggplot(plotAll) +
+    ggplot2::ggplot(plotAll) +
 
     ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"), size = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = pre, color = "QC data prior to this action"), size = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "QC data following this action"), size = 0.2) +
-
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "QC data"), size = 0.2) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = hl, color = "Data to be modified"), size = 0.2) +
 
     ggplot2::ylab("Value") +
     ggplot2::xlab(NULL) +
@@ -121,27 +111,16 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
                      # breaks = scales::date_breaks("1 years"),
                      limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
                      expand = c(0, 0)) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
     ggplot2::scale_colour_manual("",values = c("Unmodified source data"=srcColour,
-                                                           "QC data prior to this action" = preColour,
-                                                           "QC data following this action"=qcColour)) +
-    ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y') +
+                                                "QC data" = qcColour,
+                                                "Data to be modified"=hlColour)) +
+
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
     ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom")
+    ggplot2::theme(legend.position = "bottom") +
+    ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y')
 
-
-  if (showPlot == TRUE) {
-
-    print(varPlot)
-             }
-
-if (!is.null(savePlot)) {
-
-    ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                  height = 1.2 * length(unique(plotAll$var)),
-                  width = 7.5,
-                  dpi = dpi)
-               }
+   )
 
 }
   ######## end function ########

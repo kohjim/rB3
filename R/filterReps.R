@@ -61,14 +61,17 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
- # apply locations to qcDF
+  # copy qcDF to working DF
   df <- rB3in[["qcDF"]]
+
+  # make blank df for highlighting in plots
+  hlDF <- df
+     hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
   # col names for later use
   DFColNames <- colnames(df)
 
-    # write to the logKey
-  rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
+
 
   # set filter thresholds for repeated values
   if (is.numeric(maxReps)) {
@@ -84,7 +87,7 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
       maxRep <- as.numeric(as.character(filts[(colLocsNums[i]- 1)]) )
 
 
-    ##### algorithm to identify repeats and remove #####
+  ##### algorithm to identify repeats and remove #####
 
   # dataframe columns to modify
   thisCol <- data.frame(rB3in[["qcDF"]] [colLocsNums[i]])
@@ -110,45 +113,61 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   # outside user date range = do not modify
   thisCol$rowsToChange[-rowLocsNums] <- FALSE
 
-  # replace by NA
+  #>> make changes
+
+  ## write data that will be removed to highlighting DF
+  hlDF[thisCol$rowsToChange,colLocsNums[i]] <- df[thisCol$rowsToChange,colLocsNums[i]]
+
+  ### replace by NA in working DF
   df[thisCol$rowsToChange,colLocsNums[i]] <- NA
 
-  # rowLocs[,i] <- df$rowsToChange[]
-
-#
-#     for (i in 1:length(colLocsNums)){
-#
-#     # find conditional location in the df
-#     rowsToChange <- which( df[,colLocsNums[i]] <= as.numeric(as.character(filts[colLocsNums[i - 1]])) )
-#     rowsToChange <- intersect(rowLocsNums,rowsToChange)
-#
-#     # replace by new value
-#     df[rowsToChange,colLocsNums[i]] <- NA
-
-    ### write to same portion of logDF
-    rB3in[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]] <- logID
+  ### write to same portion of logDF
+  rB3in[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]] <- logID
 
     }
+
+
+  # copy working df to source df
+  rB3in[["qcDF"]] <- df
 
   ##### plotting #######
 
   rB3plot <- rB3in
+  rB3plot[["hlDF"]] <- hlDF
 
-  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
-  rB3plot[["qcDF"]] <- df
-
-  # generate plot, if specified
-
+  # if showPlot == TRUE, generate prompt and ask to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
     prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
-                srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
-  }
-
-  rB3in[["qcDF"]] <- df
+                srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
 
+    if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
+
+      if (!is.null(savePlot)) {
+
+
+           ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                        height = 1.2 * length(unique(plotAll$var)),
+                        width = 7.5,
+                        dpi = dpi)
+      }
+
+      # write the changes
+      rB3in[["qcDF"]] <- df
+
+      # write to the logKey
+      rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
+
+      # return the modified rB3 object
+      return(rB3in)
+
+      # ..or don't
+      } else {}
+
+     }   # end showPlot loop
+
+  # always return changes if no showPlot
+  return(rB3in)
 
   ######## end function ########
-
-  return(rB3in)
-}
+  }
