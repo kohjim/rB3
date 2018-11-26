@@ -4,8 +4,8 @@
 \alias{assign_na}
 \title{Assign NA to the specified dates range and variables}
 \usage{
-assign_na(rB3in, startDate, endDate, varNames, minVal, maxVal, logID, Reason,
-  showPlot, savePlot)
+assign_na(rB3in, startDate, endDate, varNames, minVal, maxVal, logID,
+  Reason, showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}

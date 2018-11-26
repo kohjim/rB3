@@ -5,10 +5,12 @@ setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd")
 # remotes::install_github("kohjim/rB3", ref = "G20", upgrade = c("never"))
 # library(rB3)
 
-# library(remotes)
-# remotes::install_local(path = "../../rB3")
+library(remotes)
+remotes::install_local(path = "../../rB3")
 
+# install.packages("roxygen2")
 library(roxygen2)
+library(devtools)
 setwd("C:/Users/km-admin/Dropbox/Git")
 document("rB3")
 
@@ -20,8 +22,35 @@ library(rB3)
 ## read file
 rB3demo <- csv2rB3("rB3demo_201507-201806_RAW_R.csv","Lake_Rotoehu",-38.5, 176.5,"NZ",TRUE)
 
-rB3agg <- rB3stdze(rB3in = rB3demo, varNames = 'All', startDate = '2016-07-01', endDate = '2018-06-30 23:45:00',
-                   timestep = 15)
+system.time(dt <- fastStdze(rB3in = rB3demo, 
+                                varNames = 'All', 
+                                startDate = '2016-07-01', 
+                                endDate = '2018-06-30 23:45:00',
+                                timestep = 15))
+
+system.time(
+  {aggVals = dt[ , funAgg(dt[[2]]), by = dt[[1]]]}
+  )
+
+dt2 = as.data.frame(dt)
+system.time(
+{aggVals <- aggregate(
+  dt2[,2],
+  by = list(dt2$DateTime),
+  FUN = funAgg)}
+)
+
+system.time(rB3agg <- fastStdze(rB3in = rB3demo, 
+                   varNames = 'All', 
+                   startDate = '2016-07-01', 
+                   endDate = '2018-06-30 23:45:00',
+                   timestep = 15))
+
+system.time({rB3agg <- rB3stdze(rB3in = rB3demo, 
+                   varNames = 'All', 
+                   startDate = '2016-07-01', 
+                   endDate = '2018-06-30 23:45:00',
+                   timestep = 15)})
 
 rB3agg2 <- rB3agg
 
@@ -44,6 +73,6 @@ rB3agg2 <- tmp_align(rB3agg2,
 ##
 install("../../rB3")
 library(rB3)
-shinyrB3(rB3agg2, isPlotSrc = TRUE)
+shinyrB3(rB3agg2)
 
 shinyVar(rB3agg2, varNames = "TmpWtr.d00050", srcColour = 'red')

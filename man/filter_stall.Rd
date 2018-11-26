@@ -4,8 +4,8 @@
 \alias{filter_stall}
 \title{Remove repeated values}
 \usage{
-filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile, logID,
-  plotPath)
+filter_stall(DF_in, metaD, maxRep, varNames, startDate, endDate, cndFile,
+  logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

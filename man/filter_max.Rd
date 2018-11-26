@@ -4,8 +4,8 @@
 \alias{filter_max}
 \title{Remove large values}
 \usage{
-filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile, logID,
-  plotPath)
+filter_max(DF_in, metaD, maxVal, varNames, startDate, endDate, cndFile,
+  logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

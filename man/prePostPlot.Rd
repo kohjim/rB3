@@ -5,7 +5,7 @@
 \title{gg_facetVar}
 \usage{
 prePostPlot(rB3in, startDate, endDate, varNames, plotLabels, srcColour,
-  preColour, qcColour, showPlot, savePlot, dpi)
+  hlColour, qcColour, showPlot, savePlot, dpi)
 }
 \arguments{
 \item{rB3in}{rB3 object input}

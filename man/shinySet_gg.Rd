@@ -4,7 +4,8 @@
 \alias{shinySet_gg}
 \title{shinyVar - visually assist data transformation process                         {rB3}}
 \usage{
-shinySet_gg(rB3in, startDate, endDate, varNames, colNum, srcColour, qcColour)
+shinySet_gg(rB3in, startDate, endDate, varNames, colNum, srcColour,
+  qcColour)
 }
 \arguments{
 \item{rB3in}{rB3 object to be displayed}

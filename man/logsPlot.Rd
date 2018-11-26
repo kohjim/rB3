@@ -4,8 +4,8 @@
 \alias{logsPlot}
 \title{Produce a plot summarising QC changes}
 \usage{
-logsPlot(rB3in, startDate, endDate, varNames, plotLabels, srcColour, showPlot,
-  savePlot, dpi)
+logsPlot(rB3in, startDate, endDate, varNames, plotLabels, srcColour,
+  showPlot, savePlot, dpi)
 }
 \arguments{
 \item{rB3in}{rB3 object input}

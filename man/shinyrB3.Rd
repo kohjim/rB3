@@ -4,7 +4,7 @@
 \alias{shinyrB3}
 \title{Interactive data visualisation}
 \usage{
-shinyrB3(rB3in, startDate, endDate, isPlotSrc)
+shinyrB3(rB3in, startDate, endDate)
 }
 \arguments{
 \item{rB3in}{rB3 object to be displayed}

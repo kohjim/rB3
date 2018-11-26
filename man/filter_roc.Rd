@@ -4,8 +4,8 @@
 \alias{filter_roc}
 \title{Find values' rate of change exceeded maxRoc value and assign NA}
 \usage{
-filter_roc(DF_in, metaD, maxRoc, varNames, startDate, endDate, cndFile, logID,
-  plotPath)
+filter_roc(DF_in, metaD, maxRoc, varNames, startDate, endDate, cndFile,
+  logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

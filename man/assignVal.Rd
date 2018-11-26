@@ -4,8 +4,8 @@
 \alias{assignVal}
 \title{Assign a value or NA to the specified dates range and variables}
 \usage{
-assignVal(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal, logID,
-  Reason, showPlot, savePlot)
+assignVal(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal,
+  logID, Reason, showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}

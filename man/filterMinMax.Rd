@@ -4,8 +4,8 @@
 \alias{filterMinMax}
 \title{Assign NA based on filter values from the "ctrls" data frame}
 \usage{
-filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax, logID,
-  showPlot, savePlot)
+filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax,
+  logID, showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}

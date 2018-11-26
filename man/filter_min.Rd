@@ -4,8 +4,8 @@
 \alias{filter_min}
 \title{Remove small values}
 \usage{
-filter_min(DF_in, metaD, minVal, varNames, startDate, endDate, cndFile, logID,
-  plotPath)
+filter_min(DF_in, metaD, minVal, varNames, startDate, endDate, cndFile,
+  logID, plotPath)
 }
 \arguments{
 \item{DF_in}{data frame input}

@@ -4,7 +4,8 @@
 \alias{writeLAinputs}
 \title{Write input files for Lake Analyzer from your rB3 files}
 \usage{
-writeLAinputs(rB3in, startDate, endDate, wtrNames, wndName, wndHeight, filePath)
+writeLAinputs(rB3in, startDate, endDate, wtrNames, wndName, wndHeight,
+  filePath)
 }
 \arguments{
 \item{rB3in}{data frame to be standardized}

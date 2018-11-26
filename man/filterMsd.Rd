@@ -4,8 +4,8 @@
 \alias{filterMsd}
 \title{Detect and remove outliers based on running mean with standard deviation}
 \usage{
-filterMsd(rB3in, startDate, endDate, varNames, avgWindow, nSD, logID, showPlot,
-  savePlot)
+filterMsd(rB3in, startDate, endDate, varNames, avgWindow, nSD, logID,
+  showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
