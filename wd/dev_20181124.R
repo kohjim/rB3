@@ -1,9 +1,9 @@
 setwd("C:/Users/km-admin/Dropbox/Git/rB3/wd")
 
 # install.packages("remotes")
-# library(remotes)
-# remotes::install_github("kohjim/rB3", ref = "G20", upgrade = c("never"))
-# library(rB3)
+library(remotes)
+remotes::install_github("kohjim/rB3", ref = "G20")
+library(rB3)
 
 library(remotes)
 remotes::install_local(path = "../../rB3")
@@ -56,7 +56,7 @@ shinyrB3(rB3agg2)
 
 shinyVar(rB3agg2, varNames = "TmpWtr.d00050", srcColour = 'red')
 
-rB3in <- rB3agg2
+rB3agg3 <- rB3agg2
 
 # create empty variables called DOSat1, DOSat2, DOSat3 after third column (3rd variables, excluding datetime)
 rB3agg3 <- varWrangle(rB3agg2, varNames = c("DOSat1","DOSat2","DOSat3"), loc = 3)
@@ -67,5 +67,16 @@ rB3agg3 <- varWrangle(rB3agg3, varNames = "Wnd|Rad", task = "moveto", loc = 4)
 rownames(rB3agg3[['ctrls']])
 
 # remove variables includes keyword "TmpWtr"
-rB3agg3 <- varWrangle(rB3agg3, varNames = "TmpWtr", task = "rm", loc = 3)
+rB3agg3 <- varWrangle(rB3agg3, varNames = "TmpWtr", task = "rm")
 rownames(rB3agg3[['ctrls']])
+
+# this will add "DDD"
+rB3agg3 <- varWrangle(rB3agg3,"DDD")
+rownames(rB3agg3[['ctrls']])
+
+# this will remove keyword "DDD"
+rB3agg3 <- varWrangle(rB3agg3,"DDD")
+rownames(rB3agg3[['ctrls']])
+
+colnames(rB3agg3[['qcDF']])
+

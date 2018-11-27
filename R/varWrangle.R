@@ -25,7 +25,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
   }
   
   if (missing(loc)){
-    varNames <- NULL
+    loc <- NULL
   }
   
   ######## check vars ########
@@ -40,7 +40,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
   # decompose the list
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
-  
+
   ######## end check vars ########
   
   if (sum(colLocs) == 0){ # the specified varNames do not exist, add the VarNames
@@ -80,21 +80,22 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     rB3in[["logDF"]][,varNames] <- NA
     rB3in[["ctrls"]][varNames,] <- NA
     
-    newNCol = ncol(srcDF)
+    newNCol = ncol(rB3in[["srcDF"]])
     
     # because ctrls have N-1 vars (without dateTime), adjust this complication..
-    rB3in[["ctrls"]] <- rB3in[["ctrls"]][c(1:(orgNCol-1), (orgNCol+1):newNCol, orgNCol),]
+
+    rB3in[["ctrls"]] <- rB3in[["ctrls"]][c(1:(orgNCol-1),(orgNCol+1):(newNCol),orgNCol),]
     
     # continue program
     
   } else if (task == "rm"){ # remove variables
-    
+
     rB3in[["srcDF"]] <- rB3in[["srcDF"]][,!colLocs]
     rB3in[["qcDF"]] <- rB3in[["qcDF"]][,!colLocs]
     rB3in[["logDF"]] <- rB3in[["logDF"]][,!colLocs]
-    rB3in[["ctrls"]] <- rB3in[["ctrls"]][!colLocs[2:orgNCol],]
+    rB3in[["ctrls"]] <- rB3in[["ctrls"]][!c(colLocs[2:orgNCol],FALSE),]
     
-    print(paste0(paste0(varNames[1:3],collapse = ", "), " were removed from the rB3 obj"))
+    print(paste0(paste0(varNames,collapse = ", "), " were removed from the rB3 obj"))
     
     return(rB3in) # end program
     
