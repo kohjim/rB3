@@ -4,7 +4,7 @@
 \alias{varWrangle}
 \title{Interpolate the date range given for the variables specified}
 \usage{
-varWrangle(rB3in, varNames, task)
+varWrangle(rB3in, varNames, task, loc)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
