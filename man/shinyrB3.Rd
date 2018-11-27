@@ -12,22 +12,15 @@ shinyrB3(rB3in, startDate, endDate)
 \item{startDate}{start date for plot}
 
 \item{endDate}{end date for plot}
-
-\item{varNames}{name of the (single!) variable to be plotted}
-
-\item{colNum}{location of the column, alternative to varNames}
-
-\item{srcColour}{colour of the unmodified data (leave out to plot only quality controlled data)}
-
-\item{qcColour}{colour of the quality controlled data (leave out to plot only unmodified/raw data)}
 }
 \description{
-Plot single timeseries of source and quality controlled data. Can zoom in (dbl-click). \cr
-  Return x and y information in response to clicks. \cr
+Choose and plot interactively single timeseries of source and quality controlled data. \cr
+  Select variable from drop-down, choose to display or ignore source data.  \cr
+  PLot can be selected and zoomed by brush. Returns x and y information in response to brush selection. \cr
   Example code is generated for removing (set to NA) the highlighted area of the plot
 }
 \examples{
-shinySetOut <- shinySet(newDF, varNames = "TmpWtr.d00500", endDate = '2018-07-01')
+shinyrB3(rB3in, endDate = '2018-07-01')
 
 }
 \keyword{editing}

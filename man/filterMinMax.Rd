@@ -2,10 +2,10 @@
 % Please edit documentation in R/filterMinMax.R
 \name{filterMinMax}
 \alias{filterMinMax}
-\title{Assign NA based on filter values from the "ctrls" data frame}
+\title{Remove values outside of specified minimum and maximum bounds}
 \usage{
 filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax,
-  logID, showPlot, savePlot)
+  logID, Reason, showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
@@ -22,6 +22,8 @@ filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax,
 
 \item{logID}{write an operation identifier to the log frames, default = NA}
 
+\item{Reason}{reason for the logged changes (character)}
+
 \item{showPlot}{display figure in plots window (TRUE/FALSE)}
 
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
@@ -30,6 +32,6 @@ filterMinMax(rB3in, startDate, endDate, varNames, filterMin, filterMax,
 Assigns NA to the selected subset of dates and variables
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+new <- filterReps(old, varNames = 'TmpWtr', filterMin = 9, filterMax = 25,logID = 10, showPlot = TRUE)
 }
 \keyword{wrangling}

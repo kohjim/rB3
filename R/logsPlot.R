@@ -86,18 +86,19 @@ logsPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour,
 
     plotAll$src <- plotSrc$src
 
-        hVal <- min(plotAll[,c(3,5)],na.rm = T) * 0.8
+         hVal <- min(plotAll[,c(3,5)],na.rm = T)
+         hVal <- ifelse(hVal <0, hVal * 1.5, hVal * 0.8)
+
     plotAll$logInd <- ifelse(!is.na(plotAll$logs), hVal, NA)
 
 
-    browser()
   varPlot <-
 
    ggplot2::ggplot(plotAll) +
     ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src), color = 'grey', size = 0.2) +
     ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc), color = 'blue', size = 0.2) +
     ggplot2::geom_point(data = plotAll[!is.na(plotAll$logs),],
-                        ggplot2::aes(x = DateTime, y = hVal, color = logs), na.rm = T, size = 1) +
+                        ggplot2::aes(x = DateTime, y = hVal, color = logs), na.rm = T, size = 2, shape = 73) +
     ggplot2::ylab("Value") +
     ggplot2::xlab(NULL) +
     ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m"),

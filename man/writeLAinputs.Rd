@@ -16,9 +16,9 @@ writeLAinputs(rB3in, startDate, endDate, wtrNames, wndName, wndHeight,
 
 \item{wtrNames}{variables (columns) of water temperature to be written to .wtr file}
 
-\item{wndName}{variable (column) containing wind speed data .wnd file}
+\item{wndName}{variable (column) of wind speed data to be written to .wnd file}
 
-\item{wndHeight}{height of wind sensor (in m) above water surface, used to stadardise wind speed to 10 m height using wind power law}
+\item{wndHeight}{height of wind speed sensor above lake surface}
 
 \item{filePath}{folder to which files will be writen, set relative to working dir}
 }
@@ -26,7 +26,7 @@ writeLAinputs(rB3in, startDate, endDate, wtrNames, wndName, wndHeight,
 Easily generate Lake Analyzer water temperature (.wtr) and wind speed (.wnd) files with the correct header formats
 }
 \examples{
-stdDF <- rB3stdze(df = rawDF, varNames = wqVars, startDate = '2016-07-01 00:00:00', endDate = '2018-06-30 23:45:00', doAgg = TRUE, methodAgg = ctrls$methodAgg, pullAgg = ctrls$pullAgg)
+writeLAinputs(rB3in = rB3agg2, wtrNames = 'TmpWtr', wndName = 'WndSpd', wndHeight = 1.5)
 
 
 }

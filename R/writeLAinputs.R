@@ -7,11 +7,11 @@
 #' @param startDate start date
 #' @param endDate endDate
 #' @param wtrNames variables (columns) of water temperature to be written to .wtr file
-#' @param wndName variable (column) containing wind speed data .wnd file
-#' @param wndHeight height of wind sensor (in m) above water surface, used to stadardise wind speed to 10 m height using wind power law
+#' @param wndName variable (column) of wind speed data to be written to .wnd file
+#' @param wndHeight height of wind speed sensor above lake surface
 #' @param filePath folder to which files will be writen, set relative to working dir
 #' @keywords fileIO
-#' @examples stdDF <- rB3stdze(df = rawDF, varNames = wqVars, startDate = '2016-07-01 00:00:00', endDate = '2018-06-30 23:45:00', doAgg = TRUE, methodAgg = ctrls$methodAgg, pullAgg = ctrls$pullAgg)
+#' @examples writeLAinputs(rB3in = rB3agg2, wtrNames = 'TmpWtr', wndName = 'WndSpd', wndHeight = 1.5)
 #'
 #'
 

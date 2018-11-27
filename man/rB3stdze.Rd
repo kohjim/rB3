@@ -4,7 +4,8 @@
 \alias{rB3stdze}
 \title{Buoy observation to data frame}
 \usage{
-rB3stdze(rB3in, startDate, endDate, varNames, timestep, methodAgg, pullAgg)
+rB3stdze(rB3in, startDate, endDate, varNames, timestep, aggAll, methodAgg,
+  pullAgg)
 }
 \arguments{
 \item{rB3in}{rB3 object to be 'standardized'}
@@ -15,7 +16,9 @@ rB3stdze(rB3in, startDate, endDate, varNames, timestep, methodAgg, pullAgg)
 
 \item{varNames}{variables (columns) to be retained, select by full header name, key characters, or 'All'}
 
-\item{timestep}{standardise (aggregate) to a common timestep (T/F; turn aggregation on or off)}
+\item{timestep}{standardise (aggregate) to a common timestep (numeric, in mins, to turn aggregation on) !! NOTE! logs will be reset to NA!!}
+
+\item{aggAll}{TRUE: aggregate source and qc data separately, FALSE: source data = qc data.}
 
 \item{methodAgg}{aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)}
 

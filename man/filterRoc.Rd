@@ -4,8 +4,8 @@
 \alias{filterRoc}
 \title{Remove values that exceed rate of change - replace with NA}
 \usage{
-filterRoc(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot,
-  savePlot)
+filterRoc(rB3in, startDate, endDate, varNames, maxRoc, logID, Reason,
+  showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
@@ -16,13 +16,13 @@ filterRoc(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot,
 
 \item{varNames}{list of variable names or keywords}
 
-\item{maxRoc}{apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'crtls'}
+\item{maxRoc}{maximum allowed rate of change between consecutive values (irrespective of time diff)}
 
 \item{logID}{write an operation identifier to the log frames, default = NA}
 
-\item{showPlot}{display figure in plots window (TRUE/FALSE)}
+\item{showPlot}{display figure in plots window, and prompt to accept changes (TRUE/FALSE)}
 
-\item{savePlot}{save figure to a path (TRUE/FALSE)}
+\item{savePlot}{save the figure to a path (provide path relative to working directory)}
 }
 \description{
 Specify a maximum ROC manually, or read from the 'ctrls' (which have been read from source dataset headers)
@@ -30,4 +30,4 @@ Specify a maximum ROC manually, or read from the 'ctrls' (which have been read f
 \examples{
 newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 }
-\keyword{wrangling}
+\keyword{outliers}

@@ -15,7 +15,7 @@
 
 interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason, showPlot, savePlot){
   
-  ######## set defaults ######## 
+  ######## defaults ########
   if (missing(startDate)){
     startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
@@ -36,14 +36,25 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
     showPlot <- FALSE
   }
   
+  if (missing(Reason)){
+    Reason <- "Interpolation of missing data"
+  }
+  
+  if (missing(showPlot)) {
+    showPlot <- FALSE
+  }
+  
   if (missing(savePlot)) {
     savePlot <- NULL
   }
   
   if (missing(logID)){
-    logID <- NA
+    logID <- "interp_na"
   }
-
+  
+  # back up original
+  rB3new = rB3in
+  
   # write to the logKey
   writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
   
@@ -54,6 +65,11 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
   # extract data
   DF_in <- rB3in[["qcDF"]]
   
+  # make blank df for highlighting in plots
+  hlDF <- DF_in
+  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
+  
+  # find vars - dates to search
   outs.idElToModify <- idElToModify(
     rB3in,
     startDate = startDate,
@@ -87,7 +103,7 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
     ##### algorithm to identify NA chunks ##### 
     
     # find na
-    is.na.thisDF <- !is.na(thisDF)
+    is.na.thisDF <- !is.na(thisDF) # -> aa
     
     # counts continous na
     
@@ -138,60 +154,67 @@ interp_na <- function(rB3in, startDate, endDate, varNames, maxRep, logID, Reason
                                method = "linear")
           
           # assign back
-          thisDF[(flip.ee[j]-1):(ee[j]+1),1] <- approx.out$y
+          DF_in[(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]] <- approx.out$y
           
           
-          ##### log of this column 2 #####
-          # if (!is.na(logID)){
-            # thisDF_log[(flip.ee[j]):(ee[j]),1] <- logID
-            rB3in[["logDF"]] [(flip.ee[j]):(ee[j]),colLocsNums[i]]  <- logID
-          # }
-          ##### log of this column 2 #####
+          # log and plot highlighting
+          rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]]  <- logID
+          hlDF[(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]] <- approx.out$y
         }
       }
     }
 
-    DF_in[rowLocsNums,colLocsNums[i]] <- thisDF
+    # DF_in[rowLocsNums,colLocsNums[i]] <- thisDF
 
-    # ##### log 2 #####
-    # if (!is.na(logID)){
-    #   thisLog[rowLocsNums,colLocsNums[i]] <- thisDF_log
-    # }
-    # ##### log 2 #####
-    
     ##### end interpolation ##### 
   }
   
  
   ##### plots #######
-  
-  rB3plot <- rB3in
-  
-  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
-  rB3plot[["qcDF"]] <- DF_in
+  rB3new[["hlDF"]] <- hlDF
   
   
-  # generate plot, if specified
-  
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot,
+    prePostPlot(rB3new,
                 startDate,
-                endDate,
+                endDate, 
                 varNames = varNames,
                 srcColour = 'grey',
-                preColour = 'red',
+                hlColour = 'red',
                 qcColour = 'blue',
                 showPlot = showPlot,
                 savePlot = savePlot,
                 dpi = 200)
-  }
-  
-  ##### end plots #######
-  
-  # return rB3 obj
-  rB3in[["qcDF"]] <- DF_in
-  
-  return(rB3in)
+    
+    if (!is.null(savePlot)) {
+      
+      ggplot2::ggsave(
+        paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+        height = 0.5 + 1.1 * length(unique(plotAll$var)),
+        width = 7.5,
+        dpi = dpi
+      )
+    }
+    
+    if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
+      
+      # write the changes
+      # copy working df to source df
+      rB3new[["qcDF"]] <- DF_in
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
+      
+      return(rB3new)
+      
+    } else { # ..or don't
+      
+      print ( 'Changes were not applied' )
+      
+      return(rB3in)
+    }
+    
+  }   # end plotting loop
   
   ######## end function ######## 
 }

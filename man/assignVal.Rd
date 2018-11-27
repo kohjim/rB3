@@ -22,9 +22,9 @@ assignVal(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal,
 
 \item{logID}{write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code}
 
-\item{showPlot}{display figure in plots window (TRUE/FALSE)}
+\item{showPlot}{display figure in plots window, and prompt to accept changes (TRUE/FALSE)}
 
-\item{savePlot}{save figure to a path (TRUE/FALSE)}
+\item{savePlot}{save the figure to a path (provide path relative to working directory)}
 }
 \description{
 Specify subset of dates, values and variables to modify

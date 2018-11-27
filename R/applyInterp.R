@@ -13,7 +13,7 @@
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, showPlot, savePlot) {
+applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
@@ -59,76 +59,77 @@ assignInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, sho
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
+  # make preview rB3 object
+  rB3new <- rB3in
+
   # copy qcDF to working DF
-  df <- rB3in[["qcDF"]]
+  df <- rB3new[["qcDF"]]
 
   # make blank df for highlighting in plots
   hlDF <- df
-  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
+      hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
   # col names for later use
   DFColNames <- colnames(df)
 
 
-
+   #### body of function
 
   for (i in 1:length(colLocsNums)){
 
     # find the periods that will be interped to hlDF
-    changeRows <- is.na(df[rowLocsNums,colLocsNums[i]])
+    rowsToChange <- which( is.na(df[,colLocsNums[i]]) )
+    rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
     # interpolate the working DF
     df[rowLocsNums,colLocsNums[i]] <- forecast::na.interp ( df[rowLocsNums,colLocsNums[i]] )
 
     # write the hlDF with interpolated values
-    hlDF[changeRows,colLocsNums[i]] <- df[changeRows,colLocsNums[i]]
+    hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
 
     ### write to same portion of logDF
-    rB3in[["logDF"]] [changeRows,colLocsNums[i]] <- logID
-
+    rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                              logID,
+                                                              paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ) )
     }
 
-  # copy working df to source df
-  rB3in[["qcDF"]] <- df
+
 
   ##### plotting #######
 
-  rB3plot <- rB3in
-  rB3plot[["hlDF"]] <- hlDF
+  rB3new[["hlDF"]] <- hlDF
 
-  # if showPlot == TRUE, generate prompt and ask to accept
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
-
-
-        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
-
       # write the changes
-      rB3in[["qcDF"]] <- df
-
-      # write to the logKey
-      rB3in <- writeLog(rB3in, logID, funName = "assignInterp", Reason = "Interpolation of missing data" )
-
-      # return the modified rB3 object
-      return(rB3in)
+      # copy working df to source df
+      rB3new[["qcDF"]] <- df
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
 
       # ..or don't
-    } else {}
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+    }
 
-  }   # end showPlot loop
+  }   # end plotting loop
 
-  # always return changes if no showPlot
-  return(rB3in)
+  # return the modified rB3 object
+  return(rB3new)
 
   ######## end function ########
 }

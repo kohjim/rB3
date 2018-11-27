@@ -1,4 +1,4 @@
-#' Assign NA based on filter values from the "ctrls" data frame
+#' Remove values outside of specified minimum and maximum bounds
 #'
 #' Assigns NA to the selected subset of dates and variables
 #'
@@ -9,13 +9,14 @@
 #' @param filterMin apply min value filter, either numeric (filterMin = <value>), or from 'crtls' (filterMin = TRUE)
 #' @param filterMax apply max value filter, either numeric (filterMax = <value>), or from 'crtls' (filterMax = TRUE)
 #' @param logID write an operation identifier to the log frames, default = NA
+#' @param Reason reason for the logged changes (character)
 #' @param showPlot display figure in plots window (TRUE/FALSE)
 #' @param savePlot save figure to a path (TRUE/FALSE)
 #' @keywords wrangling
 #' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @examples new <- filterReps(old, varNames = 'TmpWtr', filterMin = 9, filterMax = 25,logID = 10, showPlot = TRUE)
 
-filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterMax, logID, showPlot, savePlot) {
+filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterMax, logID, Reason, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
@@ -30,14 +31,6 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
     varNames <- "All"
   }
 
-  if (missing(showPlot)){
-    showPlot <- FALSE
-  }
-
-  if (missing(savePlot)) {
-    savePlot <- NULL
-  }
-
   if (missing(filterMin)){
     filterMin <- FALSE
   }
@@ -47,7 +40,19 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
   }
 
   if (missing(logID)){
-    logID <- "filter"
+    logID <- "Out-of-bounds"
+  }
+
+  if (missing(Reason)){
+    Reason <- "RValue oiutside min/max bounds"
+  }
+
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+
+  if (missing(savePlot)) {
+    savePlot <- NULL
   }
 
   ######## end defaults ########
@@ -66,32 +71,35 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
- # apply locations to qcDF
-  df <- rB3in[["qcDF"]]
+  # make preview rB3 object
+  rB3new <- rB3in
+
+  # copy qcDF to working DF
+  df <- rB3new[["qcDF"]]
+
+  # make blank df for highlighting in plots
+  hlDF <- df
+     hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
   # col names for later use
   DFColNames <- colnames(df)
 
-  ###### filter below minimum values
+  # write to the logKey
+  rB3new <- writeLog(rB3new, paste0(logID,"_min") , funName = "filterMinMax", Reason = Reason)
 
+  ###### filter below minimum values
   if (filterMin != FALSE) {
 
-
   # determine value of filts for the cols affected
-  if (filterMin == TRUE) { filts <- rB3in[["ctrls"]]$minVal
+  if (filterMin == TRUE) { filts <- rB3new[["ctrls"]]$minVal
 
   } else if (is.numeric(filterMin)) {
 
-    filts <- rep(filterMin,nrow(rB3in[["ctrls"]]))
+    filts <- rep(filterMin,nrow(rB3new[["ctrls"]]))
 
-  } else { rep(-1000000000,nrow(rB3in[["ctrls"]])) }
+  } else { rep(-1000000000,nrow(rB3new[["ctrls"]])) }
 
 
-    # write to the logKey
-
-    if (filterMin != FALSE) {
-    rB3in <- writeLog(rB3in, paste0(logID,"_min") , funName = "filterMin", Reason = "Value < min allowed")
-    }
 
     # find locations
     for (i in 1:length(colLocsNums)){
@@ -100,33 +108,37 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
     rowsToChange <- which( df[,colLocsNums[i]] <= as.numeric(as.character(filts[(colLocsNums[i] - 1)]) ) )
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
+    ## write to highlighting DF
+    hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+
     # replace by new value
     df[rowsToChange,colLocsNums[i]] <- NA
 
     ### write to same portion of logDF
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- paste0(logID,'_min')
+    rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                              logID,
+                                                              paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID,"_min" ) )
+
 
     }
   }
 
 
   ###### filter above maximum values
-
   if (filterMax != FALSE) {
 
-
     # determine value of filts for the cols affected
-    if (filterMax == TRUE) { filts <- rB3in[["ctrls"]]$maxVal
+    if (filterMax == TRUE) { filts <- rB3new[["ctrls"]]$maxVal
 
     } else if (is.numeric(filterMax)) {
 
-      filts <- rep(filterMax,nrow(rB3in[["ctrls"]]))
+      filts <- rep(filterMax,nrow(rB3new[["ctrls"]]))
 
-    } else { rep(-1000000000,nrow(rB3in[["ctrls"]])) }
+    } else { rep(-1000000000,nrow(rB3new[["ctrls"]])) }
 
 
     if (filterMax != FALSE) {
-      rB3in <- writeLog(rB3in, paste0(logID,"_max"), funName = "filterMax", Reason = "Value > max allowed")
+      rB3new <- writeLog(rB3new, logID, funName = "filterMinMax", Reason = Reason)
     }
 
 
@@ -137,57 +149,55 @@ filterMinMax <- function(rB3in, startDate, endDate, varNames, filterMin, filterM
       rowsToChange <- which( df[,colLocsNums[i]] >= as.numeric(as.character(filts[(colLocsNums[i] - 1)]) ) )
       rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
+      ## write to highlighting DF
+      hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+
       # replace by new value
       df[rowsToChange,colLocsNums[i]] <- NA
 
       ### write to same portion of logDF
-      rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- paste0(logID,'_max')
+      rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                               logID,
+                                                               paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ,"_max") )
 
     }
   }
 
+
   ##### plotting #######
 
-  rB3plot <- rB3in
+  rB3new[["hlDF"]] <- hlDF
 
-  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
-  rB3plot[["qcDF"]] <- df
-
-  # generate plot, if specified
-
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
-                srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
+    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+                srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
+      # write the changes
+      rB3new[["qcDF"]] <- df
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
 
-        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
+      # ..or don't
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+    }
 
+  }   # end plotting loop
 
-      rB3in[["qcDF"]] <- df
-
-      return(rB3in)
-
-    } else {}
-
-
-
-
-  }   # close showPlot loop
-
-
-  return(rB3in)
-
-
+  # return the modified rB3 object
+  return(rB3new)
 
   ######## end function ########
-
-
 }

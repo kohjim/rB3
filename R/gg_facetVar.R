@@ -75,6 +75,20 @@ gg_facetVar <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
 
 
+  # check for valid plotLabels and replace with varName if necessary
+
+  for (n in 1:length(plotLabels)){
+
+    if (is.na(plotLabels[n])) {
+      colnames(rB3in[["qcDF"]])[n + 1]
+    } else {
+      plotLabels[n]
+    }
+
+  }
+
+
+
   ####### MAKE A FACETED GGPLOT ################
 
   plotQC <- rB3in[["qcDF"]][rowLocsNums,c(1,colLocsNums)]
@@ -125,7 +139,7 @@ gg_facetVar <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 if (!is.null(savePlot)) {
 
     ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                  height = 1.2 * length(unique(plotAll$var)),
+                  height = 0.5 + 1.1 * length(unique(plotAll$var)),
                   width = 7.5,
                   dpi = dpi)
                }

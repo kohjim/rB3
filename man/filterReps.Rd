@@ -4,8 +4,8 @@
 \alias{filterReps}
 \title{Remove consecutive repeated values}
 \usage{
-filterReps(rB3in, startDate, endDate, varNames, maxReps, logID, showPlot,
-  savePlot)
+filterReps(rB3in, startDate, endDate, varNames, maxReps, logID, Reason,
+  showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
@@ -16,9 +16,11 @@ filterReps(rB3in, startDate, endDate, varNames, maxReps, logID, showPlot,
 
 \item{varNames}{list of variable names or keywords}
 
-\item{maxReps}{apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'crtls'}
+\item{maxReps}{apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'ctrls'}
 
-\item{logID}{write an operation identifier to the log frames, default = NA}
+\item{logID}{write an operation identifier to the log frames}
+
+\item{Reason}{reason for hte logged changes (character)}
 
 \item{showPlot}{display figure in plots window (TRUE/FALSE)}
 
@@ -28,6 +30,6 @@ filterReps(rB3in, startDate, endDate, varNames, maxReps, logID, showPlot,
 Specify maximum number of allowable consecutive identical values, or read from the 'ctrls' (which have been read from source dataset headers)
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+new <- filterReps(old, varNames = 'TmpWtr', maxReps = 20, showPlot = TRUE)
 }
 \keyword{wrangling}

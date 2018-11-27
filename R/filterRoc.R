@@ -6,15 +6,15 @@
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
-#' @param maxRoc apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'crtls'
+#' @param maxRoc maximum allowed rate of change between consecutive values (irrespective of time diff)
 #' @param logID write an operation identifier to the log frames, default = NA
-#' @param showPlot display figure in plots window (TRUE/FALSE)
-#' @param savePlot save figure to a path (TRUE/FALSE)
-#' @keywords wrangling
+#' @param showPlot display figure in plots window, and prompt to accept changes (TRUE/FALSE)
+#' @param savePlot save the figure to a path (provide path relative to working directory)
+#' @keywords outliers
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
 
-filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPlot, savePlot) {
+filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, Reason, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
@@ -29,6 +29,18 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPl
     varNames <- "All"
   }
 
+  if (missing(maxRoc)){
+    maxRoc <- TRUE
+  }
+
+  if (missing(logID)){
+    logID <- ">ROC"
+  }
+
+  if (missing(Reason)){
+    Reason <- "Removed values exceeding rate of change"
+  }
+
   if (missing(showPlot)){
     showPlot <- FALSE
   }
@@ -37,19 +49,12 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, showPl
     savePlot <- NULL
   }
 
-  if (missing(maxRoc)){
-    maxRoc <- TRUE
-  }
-
-  if (missing(logID)){
-    logID <- "R.O.C"
-  }
 
   ######## end defaults ########
 
 
   ######## function ########
-lagDiff <- 1
+  lagDiff <- 1
 
   ########### assign_na to qcDF based on input args
 
@@ -62,23 +67,33 @@ lagDiff <- 1
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
-  # apply locations to qcDF
-  df <- rB3in[["qcDF"]]
+  # make preview rB3 object
+  rB3new <- rB3in
+
+  # copy qcDF to working DF
+  df <- rB3new[["qcDF"]]
+
+  # make blank df for highlighting in plots
+  hlDF <- df
+  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
   # col names for later use
   DFColNames <- colnames(df)
 
-  # write to the logKey
-  rB3in <- writeLog(rB3in = rB3in, logID = logID, funName = "filterRoc", Reason = "Exceeds max rate of change" )
+  #### body of function
 
   # set filter thresholds for repeated values
   if (is.numeric(maxRoc)) {
-    filts <- rep(maxRoc,nrow(rB3in[["ctrls"]]))
+    filts <- rep(maxRoc,nrow(rB3new[["ctrls"]]))
   } else {
-    filts <- rB3in[["ctrls"]]$maxRoc }
+    filts <- rB3new[["ctrls"]]$maxRoc }
 
 
-  for (i in 1:length(colLocsNums)){
+  # write to the logKey
+  rB3new <- writeLog(rB3new, logID = logID, funName = "filterROC", Reason = Reason)
+
+  # loop through vars
+   for (i in 1:length(colLocsNums)){
     # name of the column to be changed
     thisColName <- DFColNames[colLocsNums[i]]
 
@@ -86,54 +101,55 @@ lagDiff <- 1
     rowsToChange <- which(abs(diff(df[,colLocsNums[i]], lagDiff)) > as.numeric(as.character(filts[(colLocsNums[i]- 1)])))
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
-    # replace by NA
+    ### write to logDF
+    rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                             logID,
+                                                             paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ) )
+
+    ## write newVal highlighting DF
+    hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+
+    ### write NA to df where rate of change was exceeded
     df[rowsToChange,colLocsNums[i]] <- NA
 
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
-
   }
+
+
+
   ##### plotting #######
 
-  rB3plot <- rB3in
+  rB3new[["hlDF"]] <- hlDF
 
-  rB3plot[["preDF"]] <- rB3plot[["qcDF"]]
-  rB3plot[["qcDF"]] <- df
-
-  # generate plot, if specified
-
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
-                srcColour = 'grey', preColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
+    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+                srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
+      # write the changes
+      rB3new[["qcDF"]] <- df
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
 
-        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
+      # ..or don't
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+    }
 
+  }   # end plotting loop
 
-      rB3in[["qcDF"]] <- df
-
-      return(rB3in)
-
-    } else {}
-
-
-
-
-  }   # close showPlot loop
-
-
-  return(rB3in)
-
-
+  # return the modified rB3 object
+  return(rB3new)
 
   ######## end function ########
-
-
 }

@@ -1,19 +1,16 @@
 #' Interactive data visualisation
 #'
-#' Plot single timeseries of source and quality controlled data. Can zoom in (dbl-click). \cr
-#'   Return x and y information in response to clicks. \cr
+#' Choose and plot interactively single timeseries of source and quality controlled data. \cr
+#'   Select variable from drop-down, choose to display or ignore source data.  \cr
+#'   PLot can be selected and zoomed by brush. Returns x and y information in response to brush selection. \cr
 #'   Example code is generated for removing (set to NA) the highlighted area of the plot
 #'
 #' @export
 #' @param rB3in rB3 object to be displayed
 #' @param startDate start date for plot
 #' @param endDate end date for plot
-#' @param varNames name of the (single!) variable to be plotted
-#' @param colNum location of the column, alternative to varNames
-#' @param srcColour colour of the unmodified data (leave out to plot only quality controlled data)
-#' @param qcColour colour of the quality controlled data (leave out to plot only unmodified/raw data)
 #' @keywords visual editing
-#' @examples shinySetOut <- shinySet(newDF, varNames = "TmpWtr.d00500", endDate = '2018-07-01')
+#' @examples shinyrB3(rB3in, endDate = '2018-07-01')
 #'
 
 shinyrB3 <- function(rB3in, startDate, endDate){
@@ -30,7 +27,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
   plotLabels <- rB3in[["ctrls"]]$plotLabels
 
   qcColour <- 'black'
-  
+
   srcColour <- 'red'
 
   isPlotSrc <- FALSE
@@ -42,16 +39,16 @@ shinyrB3 <- function(rB3in, startDate, endDate){
 
   # find name of input rB3object, to be used for example function
   rB3name <- deparse(substitute(rB3in))
-  
-  varNames = rownames(rB3agg2[['ctrls']])[1] # default
-  
+
+  varNames = rownames(rB3in[['ctrls']])[1] # default
+
   plotAll <- shiny_mkDF(
-    rB3in = rB3in, 
+    rB3in = rB3in,
     startDate = startDate,
     endDate = endDate,
     varNames = varNames,
     isPlotSrc = isPlotSrc)
-  
+
   srcGeom <- ggplot2::geom_point(
     ggplot2::aes(
       x = DateTime,
@@ -60,7 +57,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
       ),
     size = 0.2
     )
-  
+
   qcGeom <- ggplot2::geom_point(
     ggplot2::aes(
       x = DateTime,
@@ -69,7 +66,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
     ),
     size = 0.2
   )
-  
+
   srcKey <- ggplot2::scale_colour_manual(
     "",
     values = c("Unmodified data"=srcColour)
@@ -78,7 +75,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
     "",
     values = c("Quality controlled data"=qcColour)
   )
-  
+
   dualKey <- ggplot2::scale_colour_manual(
     "",
     values = c(
@@ -86,37 +83,37 @@ shinyrB3 <- function(rB3in, startDate, endDate){
       "Quality controlled data"=qcColour
     )
   )
-  
-  
+
+
   ######## end AES #########
-  
+
   ######## Shiny ########
-  
+
   ui <- shiny::fluidPage(
     shiny::fluidRow(
-      
+
     ),
-    
+
     shiny::fluidRow(
       shiny::column(
         4,
-        selectInput(
+        shiny::selectInput(
           "varNames",
           NULL,
-          rownames(rB3agg2[['ctrls']])
+          rownames(rB3in[['ctrls']])
         )
       ),
-      
+
       shiny::column(
         4,
-        checkboxInput(
+        shiny::checkboxInput(
           "isPlotSrc",
           "Plot src",
           value = FALSE
         )
       )
     ),
-    
+
     shiny::fluidRow(
       shiny::column(
         12,
@@ -128,7 +125,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
         )
       )
     ),
-    
+
     shiny::verbatimTextOutput("info")
   )
 
@@ -136,14 +133,14 @@ shinyrB3 <- function(rB3in, startDate, endDate){
     ranges <- reactiveValues(x = NULL, y = NULL)
 
     output$plot1 <- shiny::renderPlot({
-      
+
       plotAll <- shiny_mkDF(
         rB3in = rB3in,
         startDate = startDate,
         endDate = endDate,
         varNames = input$varNames,
         isPlotSrc = input$isPlotSrc)
-      
+
       varPlot <-
         ggplot2::ggplot(plotAll) +
         ggplot2::ylab("Value") +
@@ -156,19 +153,19 @@ shinyrB3 <- function(rB3in, startDate, endDate){
         ) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
         ggplot2::facet_wrap(
-          ~var, 
+          ~var,
           ncol = 1,
           scales = 'free_y'
         ) +
         ggplot2::theme_bw() +
         ggplot2::theme(legend.position = "bottom")
-      
+
       if (!input$isPlotSrc) {
         varPlot +
           qcGeom +
           qcKey +
           ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
-        
+
       } else {
         varPlot +
           srcGeom +
@@ -176,9 +173,9 @@ shinyrB3 <- function(rB3in, startDate, endDate){
           dualKey +
           ggplot2::coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE)
       }
-      
+
     })
-    
+
     shiny::observeEvent(
       input$plot_dblclick,
       {
@@ -196,7 +193,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
           )
           ranges$y <- c(brush$ymin - (brush$ymax - brush$ymin)*0.05,
                         brush$ymax + (brush$ymax - brush$ymin)*0.05)
-          
+
         } else {
           ranges$x <- NULL
           ranges$y <- NULL

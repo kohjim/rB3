@@ -5,7 +5,7 @@
 \title{Apply drift correction}
 \usage{
 driftCorr(rB3in, startDate, endDate, varNames, lowRef, lowStart, lowEnd,
-  highRef, highStart, highEnd, logID, showPlot, savePlot)
+  highRef, highStart, highEnd, logID, Reason, showPlot, savePlot)
 }
 \arguments{
 \item{rB3in}{rB3 object input}
@@ -22,7 +22,7 @@ driftCorr(rB3in, startDate, endDate, varNames, lowRef, lowStart, lowEnd,
 
 \item{lowEnd}{equivalent sensor value at end of period which should = lowRef  (i.e., finishing offset)}
 
-\item{highRef}{a reference/known low value at start of period}
+\item{highRef}{a reference/known high value at start of period}
 
 \item{highStart}{equivalent sensor value at start of period which should = lowRef  (i.e., starting offset)}
 
@@ -34,15 +34,13 @@ driftCorr(rB3in, startDate, endDate, varNames, lowRef, lowStart, lowEnd,
 
 \item{savePlot}{save figure to a path (TRUE/FALSE)}
 
-\item{plotPath}{plot figure of before and after}
-
 \item{logID}{write an operation identifier to the log frames, default = NA}
 }
 \description{
-change slope and offset over time
+Change offset and slope over time to account for linear measurement drift
 }
 \examples{
-rB3in <- driftCorr(rB3in = myDF,DOmgColName = "DOconc_d00050", DOsatColName = "DOpsat_d00050", TColName = "TmpDOs_d00050")
+rB3in <- driftCorr(rB3in = myDF,varNames = "DOpsat.d00050",lowRef = 0, lowStart = -10,lowEnd = 0, highRef = 100, highStart = 85, highEnd = 130, showPlot = TRUE)
 
 
 }

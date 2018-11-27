@@ -2,7 +2,7 @@
 % Please edit documentation in R/csv2rB3.R
 \name{csv2rB3}
 \alias{csv2rB3}
-\title{Buoy observation to data frame}
+\title{Convert a csv file of time-series observations into an rB3 object (list of dataframes)}
 \usage{
 csv2rB3(filePath, siteName, lat, lon, country, copySrc)
 }
@@ -24,11 +24,29 @@ Imports a csv file to rB3
 }
 \details{
 Creates a list of dataframes, including: \cr
-     1. the unmodified data ('srcDF')\cr
-     2. a copy of the data, which will be modified by rB3 ('qcDF')\cr
-     3. a 'log' file with similar structure to srcDF and qcDF, to store QC operations log ('logDF')\cr
-     4. controls, extracted from teh header rows in the raw csv files ('ctrls')\cr
-     5. site metadata, create from additional input args ('metaD')\cr
+     1. 'srcDF'  ; the unmodified data\cr
+     2. 'qcDF'   ; a copy of the data, which will be modified by rB3\cr
+     3. 'logDF'  ; a 'log' file with similar structure to srcDF and qcDF, to store QC operations log\cr
+     4. 'logKey' ; control key with logIDs and explanatory columns
+     5. 'ctrls'  ; controls, extracted from extra header rows in the raw csv files ('ctrls')\cr
+     6. 'metaD'  ; site metadata, create from additional input args ('metaD')\cr
+
+Import control variables by matching header rows (first col) to the following tags:
+
+FIRST COLUMN :   FORMAT  : COLUMNS 2:ncol ...
+
+"measVar"    : character : measurement variable represented by the column\cr
+"units"      : character : units of measurement\cr
+"sensorDist" : numeric   : vertical position of the sensor (e.g., below water surface, above ground, etc)\cr
+"plotLabels" : character : label that will appear on rB3 plot panels\cr
+"methodAgg"  : character : method of aggregation used for rB3stdze function\cr
+"pullAgg"    : character : direction of aggregation for rB3stdze function ('left', 'centre' or 'right')\cr
+"filterMin"  : numeric   : minimum allowable value\cr
+"filterMax"  : numeric   : maximum allowable value\cr
+"filterRoc"  : numeric   : maximum allowable rate of change\cr
+"filterReps" : numeric   : maximum allowable repeated consecutive values\cr
+"filterMean" : numeric   : time window (in hours) for running mean w/ standrard deviation filter\cr
+"filterSD"   : numeric   : number of standard deviations for cutoff\cr
 }
 \examples{
 csv2rB3("Rotorua.csv", siteName = "Lake_Rotorua", lat = -38, long = 176, country = "NZ")

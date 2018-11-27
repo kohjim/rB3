@@ -9,8 +9,8 @@
 #' @param minVal delete value greater than or equal to
 #' @param maxVal delete value less than or equal to
 #' @param logID write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code
-#' @param showPlot display figure in plots window (TRUE/FALSE)
-#' @param savePlot save figure to a path (TRUE/FALSE)
+#' @param showPlot display figure in plots window, and prompt to accept changes (TRUE/FALSE)
+#' @param savePlot save the figure to a path (provide path relative to working directory)
 #' @keywords wrangling
 #' @export
 #' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
@@ -30,18 +30,6 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
     varNames <- "All"
   }
 
-  if (missing(showPlot)){
-    showPlot <- FALSE
-  }
-
-  if (missing(Reason)){
-    Reason <- "Assign"
-  }
-
-  if (missing(savePlot)) {
-    savePlot <- NULL
-  }
-
   if (missing(minVal)){
     minVal <- -100000000000
   }
@@ -56,6 +44,18 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
   if (missing(logID)){
     logID <- "assignVal"
+  }
+
+  if (missing(Reason)){
+    Reason <- "Value replaced"
+  }
+
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+
+  if (missing(savePlot)) {
+    savePlot <- NULL
   }
 
   ######## end defaults ########
@@ -75,94 +75,98 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
+  # make preview rB3 object
+  rB3new <- rB3in
+
   # copy qcDF to working DF
-  df <- rB3in[["qcDF"]]
+  df <- rB3new[["qcDF"]]
 
   # make blank df for highlighting in plots
   hlDF <- df
-  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
+     hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
 
-  # col names for later use
-  DFColNames <- colnames(df)
-
-
-
+ #### body of function
 
   for (i in 1:length(colLocsNums)){
 
     # name of the column to be changed
     rowsToChange <- which(df[,colLocsNums[i]] >= as.numeric(as.character(minVal)) &
-                            df[,colLocsNums[i]] <= as.numeric(as.character(maxVal)) )
+                            df[,colLocsNums[i]] <= as.numeric(as.character(maxVal)) |
+                            is.na(df[,colLocsNums[i]])
+                            )
 
     rowsToChange <- intersect(rowLocsNums,rowsToChange)
 
-    ### write to same portion of logDF
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
-
-
  if (is.numeric(newVal)) {
 
+       # write to the logKey
+      rB3new <- writeLog(rB3new, logID = logID, funName = "assign_value", Reason = Reason)
+
+      ### write to logDF
+      rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                                logID,
+                                                                paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
+
+      ## write newVal to highlighting DF
+      hlDF[rowsToChange,colLocsNums[i]] <- newVal
+
+ } else {
+
       # write to the logKey
-      rB3in <- writeLog(rB3in, logID = logID, funName = "assign_value", Reason = Reason)
+      rB3new <- writeLog(rB3new, logID = logID,  funName = "assign_NA", Reason = Reason)
 
-      df[rowLocsNums,colLocsNums[i]] <- newVal
+      ### write to logDF
+      rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
+                                                                logID,
+                                                                paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
 
-    } else {
-      # write to the logKey
-      rB3in <- writeLog(rB3in, logID = logID,  funName = "assign_NA", Reason = Reason)
+      ## write data to highlighting DF
+      hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
 
-      df[rowLocsNums,colLocsNums[i]] <- NA
       }
-
-
-    ### write to same portion of logDF
-    rB3in[["logDF"]] [rowsToChange,colLocsNums[i]] <- logID
-
 
 
     }
 
+  #>> make changes
+
   # copy working df to source df
-  rB3in[["qcDF"]] <- df
+  rB3new[["qcDF"]] <- df
 
   ##### plotting #######
 
-  rB3plot <- rB3in
-  rB3plot[["hlDF"]] <- hlDF
+  rB3new[["hlDF"]] <- hlDF
 
-  # if showPlot == TRUE, generate prompt and ask to accept
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
-
-
-        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
-
       # write the changes
-      rB3in[["qcDF"]] <- df
-
-      # write to the logKey
-      rB3in <- writeLog(rB3in, logID, funName = "assignVal", Reason = "Interpolation of missing data" )
-
-      # return the modified rB3 object
-      return(rB3in)
+      df[rowsToChange,colLocsNums[i]] <- newVal
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
 
       # ..or don't
-    } else {}
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+      }
 
-  }   # end showPlot loop
+  }   # end plotting loop
 
-  # always return changes if no showPlot
-  return(rB3in)
+  # return the modified rB3 object
+  return(rB3new)
 
   ######## end function ########
 }

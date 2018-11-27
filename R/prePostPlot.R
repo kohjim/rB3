@@ -77,6 +77,19 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
   colLocsNums <- which(colLocs)
 
 
+  # check for valid plotLabels and replace with varName if necessary
+
+  for (n in 1:length(plotLabels)){
+
+    if (is.na(plotLabels[n])) {
+      colnames(rB3in[["qcDF"]])[n + 1]
+    } else {
+      plotLabels[n]
+    }
+
+  }
+
+
   ####### MAKE A FACETED GGPLOT ################
 
   plotQC <- rB3in[["qcDF"]][,c(1,colLocsNums)]
@@ -101,9 +114,9 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
     ggplot2::ggplot(plotAll) +
 
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"), size = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "QC data"), size = 0.2) +
-    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = hl, color = "Data to be modified"), size = 0.2) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"), size = 0.2, na.rm = T) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "QC data"), size = 0.2, na.rm = T) +
+    ggplot2::geom_line(ggplot2::aes(x = DateTime, y = hl, color = "Data to be modified"), size = 0.2, na.rm = T) +
 
     ggplot2::ylab("Value") +
     ggplot2::xlab(NULL) +

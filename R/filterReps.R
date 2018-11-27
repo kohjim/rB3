@@ -6,15 +6,16 @@
 #' @param startDate start date
 #' @param endDate endDate
 #' @param varNames list of variable names or keywords
-#' @param maxReps apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'crtls'
-#' @param logID write an operation identifier to the log frames, default = NA
+#' @param maxReps apply maximum allowed consecutive identical values filter, numerical or TRUE for from 'ctrls'
+#' @param logID write an operation identifier to the log frames
+#' @param Reason reason for hte logged changes (character)
 #' @param showPlot display figure in plots window (TRUE/FALSE)
 #' @param savePlot save figure to a path (TRUE/FALSE)
 #' @keywords wrangling
 #' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @examples new <- filterReps(old, varNames = 'TmpWtr', maxReps = 20, showPlot = TRUE)
 
-filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, showPlot, savePlot) {
+filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, Reason, showPlot, savePlot) {
 
   ######## defaults ########
   if (missing(startDate)){
@@ -29,14 +30,6 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
     varNames <- "All"
   }
 
-  if (missing(showPlot)){
-    showPlot <- FALSE
-  }
-
-  if (missing(savePlot)) {
-    savePlot <- NULL
-  }
-
   if (missing(maxReps)){
     maxReps <- TRUE
   }
@@ -45,12 +38,22 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
     logID <- "Repeats"
   }
 
+  if (missing(Reason)){
+    Reason <- "Removed repeated values"
+  }
+
+  if (missing(showPlot)){
+    showPlot <- FALSE
+  }
+
+  if (missing(savePlot)) {
+    savePlot <- NULL
+  }
+
   ######## end defaults ########
 
 
   ######## function ########
-
-########### assign_na to qcDF based on input args
 
   # identify the elements in the array, to be modified
   outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
@@ -60,6 +63,9 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   rowLocsNums <- which(rowLocs)
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
+
+  # make preview rB3 object
+  rB3new <- rB3in
 
   # copy qcDF to working DF
   df <- rB3in[["qcDF"]]
@@ -72,13 +78,14 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   DFColNames <- colnames(df)
 
 
-
   # set filter thresholds for repeated values
   if (is.numeric(maxReps)) {
-    filts <- rep(maxReps,nrow(rB3in[["ctrls"]]))
+    filts <- rep(maxReps,nrow(rB3new[["ctrls"]]))
   } else {
-  filts <- rB3in[["ctrls"]]$maxReps }
+  filts <- rB3new[["ctrls"]]$maxReps }
 
+
+  #### body of function
 
   ##### detect rows for each col [i]
   for (i in 1:length(colLocsNums)){
@@ -90,7 +97,7 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   ##### algorithm to identify repeats and remove #####
 
   # dataframe columns to modify
-  thisCol <- data.frame(rB3in[["qcDF"]] [colLocsNums[i]])
+  thisCol <- data.frame(rB3new[["qcDF"]] [colLocsNums[i]])
 
   # compare with the next element and if true assign same ID
   neighbourComp <- c(TRUE,thisCol[-1L,1] != thisCol[-length(thisCol[,1]),1])
@@ -122,52 +129,50 @@ filterReps <- function(rB3in, startDate, endDate, varNames, maxReps, logID, show
   df[thisCol$rowsToChange,colLocsNums[i]] <- NA
 
   ### write to same portion of logDF
-  rB3in[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]] <- logID
+  rB3new[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]]),
+                                                            logID,
+                                                            paste0(rB3new[["logDF"]] [thisCol$rowsToChange,colLocsNums[i]], ' : ',logID ) )
+
 
     }
 
 
-  # copy working df to source df
-  rB3in[["qcDF"]] <- df
 
   ##### plotting #######
 
-  rB3plot <- rB3in
-  rB3plot[["hlDF"]] <- hlDF
+  rB3new[["hlDF"]] <- hlDF
 
-  # if showPlot == TRUE, generate prompt and ask to accept
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
-
-
-           ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
-
       # write the changes
-      rB3in[["qcDF"]] <- df
-
-      # write to the logKey
-      rB3in <- writeLog(rB3in, logID, funName = "maxReps", Reason = "Repeated identical values" )
-
-      # return the modified rB3 object
-      return(rB3in)
+      # copy working df to source df
+      rB3new[["qcDF"]] <- df
+      rB3new[["hlDF"]] <- NULL
+      print('Changes have been applied')
 
       # ..or don't
-      } else {}
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+    }
 
-     }   # end showPlot loop
+  }   # end plotting loop
 
-  # always return changes if no showPlot
-  return(rB3in)
+  # return the modified rB3 object
+  return(rB3new)
 
   ######## end function ########
-  }
+}
