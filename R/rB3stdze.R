@@ -76,6 +76,8 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
         # trim the ctrls variables to match the new DF cols
         rB3trim[["ctrls"]] <- rB3trim[["ctrls"]][colLocs,]
 
+        # remove any NA rows
+        rB3trim[["ctrls"]] <- rB3trim[["ctrls"]][!is.na(rB3trim[["ctrls"]]$measVar),]
 
   ######## aggregation #######
 
