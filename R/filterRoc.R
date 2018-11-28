@@ -115,14 +115,18 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, Reason
   }
 
 
-
   ##### plotting #######
 
-  rB3new[["hlDF"]] <- hlDF
+  # copy current df for plotting
+  rB3plot <- rB3new
+  rB3plot[["hlDF"]] <- hlDF
+
+  # apply changes to new DF
+  rB3new[["qcDF"]] <- df
 
   # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
     if (!is.null(savePlot)) {
@@ -135,9 +139,6 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, Reason
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      # write the changes
-      rB3new[["qcDF"]] <- df
-      rB3new[["hlDF"]] <- NULL
       print('Changes have been applied')
 
       # ..or don't

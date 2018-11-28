@@ -95,47 +95,37 @@ FUNCrB3 <- function(rB3in,startDate,endDate,varNames, FUN, eqnVars, logID, Reaso
 
   ##### plotting #######
 
-  rB3new[["hlDF"]] <- hlDF
+  # copy current df for plotting
+  rB3plot <- rB3new
+  rB3plot[["hlDF"]] <- hlDF
 
-  # end function and return rB3 object if no showPlot
-  if (showPlot != TRUE) {
-    # always return changes if no showPlot
+  # apply changes to new DF
+  rB3new[["qcDF"]] <- df
 
-    rB3new[["hlDF"]] <- NULL
+  # if user wants a plot of the action, generate plot and prompt to accept
+  if (showPlot == TRUE | !is.null(savePlot)) {
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
+                srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
-  } else {
+    if (!is.null(savePlot)) {
 
-    # if showPlot == TRUE, generate prompt and ask to accept
-    if (showPlot == TRUE | !is.null(savePlot)) {
-      prePostPlot(rB3new, startDate, endDate, varNames = varNames,
-                  srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
+    if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
+      print('Changes have been applied')
 
-        if (!is.null(savePlot)) {
+      # ..or don't
+    } else {
+      rB3new <- rB3in
+      print ( 'Changes were not applied' )
+    }
 
-
-          ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                          height = 1.2 * length(unique(plotAll$var)),
-                          width = 7.5,
-                          dpi = dpi)
-        }
-
-        # write the changes
-        rB3new[["hlDF"]] <- NULL
-        # copy working df to source df
-        rB3new[["qcDF"]] <- df
-        print('Changes have been applied')
-
-        # ..or don't
-      } else {
-        rB3new <- rB3in
-        print ( 'Changes were not applied' ) }
-
-    }   # end showPlot == TRUE loop
-
-  }   # end showPlot loop
+  }   # end plotting loop
 
   # return the modified rB3 object
   return(rB3new)

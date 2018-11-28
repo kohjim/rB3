@@ -106,10 +106,12 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
       rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
                                                                 logID,
                                                                 paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
-
       ## write newVal to highlighting DF
       hlDF[rowsToChange,colLocsNums[i]] <- newVal
 
+      ## write newVal to highlighting DF
+      df[rowsToChange,colLocsNums[i]] <- newVal
+      
  } else {
 
       # write to the logKey
@@ -120,8 +122,13 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
                                                                 logID,
                                                                 paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
 
+
       ## write data to highlighting DF
       hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+      
+      ## write newVal to highlighting DF
+      df[rowsToChange,colLocsNums[i]] <- newVal
+      
 
       }
 
@@ -135,11 +142,16 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
   ##### plotting #######
 
-  rB3new[["hlDF"]] <- hlDF
+  # copy current df for plotting
+  rB3plot <- rB3new
+  rB3plot[["hlDF"]] <- hlDF
+
+  # apply changes to new DF
+  rB3new[["qcDF"]] <- df
 
   # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
     if (!is.null(savePlot)) {
@@ -152,16 +164,13 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      # write the changes
-      df[rowsToChange,colLocsNums[i]] <- newVal
-      rB3new[["hlDF"]] <- NULL
       print('Changes have been applied')
 
       # ..or don't
     } else {
       rB3new <- rB3in
       print ( 'Changes were not applied' )
-      }
+    }
 
   }   # end plotting loop
 

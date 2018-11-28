@@ -8,12 +8,11 @@ Authors@R: c(
 	)
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1),
-    tidyr,
+Imports: tidyr,
 	circular,
 	ggplot2,
 	shiny,
-	lubridate,
-	forecast
+	lubridate
 Suggests:
 License: GPL-2
 Encoding: UTF-8

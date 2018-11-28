@@ -26,9 +26,9 @@ shinyrB3 <- function(rB3in, startDate, endDate){
 
   plotLabels <- rB3in[["ctrls"]]$plotLabels
 
-  qcColour <- 'black'
+  qcColour <- 'blue'
 
-  srcColour <- 'red'
+  srcColour <- 'hotpink3'
 
   isPlotSrc <- FALSE
 
