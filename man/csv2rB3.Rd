@@ -4,7 +4,7 @@
 \alias{csv2rB3}
 \title{Convert a csv file of time-series observations into an rB3 object (list of dataframes)}
 \usage{
-csv2rB3(filePath, siteName, lat, lon, country, copySrc)
+csv2rB3(filePath, siteName, lat, lon, country)
 }
 \arguments{
 \item{filePath}{file path of source csv file, timestamps in first column as yyyy-mm-dd hh:mm:ss with header "DateTime"}
@@ -16,8 +16,6 @@ csv2rB3(filePath, siteName, lat, lon, country, copySrc)
 \item{lon}{longitude of the monitoring station (numeric, decimal WGS84 degrees)}
 
 \item{country}{country of origin (character)}
-
-\item{copySrc}{keep a copy of the raw (input) file as a dataframe (TRUE/FALSE) (stored as 'srcDF')}
 }
 \description{
 Imports a csv file to rB3

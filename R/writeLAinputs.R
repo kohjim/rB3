@@ -66,10 +66,11 @@ writeLAinputs <- function(rB3in, startDate, endDate, wtrNames, wndName, wndHeigh
 
   wtrHdrs <- paste0('wtr_',rB3in[["ctrls"]] [hdrLocsNums,"sensorDist"])
 
-  colnames(wtr) <- c("DateTime",wtrHdrs)
+  colnames(wtr) <- c("datetime",wtrHdrs)
 
 
-  write.csv(wtr, paste0(filePath,rB3in[["metaD"]]$siteName,'.wtr'), row.names = FALSE, quote = FALSE)
+  # write.csv(wtr, paste0(filePath,rB3in[["metaD"]]$siteName,'.wtr'), row.names = FALSE, quote = FALSE)
+  write.table(wtr, paste0(filePath,rB3in[["metaD"]]$siteName,'.wtr'), sep="\t", row.names = FALSE, quote = FALSE)
 
   ######## find data for .wnd file #######
   wnd.idElToModify <- idElToModify(rB3in, startDate, endDate, wndName)
@@ -88,5 +89,7 @@ writeLAinputs <- function(rB3in, startDate, endDate, wtrNames, wndName, wndHeigh
   # apply power law to standardise wind to 10 m
   wnd$wnd <- wnd$wnd*(10/wndHeight)^0.11
 
-  write.csv(wnd, paste0(filePath,rB3in[["metaD"]]$siteName,'.wnd'), row.names = FALSE, quote = FALSE)
+  # write.csv(wnd, paste0(filePath,rB3in[["metaD"]]$siteName,'.wnd'), row.names = FALSE, quote = FALSE)
+  write.table(wnd, paste0(filePath,rB3in[["metaD"]]$siteName,'.wnd'), sep="\t", row.names = FALSE, quote = FALSE)
+
 }

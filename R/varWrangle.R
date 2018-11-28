@@ -1,6 +1,6 @@
-#' Interpolate the date range given for the variables specified
+#' Create or remove variables in an rB3 object
 #'
-#' Linearly interpolates gaps (NAs) within the selected subset of dates and variables
+#' Creat variables, delete variables, change order of variables, etc
 #'
 #' @param rB3in rB3 object input
 #' @param varNames list of variable names or keywords
@@ -8,10 +8,10 @@
 #' @param loc N: move or add varNames after original Nth variable
 #' @keywords wrangling
 #' @export
-#' @examples newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "sort")
-#' @examples newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "moveto", loc = 3)
-#' @examples newDF <- varWrangle(rB3in, varNames = "DOSat", task = "add")
-#' @examples newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "rm")
+#' @examples rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "sort")
+#' @examples rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "moveto", loc = 3)
+#' @examples rB3in <- varWrangle(rB3in, varNames = "DOSat", task = "add")
+#' @examples rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "rm")
 
 varWrangle <- function(rB3in, varNames, task, loc) {
   
@@ -35,12 +35,12 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     startDate = startDate,
     endDate = endDate, 
     varNames = varNames
-    )
+  )
   
   # decompose the list
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
-
+  
   ######## end check vars ########
   
   if (sum(colLocs) == 0){ # the specified varNames do not exist, add the VarNames
@@ -72,7 +72,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
   ######## ######## ########
   
   orgNCol = ncol(rB3in[["srcDF"]])
-
+  
   if (task == "add"){ # add new variables
     
     rB3in[["srcDF"]][,varNames] <- NA
@@ -83,13 +83,13 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     newNCol = ncol(rB3in[["srcDF"]])
     
     # because ctrls have N-1 vars (without dateTime), adjust this complication..
-
+    
     rB3in[["ctrls"]] <- rB3in[["ctrls"]][c(1:(orgNCol-1),(orgNCol+1):(newNCol),orgNCol),]
     
     # continue program
     
   } else if (task == "rm"){ # remove variables
-
+    
     rB3in[["srcDF"]] <- rB3in[["srcDF"]][,!colLocs]
     rB3in[["qcDF"]] <- rB3in[["qcDF"]][,!colLocs]
     rB3in[["logDF"]] <- rB3in[["logDF"]][,!colLocs]
@@ -126,7 +126,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     
     diffs <- setdiff(1:ncol(rB3in[["srcDF"]]),c(colLocsNums2))
     myOrder <- c(diffs[ which(diffs <= loc) ], colLocsNums2, diffs[ which(diffs > loc) ])
-
+    
     # move vars
     rB3in[["srcDF"]] <- rB3in[["srcDF"]][,myOrder]
     rB3in[["qcDF"]] <- rB3in[["qcDF"]][,myOrder]
@@ -134,9 +134,10 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     rB3in[["ctrls"]] <- rB3in[["ctrls"]][myOrder[2:ncol(rB3in[["srcDF"]])]-1,]
     
   }
-
+  
   return(rB3in)
   ######## ######## ########
   ######## end function ########
   ######## ######## ########
 }
+

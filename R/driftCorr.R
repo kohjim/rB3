@@ -119,53 +119,42 @@ driftCorr <- function(rB3in,startDate,endDate,varNames, lowRef, lowStart, lowEnd
   ##########################>> make changes
 
 
-##### plotting #######
+  ##### plotting #######
 
-rB3new[["hlDF"]] <- hlDF
+  # copy current df for plotting
+  rB3plot <- rB3new
+  rB3plot[["hlDF"]] <- hlDF
 
-# end function and return rB3 object if no showPlot
-if (showPlot != TRUE) {
-  # always return changes if no showPlot
+  # apply changes to new DF
+  rB3new[["qcDF"]] <- df
 
-  rB3new[["hlDF"]] <- NULL
-
-} else {
-
-  # if showPlot == TRUE, generate prompt and ask to accept
+  # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
+    if (!is.null(savePlot)) {
+
+      ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
+                      height = 0.5 + 1.1 * length(unique(plotAll$var)),
+                      width = 7.5,
+                      dpi = dpi)
+    }
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      if (!is.null(savePlot)) {
-
-
-        ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                        height = 1.2 * length(unique(plotAll$var)),
-                        width = 7.5,
-                        dpi = dpi)
-      }
-
-      # write the changes
-      # copy working df to source df
-      rB3new[["qcDF"]] <- df
-      rB3new[["hlDF"]] <- NULL
       print('Changes have been applied')
 
       # ..or don't
     } else {
-      # revert to rB3in
       rB3new <- rB3in
-      print ( 'Changes were not applied' ) }
+      print ( 'Changes were not applied' )
+    }
 
-  }   # end showPlot == TRUE loop
+  }   # end plotting loop
 
-}   # end showPLot loop
+  # return the modified rB3 object
+  return(rB3new)
 
-# return the modified rB3 object
-return(rB3new)
-
-######## end function ########
+  ######## end function ########
 }

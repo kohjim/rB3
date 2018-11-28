@@ -34,18 +34,14 @@
 #' @param lat latitude of the monitoring station (numeric, decimal WGS84 degrees)
 #' @param lon longitude of the monitoring station (numeric, decimal WGS84 degrees)
 #' @param country country of origin (character)
-#' @param copySrc keep a copy of the raw (input) file as a dataframe (TRUE/FALSE) (stored as 'srcDF')
 #' @keywords fileIO
 #' @examples csv2rB3("Rotorua.csv", siteName = "Lake_Rotorua", lat = -38, long = 176, country = "NZ")
 
 
-csv2rB3 <- function(filePath, siteName, lat, lon, country, copySrc) {
+csv2rB3 <- function(filePath, siteName, lat, lon, country) {
 
-  if ( copySrc == TRUE ) {
-  srcData <<- read.csv(filePath, header = FALSE, stringsAsFactors = FALSE)
-  } else {
+
   srcData <- read.csv(filePath, header = FALSE, stringsAsFactors = FALSE)
-  }
 
   # find header row
   hRow <- which(srcData[,1] == "DateTime")
@@ -81,7 +77,7 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country, copySrc) {
   colnames(ctrls) <- srcData[hRow,2:ncol(srcData)]
 
   ctrlnames <- c("measVar","units","sensorDist","sensorLoc","plotLabels","methodAgg","pullAgg",
-                 "filterMin","filterMax","filterRoc","filterReps","filterMean","filterSD")
+                 "maxVal","minVal","maxRoc","maxReps","filterWindow","filterSD")
 
 for (n in ctrlnames) {
 
@@ -96,7 +92,7 @@ for (n in ctrlnames) {
     ctrls[,z] <- as.character(ctrls[,z])
   }
 
-  numCols <- c("sensorDist","filterMin","filterMax","filterRoc","filterReps","filterMean","filterSD")
+  numCols <- c("sensorDist","minVal","maxVal","maxRoc","maxReps","filterWindow","filterSD")
 
   for (y in numCols) {
     ctrls[,y] <- as.numeric(as.character(ctrls[,y]))

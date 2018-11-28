@@ -2,7 +2,7 @@
 % Please edit documentation in R/varWrangle.R
 \name{varWrangle}
 \alias{varWrangle}
-\title{Interpolate the date range given for the variables specified}
+\title{Create or remove variables in an rB3 object}
 \usage{
 varWrangle(rB3in, varNames, task, loc)
 }
@@ -16,12 +16,12 @@ varWrangle(rB3in, varNames, task, loc)
 \item{loc}{N: move or add varNames after original Nth variable}
 }
 \description{
-Linearly interpolates gaps (NAs) within the selected subset of dates and variables
+Creat variables, delete variables, change order of variables, etc
 }
 \examples{
-newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "sort")
-newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "moveto", loc = 3)
-newDF <- varWrangle(rB3in, varNames = "DOSat", task = "add")
-newDF <- varWrangle(rB3in, varNames = "tmpWtr", task = "rm")
+rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "sort")
+rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "moveto", loc = 3)
+rB3in <- varWrangle(rB3in, varNames = "DOSat", task = "add")
+rB3in <- varWrangle(rB3in, varNames = "tmpWtr", task = "rm")
 }
 \keyword{wrangling}

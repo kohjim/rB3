@@ -104,7 +104,7 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, maxNArep, logID, Re
 
     # find na
     is.na.thisDF <- !is.na(thisDF) # -> aa
-    
+
     if (sum(is.na(thisDF)) == 0) { # if no NA then skip this iteration
       next
     }
