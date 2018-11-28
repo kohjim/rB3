@@ -12,8 +12,7 @@ Imports: tidyr,
 	circular,
 	ggplot2,
 	shiny,
-	lubridate,
-	forecast
+	lubridate
 Suggests:
 License: GPL-2
 Encoding: UTF-8
