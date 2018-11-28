@@ -1,19 +1,19 @@
-#' Interpolate the date range given for the variables specified
+#' Interpolate NA values
 #'
-#' Linearly interpolates gaps (NAs) within the selected subset of dates and variables
+#' Assign linearly interpolated numbers for na when na is repeated less than maxNArep number of times.
 #'
-#' @param rB3in rB3 object input
+#' @export
 #' @param startDate start date
 #' @param endDate endDate
-#' @param varNames list of variable names or keywords
-#' @param logID write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code
-#' @param showPlot display figure in plots window (TRUE/FALSE)
-#' @param savePlot save figure to a path (TRUE/FALSE)
-#' @keywords wrangling
-#' @export
-#' @examples newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+#' @param varNames variable names or keywords
+#' @param maxNArep maximum repeated NA
+#' @param logID assign log ID
+#' @param plotPath plot figure of before and after
+#' @keywords QA/QC
+#' @examples rB3out <- applyInterp(rB3in, maxNArep = 4)
+#'
 
-applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, showPlot, savePlot) {
+applyInterp <- function(rB3in, startDate, endDate, varNames, maxNArep, logID, Reason, showPlot, savePlot){
 
   ######## defaults ########
   if (missing(startDate)){
@@ -28,6 +28,10 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, show
     varNames <- "All"
   }
 
+  if (missing(maxNArep)){
+    maxNArep <- nrow(rB3in[["qcDF"]])
+  }
+
   if (missing(showPlot)){
     showPlot <- FALSE
   }
@@ -40,18 +44,37 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, show
     showPlot <- FALSE
   }
 
-   if (missing(savePlot)) {
+  if (missing(savePlot)) {
     savePlot <- NULL
   }
 
   if (missing(logID)){
-    logID <- "Interp"
+    logID <- "interp_na"
   }
 
-  ######## end defaults ########
+  # back up original
+  rB3new = rB3in
 
-  # identify the elements in the array, to be modified
-  outs.idElToModify <- idElToModify(rB3in, startDate = startDate, endDate = endDate, varNames = varNames)
+  # write to the logKey
+  writeLog(rB3in, logID, funName = "interp_na", Reason = "Linearly interpolated na values" )
+
+  ######## end set defaults ########
+
+  ######## find elements to modify ########
+
+  # extract data
+  DF_in <- rB3in[["qcDF"]]
+
+  # make blank df for highlighting in plots
+  hlDF <- DF_in
+  hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
+
+  # find vars - dates to search
+  outs.idElToModify <- idElToModify(
+    rB3in,
+    startDate = startDate,
+    endDate = endDate,
+    varNames = varNames)
 
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
@@ -59,49 +82,110 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, show
   colLocs <- outs.idElToModify[[2]]
   colLocsNums <- which(colLocs)
 
-  # make preview rB3 object
-  rB3new <- rB3in
-
-  # copy qcDF to working DF
-  df <- rB3new[["qcDF"]]
-
-  # make blank df for highlighting in plots
-  hlDF <- df
-      hlDF[1:nrow(hlDF),2:ncol(hlDF)]   <- NA
-
-  # col names for later use
-  DFColNames <- colnames(df)
+  ######## end find elements to modify ########
 
 
-   #### body of function
+  ########          ########
+  ######## function ########
 
-  for (i in 1:length(colLocsNums)){
+  for (i in 1:length(colLocsNums)){ #colLocsNums
 
-    # find the periods that will be interped to hlDF
-    rowsToChange <- which( is.na(df[,colLocsNums[i]]) )
-    rowsToChange <- intersect(rowLocsNums,rowsToChange)
+    # DF_in column to modify
+    thisDF <- data.frame(DF_in[rowLocsNums,colLocsNums[i]])
 
-    # interpolate the working DF
-    df[rowLocsNums,colLocsNums[i]] <- forecast::na.interp ( df[rowLocsNums,colLocsNums[i]] )
+    ##### log of this column 1 #####
+    thisDF_log <- thisDF
+    thisDF_log[,1] <- NA
 
-    # write the hlDF with interpolated values
-    hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+    ##### log of this column 1 #####
 
-    ### write to same portion of logDF
-    rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
-                                                              logID,
-                                                              paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ) )
+
+    ##### algorithm to identify NA chunks #####
+
+    # find na
+    is.na.thisDF <- !is.na(thisDF) # -> aa
+    
+    if (sum(is.na(thisDF)) == 0) { # if no NA then skip this iteration
+      next
     }
 
+    # counts continous na
+
+    # test my algorithm
+    # aa <- c(NA,NA,0,0,NA,NA,NA,0)
+    # bb <- matrix(!is.na(aa),nrow = 1) # base matrics (find non NAs)
+
+    bb <- is.na.thisDF
+
+    cc <- cumsum(c(bb)) # cumsum TRUE (i.e. non NA)
+    dd <- ave(seq_along(bb), cc, FUN=seq_along) # count continuous NAs
+    ee <- which(dd[-length(dd)] - dd[-1L] > 0) # locatoin where NA sequence finishes
+
+    if (is.na(thisDF[nrow(thisDF),1])){
+      ee <- c(ee,nrow(thisDF))
+    }
+
+    flip.bb <- bb[c(length(bb):1)] # do same from the other side
+    flip.cc <- cumsum(c(flip.bb)) # cumsum TRUE (i.e. non NA)
+    flip.dd <- ave(seq_along(flip.bb), flip.cc, FUN=seq_along) # count continuous NAs
+    flip.ee <- length(bb) - which(flip.dd[-length(flip.dd)] - flip.dd[-1L] > 0) + 1 # locatoin where NA sequence starts
+    flip.ee <- flip.ee[c(length(flip.ee):1)] # sort in order
+
+    if (is.na(thisDF[1,1])){
+      flip.ee <- c(1, flip.ee)
+    }
+
+    ##### end algorithm to identify NA chunks #####
+
+    ##### interpolation #####
+    if (!(nrow(thisDF) == sum(is.na(thisDF)))){ # do nothing if there are no data
+      for (j in 1:length(ee)){
+
+        if (flip.ee[j] == 1){
+
+          # do not interpolate if this chunk starts from the beggining of data
+
+        } else if (ee[j] == nrow(is.na.thisDF)){
+
+          # do not interpolate if this chunk starts from the beggining of data
+
+        } else if ((ee[j] - flip.ee[j]) <= maxNArep){
+
+          # linear interpolation
+          approx.out <- approx(x = c(1,(ee[j]+1)-(flip.ee[j]-1)+1),
+                               y = c(thisDF[flip.ee[j]-1,1], thisDF[ee[j]+1,1]),
+                               xout = seq_along((flip.ee[j]-1):(ee[j]+1)),
+                               method = "linear")
+
+          # assign back
+          DF_in[(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]] <- approx.out$y
+
+
+          # log and plot highlighting
+          rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]]  <- logID
+          hlDF[(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]] <- approx.out$y
+        }
+      }
+    }
+
+    # DF_in[rowLocsNums,colLocsNums[i]] <- thisDF
+
+    ##### end interpolation #####
+  }
 
 
   ##### plotting #######
 
-  rB3new[["hlDF"]] <- hlDF
+  # copy current df for plotting
+  rB3plot <- rB3new
+  rB3plot[["hlDF"]] <- hlDF
+
+  # apply changes to new DF
+  rB3new[["qcDF"]] <- DF_in
 
   # if user wants a plot of the action, generate plot and prompt to accept
   if (showPlot == TRUE | !is.null(savePlot)) {
-    prePostPlot(rB3new, startDate, endDate, varNames = varNames,
+    prePostPlot(rB3plot, startDate, endDate, varNames = varNames,
                 srcColour = 'grey', hlColour = 'red', qcColour = 'blue', showPlot = showPlot, savePlot = savePlot, dpi = 200)
 
     if (!is.null(savePlot)) {
@@ -114,10 +198,6 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, logID, Reason, show
 
     if (menu(c("Yes", "No"), title="Apply these changes?") == 1){
 
-      # write the changes
-      # copy working df to source df
-      rB3new[["qcDF"]] <- df
-      rB3new[["hlDF"]] <- NULL
       print('Changes have been applied')
 
       # ..or don't

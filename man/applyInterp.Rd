@@ -2,30 +2,29 @@
 % Please edit documentation in R/applyInterp.R
 \name{applyInterp}
 \alias{applyInterp}
-\title{Interpolate the date range given for the variables specified}
+\title{Interpolate NA values}
 \usage{
-applyInterp(rB3in, startDate, endDate, varNames, logID, Reason, showPlot,
-  savePlot)
+applyInterp(rB3in, startDate, endDate, varNames, maxNArep, logID, Reason,
+  showPlot, savePlot)
 }
 \arguments{
-\item{rB3in}{rB3 object input}
-
 \item{startDate}{start date}
 
 \item{endDate}{endDate}
 
-\item{varNames}{list of variable names or keywords}
+\item{varNames}{variable names or keywords}
 
-\item{logID}{write an operation identifier to the log frames, default = NA, 'auto' chooses a log number for you, or provide a numerical code}
+\item{maxNArep}{maximum repeated NA}
 
-\item{showPlot}{display figure in plots window (TRUE/FALSE)}
+\item{logID}{assign log ID}
 
-\item{savePlot}{save figure to a path (TRUE/FALSE)}
+\item{plotPath}{plot figure of before and after}
 }
 \description{
-Linearly interpolates gaps (NAs) within the selected subset of dates and variables
+Assign linearly interpolated numbers for na when na is repeated less than maxNArep number of times.
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+rB3out <- applyInterp(rB3in, maxNArep = 4)
+
 }
-\keyword{wrangling}
+\keyword{QA/QC}
