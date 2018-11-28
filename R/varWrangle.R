@@ -86,6 +86,8 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     
     rB3in[["ctrls"]] <- rB3in[["ctrls"]][c(1:(orgNCol-1),(orgNCol+1):(newNCol),orgNCol),]
     
+    print(paste0(paste0(varNames,collapse = ", "), " added to the rB3 obj"))
+    
     # continue program
     
   } else if (task == "rm"){ # remove variables
@@ -95,7 +97,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
     rB3in[["logDF"]] <- rB3in[["logDF"]][,!colLocs]
     rB3in[["ctrls"]] <- rB3in[["ctrls"]][!c(colLocs[2:orgNCol],FALSE),]
     
-    print(paste0(paste0(varNames,collapse = ", "), " were removed from the rB3 obj"))
+    print(paste0(paste0(varNames,collapse = ", "), " removed from the rB3 obj"))
     
     return(rB3in) # end program
     

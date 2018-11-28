@@ -162,7 +162,10 @@ applyInterp <- function(rB3in, startDate, endDate, varNames, maxNArep, logID, Re
 
 
           # log and plot highlighting
-          rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]]  <- logID
+          rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]]  <- ifelse(is.na(rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]]),
+                                                                                 logID,
+                                                                                 paste0(rB3new[["logDF"]] [(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]], ' : ',logID ) )
+          
           hlDF[(flip.ee[j]-1):(ee[j]+1),colLocsNums[i]] <- approx.out$y
         }
       }

@@ -150,10 +150,11 @@ rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qc
 
   if (is.null(srcColour)) {
    print(varPlot + qcGeom + qcKey)
-  } else if ( is.null(qcColour)) {
+  } else if (is.null(qcColour)) {
     print(varPlot + srcGeom + srcKey)
-  } else { print(varPlot + srcGeom + qcGeom + dualKey)
-      }
+  } else if (facet == TRUE) { print(varPlot + srcGeom + qcGeom + dualKey)
+  } else { print(varPlot + qcGeom + qcKey) 
+           print("Only quality controlled data are displayed for non-faceted plots")   }
 }
 
 if (!is.null(savePlot)) {

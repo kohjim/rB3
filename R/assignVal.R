@@ -106,10 +106,12 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
       rB3new[["logDF"]] [rowsToChange,colLocsNums[i]] <- ifelse(is.na(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]]),
                                                                 logID,
                                                                 paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
-
       ## write newVal to highlighting DF
       hlDF[rowsToChange,colLocsNums[i]] <- newVal
 
+      ## write newVal to highlighting DF
+      df[rowsToChange,colLocsNums[i]] <- newVal
+      
  } else {
 
       # write to the logKey
@@ -120,8 +122,13 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
                                                                 logID,
                                                                 paste0(rB3new[["logDF"]] [rowsToChange,colLocsNums[i]], ' : ',logID ))
 
+
       ## write data to highlighting DF
       hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
+      
+      ## write newVal to highlighting DF
+      df[rowsToChange,colLocsNums[i]] <- newVal
+      
 
       }
 

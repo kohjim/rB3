@@ -115,7 +115,6 @@ filterRoc <- function(rB3in, startDate, endDate, varNames, maxRoc, logID, Reason
   }
 
 
-
   ##### plotting #######
 
   # copy current df for plotting
