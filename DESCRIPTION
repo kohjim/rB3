@@ -7,7 +7,7 @@ Authors@R: c(
 	person("Chris", "McBride", email = "chris@limnotrack.com" , role = c("aut"))
 	)
 Description: What the package does (one paragraph).
-Depends: R (>= 3.4.1),
+Imports: R (>= 3.4.1),
     tidyr,
 	circular,
 	ggplot2,
