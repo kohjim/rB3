@@ -4,22 +4,22 @@
 \alias{idElToModify}
 \title{Identify elements locations for the specified variable and dates ranges}
 \usage{
-idElToModify(DF_in, startDate, endDate, varNames)
+idElToModify(rB3in, startDate, endDate, varNames)
 }
 \arguments{
-\item{DF_in}{data frame input}
+\item{rB3in}{data frame input}
 
 \item{startDate}{start date}
 
 \item{endDate}{end date}
 
-\item{metaD}{metadata list}
+\item{varNames}{variable names that will be selected}
 }
 \description{
 This sub-function identifies elements of the data frame that satisfies dates range and/or variable names,
 }
 \examples{
-newDF <- exclude_vars(myDF,metaData,varNames = c("pH","wndDir"))
+idElToModify(rB3in, startDate = '2015-07-01', endDate = '2016-06-30', varNames = 'All')
 
 }
 \keyword{wrangling}
