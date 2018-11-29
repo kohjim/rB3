@@ -115,7 +115,7 @@ Date format must be yyyy-mm-dd hh:mm:ss, with header "DateTime"
 Setting wd
 
 ```{r}
-setwd("C:/Users/km-admin/Dropbox/Git/rB3_wd/wd")
+setwd("C:/ ...")
 ```
 
         
