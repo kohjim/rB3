@@ -32,15 +32,19 @@ library(rB3)
 
 ```{r}
 ### download directly from github
-# https://github.com/kohjim/rB3/archive/G20.zip
+## https://github.com/kohjim/rB3/archive/G20.zip
+```
 
-# !!! Open the folder 'Demo' and the file Demo.Rproj !!! #
- 
-# check your working directory, and adjust if needs be
+
+Open the provided folder 'Demo' and the file Demo.Rproj
+
+```{r}
+## check your working directory, and adjust if needs be
 getwd()
 # setwd("C:/")
 
-#install rB3
+## install rB3
+#install.packages("devtools")
 library(devtools)
 install("../rB3-G20")
 
@@ -61,17 +65,9 @@ library(rB3)
 ```
 
 
-** load remotes package and download rB3 from github **
+### Set system timezone to UTC! 
 
-```{r}
-# library(remotes)
-# 
-# remotes::install_github("kohjim/rB3", ref = "G20")
-library(rB3)
-```
-
-
-SET SYSTEM TIMEZONE TO UTC! why?..
+why?..
 
    ..the POSIXct date format used by rB3 can play havoc with your data editing if timezones are not handled well..
    
@@ -111,21 +107,17 @@ Intial csv header rows can contain time-series/sensor metadata to be used in lat
  
 Date format must be yyyy-mm-dd hh:mm:ss, with header "DateTime"
 
-
-Setting wd
+**Import a raw dataset**
 
 ```{r}
-setwd("C:/ ...")
-```
+## make sure the demo csv is in the same working dir
+# setwd("C:/ ...")
 
-        
-```{r}
 rB3demo <- csv2rB3("rB3demo_201507-201806_RAW_R.csv","Lake_Rotoehu",-38.5, 176.5,"NZ")
 ```
         
 
 call the components of the rB3 object on the fly (not needed for rB3 operations).
-
 
 ```{r}
 names(rB3demo)
