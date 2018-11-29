@@ -1,11 +1,5 @@
 ---
-title: "rB3 demo for GLEON-20 pre-meeting workshop"
-output:
-  html_notebook: default
-  html_document:
-    df_print: paged
-  pdf_document: default
-  word_document: default
+# rB3 demo for GLEON-20 pre-meeting workshop
 ---
 
 *prepared for GLEON 20, GSA workshop 2018-12-03*  
