@@ -1,87 +1,600 @@
-# rB3
+---
+# rB3 demo for GLEON-20 pre-meeting workshop
+---
 
-Data handling tools for high-frequency lake monitoring buoy observations
+*prepared for GLEON 20, GSA workshop 2018-12-03*  
 
-## Motivation
-Environmental observations are inherently noisy. By date, few resources are made available for generic QA/C of high-frequency (HF) environmental observations (e.g. Horsburgh et al., 2015). Often more specific and complex processes and analysis are required to produce sensible scientific results from lake HF observations. In scientific analysis, critical steps require generic QA/QC, data dimension reduction and representation, and finally analysis of coherence. Multiple lake buoy HF data analysis packages were produced on the philosophy of such scientific procedure through Global Lake Ecological Observatory Network (GLEON; e.g. physical stability - Read et al., 2011; energy flux - Woolway et al., 2015; lake metabolism - Winslow et al., 2016; fluorescence signal mining - Ruan et al., 2017; dissolved oxygen classification – Muraoka et al., in press). Authors of this package were heavily involved in intitiatin and development of B3 software, a lake buoy data QA/QC graphic user interface executable, created by the University of Waikato Lakes Ecosystem Research New Zealand (LERNZ: https://www.lernz.co.nz/tools-and-resources/b3). Siince the initial development of B3 in 2012, LERNZ is continuously receiving download requests, inqueries and request to be in the mailing list, primarily through GLEON community. Although B3 software focuses on usability and standardized practice, further development is not feasible because (a) the software is made in C# language which is difficult for scientific community to collaborate on, (b) development is semi-completed with solid GUI base, meaning it is difficult to add customised functions, and (c) due to its free-ware nature, the project was not developed for open source ready. Furthermore, it is reported that B3 may have issue handling truly large data, and also was not produced on the basis of extension to near future streaming practices. This package rB3, a set of R-language functions, was initiated to overcome these issues; (a) R is a well-used statistical computing language in GLEON and scientific community, (b) modularised functions makes additional or specialized functions very easy to develop, and (c) developed on GitHub with open source and open access ready. We are interested in continuous development of the package, especially to bridge a typical buoy raw data with other available lake analyisis resources. The project was initiated with a strong support from the Waikato Regional Council.
-
-## How does it work
-
-
-## Module categories
-
-Modules can be classified by their functionalities: (1) file I/O functions, (2) data wrangling functions, and (3) data editing functions, and (4) sub-functions / utilities. Tasks of (1) includes reading and writing data files, as well as saving plot functions. Tasks of category (2) modifies data, but as a results, data shapes are transformed. Example of these might be removing specific variables, or down sample from the original timeseries. Category (3) tasks also modify
-
-### File I/O
-
-### Data wrangling
-
-### Data modification
-
-### sub-functions / utilities
-
-### Custom functions
-
-```
-test
-```
+Chris McBride & Kohji Muraoka, UoW, November 2018  
+correspondance to cmcbride@waikato.ac.nz   
 
 
-``` 
-Example (outdated)
-Use mixed temperature differences to align temperature readings. 
-Mixed periods are defined by dTmp < Value1%dTmp, wndspd > Value2%wndspd
 
-Require: 
-Vars, StartDate, EndDate, Value1 = percentile temperature differences, Value2 = percentile wind speed
+## INSTALLING rB3
+
+Install remotes package to remotely install G20 version of rB3
+
+** Web installation via git ('remotes' OR 'devtools') **
+
+```{r}
+### via package "remotes" 
+# install.packages("remotes")
+ remotes::install_github("kohjim/rB3", ref = "G20")
+
+### via package "devtools"
+# install.packages("devtools")
+ devtools::install_github("kohjim/rB3", ref = "G20")
+
+library(rB3)
 ```
 
-## Module categories
 
-### Output (longformat) contents control
-#### Sensor_model
-#### Sensor_serial
+** Local installation **
 
-## Getting started
+```{r}
+### download directly from github
+# https://github.com/kohjim/rB3/archive/G20.zip
 
-### Prerequisites
+# !!! Open the folder 'Demo' and the file Demo.Rproj !!! #
+ 
+# check your working directory, and adjust if needs be
+getwd()
+# setwd("C:/")
 
-To be updated
+#install rB3
+library(devtools)
+install("../rB3-G20")
 
-### Installing
+# load the rB3 library
+library(rB3)
+```
 
-To be updated 
+
+```{r}
+#install.packages("remotes")
+
+##### If installing packages failed, manually install dependencies below:
+# install.packages("tidyr")
+# install.packages("ggplot2", dependencies = TRUE)
+# install.packages("lubridate")
+# install.packages("shiny")
+# install.packages("circular")
+```
+
+
+** load remotes package and download rB3 from github **
+
+```{r}
+# library(remotes)
+# 
+# remotes::install_github("kohjim/rB3", ref = "G20")
+library(rB3)
+```
+
+
+SET SYSTEM TIMEZONE TO UTC! why?..
+
+   ..the POSIXct date format used by rB3 can play havoc with your data editing if timezones are not handled well..
+   
+   ..so it can help to set your system environment to UTC, which avoids issues with tz offsets
+
+```{r}
+# set timezone - only change for this R session
+Sys.setenv(TZ = "UTC")
 
 ```
-To be updated 
+
+
+
+## File In
+
+### csv2rB3() - Import a raw dataset (csv)
+
+
+Import a starting .csv file, which will be converted into a list of data frames:
+
+ 1. the raw data block from your csv file;                                           'srcDF'
+ 
+ 2. a copy of the raw data block, to be quality controlled;                          'qcDF'
+ 
+ 3. a matrix with similar dimensions to 1 & 2, to store qc action logID values;      'logDF'
+ 
+ 4. a list of logID values and their meanings;                                       'logKey'
+ 
+ 5. sensor/time-series metadata and control values used for filtering/plotting etc   'ctrls'
+ 
+ 6. site/station meta data                                                           'metaD'
+
+
+For the documentation, run following code
+?csv2rB3
+
+Intial csv header rows can contain time-series/sensor metadata to be used in later functions (loaded as 'ctrls' DF within list). Row prior to start of data will be data frame headers
+ 
+Date format must be yyyy-mm-dd hh:mm:ss, with header "DateTime"
+
+
+Setting wd
+
+```{r}
+setwd("C:/Users/km-admin/Dropbox/Git/rB3_wd/wd")
 ```
 
-## Example
+        
+```{r}
+rB3demo <- csv2rB3("rB3demo_201507-201806_RAW_R.csv","Lake_Rotoehu",-38.5, 176.5,"NZ")
+```
+        
 
-To be updated
-
-## Versioning
-
-
-## Citation
-
-To be updated
-
-## Authors
+call the components of the rB3 object on the fly (not needed for rB3 operations).
 
 
-## License
+```{r}
+names(rB3demo)
+```
+
+srcDF: Starting data in data frame
+
+qcDF: Current version of the data in data frame (same size as the srcDF)
+
+logDF: log of last operated task ID for particular element of the data (same size as the srcDF)
+
+logKey: each task ID's infromation
+
+ctrls: Stores bulk operation options for each variables
+
+metaD: dataset meta data (e.g. lake name etc)
 
 
-## Acknowledgments
 
-## References
-Horsburgh, J. S., S. L. Reeder, A. S. Jones, and J. Meline. 2015. Open source software for visualization and quality control of continuous hydrologic and water quality sensor data. Environ. Model. Softw. 70: 32–44. doi:10.1016/j.envsoft.2015.04.002
+You can access a data frame object by following syntax e.g.,
 
-Ruan, G., Hanson, P. C., Dugan, H. A., & Plale, B. 2017. Mining lake time series using symbolic representation. Ecological Informatics, 39, 10-22.
+```{r}
+testDF <- rB3demo[["qcDF"]]
+```
 
-Read, J. S., D. P. Hamilton, I. D. Jones, K. Muraoka, L. A. Winslow, R. Kroiss, C. H. Wu, and E. Gaiser. 2011. Derivation of lake mixing and stratification indices from high-resolution lake buoy data. Environ. Model. Softw. 26: 1325–1336. doi:10.1016/j.envsoft.2011.05.006
 
-Winslow, L. A., J. A. Zwart, R. D. Batt, H. A. Duggan, R. I. Woolway, J. R. Corman, P. C. Hanson, and J. S. Read. 2016. LakeMetabolizer: an R package for estimating lake metabolism from free-water oxygen using diverse statistical models. Inl. waters 6.
 
-Woolway, R. I., I. D. Jones, D. P. Hamilton, S. C. Maberly, K. Muraoka, J. S. Read, R. L. Smyth, and L. A. Winslow. 2015. Automated calculation of surface energy fluxes with high-frequency lake buoy data. Environ. Model. Softw. 70: 191–198. doi:10.1016/j.envsoft.2015.04.013
+
+## Explore and reformat your data
+
+
+### ShinyrB3() - GUI (graphic user interphase)
+
+This module lets you investigate your data interactively using shiny package
+
+For the documentation, run following code
+?shinyrB3
+
+```{r}
+shinyrB3(rB3demo)
+```
+
+Note that shiny occupies R studio so you need to shut the Shiny window in order to action any more commands..
+
+More future updates will come around this GUI
+
+
+### Selecting variables in rB3
+                                     
+Variables can be called using key phrases/characters (i.e., all vars containing key word will be selected)
+
+create vector of key phrases, for later functions, e.g.;
+
+```{r}
+wqVars <- c('Fl','Tur','pH','DO')
+
+```
+
+
+?rB3getVars
+
+```{r}
+rB3getVars(rB3demo, wqVars)
+```
+
+
+retrieve varNames; 'All' (default) or select by keyphrase
+
+?rB3getVars
+
+```{r}
+rB3getVars(rB3demo, 'All')
+```
+
+
+### rB3stdze() - data trimming and temporal aggregation
+
+Trim and standardize time intervals of a data frame
+
+                              
+Our demo rawDF has 3 yrs data, some with 5 min data, some 15 min.
+
+So let's trim dataset to **most recent 2 years**, and **aggregate to common (15 min) timestep**, using aggregation methods specific to each column as defined in the header metadata (ctrls$methodAgg).
+
+
+```{r}
+rB3demo[["ctrls"]]$methodAgg
+```
+
+
+For example, here we'll aggregate by mean, but sum for rainfall, and circular averaging for wind direction 
+
+?rB3stdze
+
+```{r}
+# aggregate the data to 15 min timestep - can take a while on big DFs!
+rB3agg <- rB3stdze(rB3in = rB3demo, 
+                   varNames = 'All', 
+                   startDate = '2016-07-01', 
+                   endDate = '2018-06-30 23:45:00',
+                   timestep = 15,
+                   aggAll = FALSE)
+```
+
+
+
+### varWrangle() - create, remove or move variables
+
+?varWrangle
+
+```{r}
+# add variable(s) after 3rd variable (3rd excluding DateTime)
+rB3agg <- varWrangle(rB3agg, 
+                     varNames = "TESTVAR", 
+                     task = "add",
+                     loc = 4)
+
+rB3getVars(rB3agg)
+
+```
+
+
+```{r}
+# remove variable(s) by "keyword" TESTVAR
+rB3agg <- varWrangle(rB3agg, 
+                     varNames = "TESTVAR", 
+                     task = "rm")
+
+rB3getVars(rB3agg)
+```
+
+
+### gg_facetVar() - Basic panel plots
+
+?rB3gg
+
+```{r}
+# plot the variables called by the the keywords, saved to figures dir
+rB3gg(rB3in = rB3agg,
+      varNames = c("TmpWtr.d00050","TmpWtr.d00150"),
+      srcColour = 'grey34',
+      facet = TRUE,
+      showPlot = TRUE)
+```
+
+
+```{r}
+rB3gg(rB3in = rB3agg, 
+      varNames = 'DOpsat', 
+      srcColour = 'grey34', 
+      facet = FALSE,
+      showPlot = TRUE,
+      savePlot = 'figures/RAW_WQ_',  
+      dpi = 400)
+```
+
+
+Backup the aggregated data frame, in case we want to revert later
+
+```{r}
+rB3agg2 <- rB3agg
+```
+
+```{r}
+shinyrB3(rB3agg2)
+```
+
+
+### assignVal() - Delete or change selected data values
+                                  
+This function replace values in specified regions of data with a numerical value or with NA
+
+?assignVal
+
+Select a region from your shiny plot containing erroneous data, then paste the example function, e.g.:
+
+```{r}
+rB3agg2 <- assignVal(rB3agg2, 
+                     varNames = c('TmpWtr.d00050','TmpWtr.d00150'),  
+                     startDate = "2017-06-15 23:05:14", 
+                     endDate = "2017-07-06 11:00:38", 
+                     minVal = 12, 
+                     maxVal = 22.9, 
+                     newVal = NA, 
+                     logID = "Shiny", 
+                     Reason = "Manual removal",
+                     showPlot = T)
+```
+
+
+
+
+## Apply filters using 'ctrls' values
+
+### filterRoc() - Filter data by rate of change
+
+Replace values exceedign specified rate of change with NA
+
+?filterRoc
+
+```{r}
+rB3agg2 <- filterRoc(rB3agg2, 
+                     varNames = c('TmpWtr.d00050','TmpWtr.d00150'), 
+                     maxRoc = 0.5,
+                     showPlot = T)
+```
+
+
+If showPlot is TRUE, so you must enter your choice (1 = accept, 2 = decline) to continue
+
+### filterReps() - filter by repeated values
+
+Replace data where identical value has been repeated more than n = maxReps
+
+
+?filterReps
+
+```{r}
+rB3agg2 <- filterReps(rB3agg2,
+                      varNames = c('TmpWtr.d00050','TmpWtr.d00150'), 
+                      maxReps = 20,
+                      showPlot = T)
+```
+
+
+### filterMinMax() - limit data value by range
+
+Filter data below minVal or above maxVal (either specified, or from 'ctrls'/headers)
+
+?filterMinMax
+
+```{r}
+rB3agg2 <- filterMinMax(rB3agg2,
+                        varNames = c('TmpWtr.d00050','TmpWtr.d00150'), 
+                       filterMin = 9, 
+                       filterMax = 25,
+                       showPlot = T) 
+```
+
+
+### applyInterp() - linearly interpolate NA values
+
+?applyInterp
+
+```{r}
+rB3agg2 <- applyInterp(rB3agg2,
+                       varNames = c('TmpWtr.d00050','TmpWtr.d00150'),
+                       showPlot = T)
+```
+
+
+
+## Visualise your rB3 process
+
+### logsPlot() - visualise source, QC data and modifications log
+
+?logsPlot
+
+visualise changes to data
+
+```{r}
+logsPlot(rB3in = rB3agg2, 
+         varNames = c('TmpWtr.d00050','TmpWtr.d00150'), 
+         srcColour = 'grey') 
+```
+
+
+?rB3gg
+
+View the final before and after, without logs
+
+```{r}
+rB3gg(rB3in = rB3agg2, 
+      varNames = c('TmpWtr.d00050','TmpWtr.d00150'), 
+      srcColour = 'orange',
+      qcColour = 'blue') #, savePlot = 'figures/RAW_WQ_',  dpi = 400)
+```
+
+
+### rB3export() EXPORTING rB3 DATA
+
+Export data from the rB3 object into csv files
+
+?rB3export
+
+```{r}
+rB3export(rB3agg2, 
+          varNames = 'All',
+          qc = T, 
+          src = T,
+          metadata = T)
+```
+
+
+```{r}
+rB3agg3 <- rB3agg2
+```
+
+## Advanced QA/QC function
+
+### applyNth()
+
+Apply a mathematical transformation, e.g. new = a + b(old) + c(old)^2 + c(old)^3 + ...etc
+
+?applyNth          
+
+```{r}
+rB3agg2 <- applyNth(rB3in = rB3agg2,
+                    startDate = '2016-07-01 00:00:00',
+                    endDate = '2017-06-28 23:45:00',
+                    varNames = 'DOpsat.d00050',
+                    coeffs = c(12,1,0.02),
+                    showPlot = T)
+```
+
+
+### driftCorr()
+
+Correct linear sensor drift (assumes consistent timestep)
+
+?driftCorr
+
+```{r}
+rB3agg2 <- driftCorr(rB3agg2,
+                     '2016-07-01 00:00:00',
+                     '2017-06-28 23:45:00',
+                     'DOpsat.d00050',
+                     lowRef = 0,   
+                     lowStart =  0, 
+                     lowEnd =  0, 
+                     highRef = 100,
+                     highStart = 85, 
+                     highEnd = 130,
+                     showPlot = T)
+```
+
+
+
+
+## Some useful functions
+
+### tmprAlign()
+
+?tmprAlign
+
+Post-calibrate temperature sensors based on periods of mixing, as found by temp differences and wind speed (optional)
+
+
+**Pre tmprAlign()**
+
+
+```{r}
+rB3gg(rB3in = rB3agg2, 
+      varNames = 'TmpWtr', 
+      startDate = '2017-07-01', 
+      endDate = '2017-08-01',  
+      facet = FALSE,
+      showPlot = T)
+```
+
+
+```{r}
+rB3agg2 <- tmprAlign(rB3agg2,
+                     varNames = 'TmpWtr',
+                     dTPerctile = 0.2, 
+                     logID = "tpmAlign", 
+                     Reason = "Interp",
+                     showPlot = T,
+                     plotType = 'All')
+```
+
+
+**Post tmprAlign()**
+
+
+```{r}
+rB3gg(rB3in = rB3agg2, 
+      varNames = 'TmpWtr', 
+      startDate = '2017-07-01', 
+      endDate = '2017-08-01',  
+      facet = FALSE,
+      showPlot = T)
+```
+
+### FUNCrB3() - apply your own equation
+
+?FUNCrB3
+Apply a custom function using rB3
+
+**Simple example:**
+
+multiply a variable by 2
+
+```{r}
+# define a simple function ( result = input variable * 2)
+test <- function(eqnVars) {eqnVars[1] * 2}
+
+# apply this custom function
+rB3agg2 <- FUNCrB3(rB3agg2,
+                   varNames = 'DOpsat.d00050', 
+                   eqnVars = 'DOpsat.d00050', 
+                   FUN = test, 
+                   showPlot = T)
+```
+
+
+**Complex example:**
+
+calculate DO (mg/L) using ( DO (%sat) and water temperature ) using USGS method..
+
+*Meyers, D.N. (2011)   https://water.usgs.gov/admin/memo/QW/qw11.03.pdf*
+
+eqn:  DOmg = (exp(-139.34411 + ((157570.1*(1/( tmpwtr +273.15))) + (-66423080*((1/( tmpwtr +273.15))^2)) +  
+        (12438000000*((1/( tmpwtr +273.15))^3)) + (-862194900000*((1/( tmpwtr +273.15))^4))))) * DOsat *0.01
+
+ ..where tmpwtr = water temperature and DOsat = dissolved oxygen saturation
+
+```{r}
+rB3gg(rB3agg2,
+      varNames = c('DOpsat.d00050','DOconc.d00050'), 
+      showPlot = T, 
+      srcColour = 'orange',
+      qcColour = 'blue')
+```
+
+
+
+```{r}
+# define the list of input variables required for the calculation
+eqnVars = c('TmpWtr.d00050','DOpsat.d00050')
+
+# define the function, using eqnVars[1] - tmpwtr and eqnVars[2] = DOsat
+DOsat2mg <- function(eqnVars) {
+  (exp(-139.34411 + ((157570.1*(1/( eqnVars[1] +273.15))) + 
+      (-66423080*((1/( eqnVars[1] +273.15))^2)) + 
+        (12438000000*((1/( eqnVars[1] +273.15))^3)) + 
+           (-862194900000*((1/( eqnVars[1] +273.15))^4))))) * eqnVars[2] * 0.01
+}
+```
+
+
+```{r}
+rB3agg2 <- FUNCrB3(rB3agg2, 
+                   varNames = 'DOconc.d00050', 
+                   eqnVars = eqnVars, 
+                   FUN = DOsat2mg, 
+                   showPlot = T)
+
+```
+
+
+
+
+## Export files as Lake Analyzer inputs
+
+### writeLAinputs() - 
+
+write cleaned up temperature and wind data to .wtr and .wnd files for direct input to rLakeAnalyzer
+
+?writeLAinputs
+
+```{r}
+
+writeLAinputs(rB3in = rB3agg2,
+              wtrNames = 'TmpWtr',
+              wndName = 'WndSpd',
+              wndHeight = 1.5)
+```
+
+
+
