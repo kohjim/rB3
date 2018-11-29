@@ -105,8 +105,7 @@ Import a starting .csv file, which will be converted into a list of data frames:
  6. site/station meta data                                                           'metaD'
 
 
-For the documentation, run following code
-?csv2rB3
+For the documentation, ?csv2rB3
 
 Intial csv header rows can contain time-series/sensor metadata to be used in later functions (loaded as 'ctrls' DF within list). Row prior to start of data will be data frame headers
  
@@ -116,7 +115,7 @@ Date format must be yyyy-mm-dd hh:mm:ss, with header "DateTime"
 Setting wd
 
 ```{r}
-setwd("C:/Users/km-admin/Dropbox/Git/rB3_wd/wd")
+setwd("C:/ ...")
 ```
 
         
@@ -132,21 +131,8 @@ call the components of the rB3 object on the fly (not needed for rB3 operations)
 names(rB3demo)
 ```
 
-srcDF: Starting data in data frame
 
-qcDF: Current version of the data in data frame (same size as the srcDF)
-
-logDF: log of last operated task ID for particular element of the data (same size as the srcDF)
-
-logKey: each task ID's infromation
-
-ctrls: Stores bulk operation options for each variables
-
-metaD: dataset meta data (e.g. lake name etc)
-
-
-
-You can access a data frame object by following syntax e.g.,
+You can access a data frame object by e.g.,
 
 ```{r}
 testDF <- rB3demo[["qcDF"]]
@@ -162,8 +148,7 @@ testDF <- rB3demo[["qcDF"]]
 
 This module lets you investigate your data interactively using shiny package
 
-For the documentation, run following code
-?shinyrB3
+For the documentation, ?shinyrB3
 
 ```{r}
 shinyrB3(rB3demo)
@@ -421,11 +406,12 @@ rB3export(rB3agg2,
 ```
 
 
+## Advanced QA/QC function
+
+
 ```{r}
 rB3agg3 <- rB3agg2
 ```
-
-## Advanced QA/QC function
 
 ### applyNth()
 
@@ -434,7 +420,7 @@ Apply a mathematical transformation, e.g. new = a + b(old) + c(old)^2 + c(old)^3
 ?applyNth          
 
 ```{r}
-rB3agg2 <- applyNth(rB3in = rB3agg2,
+rB3agg3 <- applyNth(rB3in = rB3agg3,
                     startDate = '2016-07-01 00:00:00',
                     endDate = '2017-06-28 23:45:00',
                     varNames = 'DOpsat.d00050',
@@ -450,7 +436,7 @@ Correct linear sensor drift (assumes consistent timestep)
 ?driftCorr
 
 ```{r}
-rB3agg2 <- driftCorr(rB3agg2,
+rB3agg3 <- driftCorr(rB3agg3,
                      '2016-07-01 00:00:00',
                      '2017-06-28 23:45:00',
                      'DOpsat.d00050',
@@ -479,7 +465,7 @@ Post-calibrate temperature sensors based on periods of mixing, as found by temp 
 
 
 ```{r}
-rB3gg(rB3in = rB3agg2, 
+rB3gg(rB3in = rB3agg3, 
       varNames = 'TmpWtr', 
       startDate = '2017-07-01', 
       endDate = '2017-08-01',  
@@ -489,7 +475,7 @@ rB3gg(rB3in = rB3agg2,
 
 
 ```{r}
-rB3agg2 <- tmprAlign(rB3agg2,
+rB3agg3 <- tmprAlign(rB3agg3,
                      varNames = 'TmpWtr',
                      dTPerctile = 0.2, 
                      logID = "tpmAlign", 
@@ -503,7 +489,7 @@ rB3agg2 <- tmprAlign(rB3agg2,
 
 
 ```{r}
-rB3gg(rB3in = rB3agg2, 
+rB3gg(rB3in = rB3agg3, 
       varNames = 'TmpWtr', 
       startDate = '2017-07-01', 
       endDate = '2017-08-01',  
@@ -525,7 +511,7 @@ multiply a variable by 2
 test <- function(eqnVars) {eqnVars[1] * 2}
 
 # apply this custom function
-rB3agg2 <- FUNCrB3(rB3agg2,
+rB3agg3 <- FUNCrB3(rB3agg3,
                    varNames = 'DOpsat.d00050', 
                    eqnVars = 'DOpsat.d00050', 
                    FUN = test, 
@@ -545,7 +531,7 @@ eqn:  DOmg = (exp(-139.34411 + ((157570.1*(1/( tmpwtr +273.15))) + (-66423080*((
  ..where tmpwtr = water temperature and DOsat = dissolved oxygen saturation
 
 ```{r}
-rB3gg(rB3agg2,
+rB3gg(rB3agg3,
       varNames = c('DOpsat.d00050','DOconc.d00050'), 
       showPlot = T, 
       srcColour = 'orange',
@@ -569,7 +555,7 @@ DOsat2mg <- function(eqnVars) {
 
 
 ```{r}
-rB3agg2 <- FUNCrB3(rB3agg2, 
+rB3agg3 <- FUNCrB3(rB3agg3, 
                    varNames = 'DOconc.d00050', 
                    eqnVars = eqnVars, 
                    FUN = DOsat2mg, 
@@ -590,11 +576,9 @@ write cleaned up temperature and wind data to .wtr and .wnd files for direct inp
 
 ```{r}
 
-writeLAinputs(rB3in = rB3agg2,
+writeLAinputs(rB3in = rB3agg3,
               wtrNames = 'TmpWtr',
               wndName = 'WndSpd',
               wndHeight = 1.5)
 ```
-
-
 
