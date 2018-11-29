@@ -132,17 +132,17 @@ call the components of the rB3 object on the fly (not needed for rB3 operations)
 names(rB3demo)
 ```
 
-srcDF: Starting data in data frame
+srcDF: the unmodified data (data frame)
 
 qcDF: Current version of the data in data frame (same size as the srcDF)
 
-logDF: log of last operated task ID for particular element of the data (same size as the srcDF)
+logDF: a 'log' file with similar structure to srcDF and qcDF, to store QC operations log (same size as the srcDF)
 
-logKey: each task ID's infromation
+logKey: control key with logIDs and explanatory columns
 
-ctrls: Stores bulk operation options for each variables
+ctrls: controls, extracted from extra header rows in the raw csv files ('ctrls')
 
-metaD: dataset meta data (e.g. lake name etc)
+metaD: site metadata, create from additional input args ('metaD')
 
 
 
