@@ -74,14 +74,13 @@ sparseLR <- function(dataIn,filePath,varNames,suffix,sparseMethod,minZ,maxZ){
       # make new var name according to suffix given
       newName <- paste0(i,suffix)
       
-    } else if(!sum(colnames(DF_HF) == i)){ # sane varName exist?
+    } else if(sum(colnames(DF_HF) == i)){ # sane varName exist?
       
       # if suffix was not specified and var name already exist, try using suffix "_LR"
       newName <- paste0(i,"_LR")
       
       # error if _LR exists
       if (sum(colnames(DF_HF) == newName)){
-        browser()
         stop(
           paste0(
             newName,
@@ -89,6 +88,8 @@ sparseLR <- function(dataIn,filePath,varNames,suffix,sparseMethod,minZ,maxZ){
           )
         )
       }
+    } else {
+      newName <- i
     }
     
     # extract data from LR obj
@@ -120,7 +121,7 @@ sparseLR <- function(dataIn,filePath,varNames,suffix,sparseMethod,minZ,maxZ){
       )
       
     }
-    
+
     # make output
     if (is.data.frame(dataIn)){  
       # in case input was a data frame
