@@ -8,6 +8,7 @@ Authors@R: c(
 	)
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.1),
+	data.table
 Imports: tidyr,
 	circular,
 	ggplot2,
