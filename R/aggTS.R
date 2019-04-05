@@ -4,28 +4,27 @@
 #'
 #' @export
 #' @param dataIn data frame object
-#' @param timestep standardise (aggregate) to a common timestep (numeric, in mins, to turn aggregation on) !!
+#' @param timestep new timestep used in the aggregation results
 #' @param FUN aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
-#' @keywords fileIO
-#' @examples stdDF <- rB3stdze(rB3in = rawDF, varNames = wqVars, metaD = metaD, startDate = '2016-07-01 00:00:00', endDate = '2018-06-30 23:45:00', doAgg = TRUE, methodAgg = ctrls$methodAgg, pullAgg = ctrls$pullAgg)
+#' @param outType output data. "LF" for low resolution data frame, "HF" for original resolution data with bin, and "both" for both formats in the list
+#' @keywords wrangling
+#' @examples LF = aggTS(dataIn = myDF, timestep = 60*4, FUN = "mean", pullAgg = "center", outType = "LF")
 #'
 #'
 
-aggTS <- function(dataIn, timestep, FUN, pullAgg){
+aggTS <- function(dataIn, timestep, FUN, pullAgg, outType){
 
   ######## set defaults ########
 
   tz.src = Sys.timezone()  # back up
   Sys.setenv(tz = 'UTC')
 
-  if (is.data.frame(dataIn)){
-    # in case input was a data frame
-    DF_HF <- dataIn
-
+  DF_HF = dataIn
+  if (ncol(DF_HF) > 2){
+    multiVars = 1
   } else {
-    # otherwise it has to be an rB3 object
-    DF_HF <- dataIn[["qcDF"]]
+    multiVars = 0
   }
 
   if (missing(timestep)){
@@ -38,6 +37,10 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg){
 
   if (missing(pullAgg)){
     pullAgg <- "left"
+  }
+
+  if (missing(outType)){
+    pullAgg <- "LF"
   }
 
   ######## end defaults ########
@@ -77,7 +80,12 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg){
   }
 
   DF_HF = cbind(DF_HF, newTS)
-  colnames(DF_HF) = c("DateTime","Data","newTS")
+
+  if (!multiVars){
+    colnames(DF_HF) = c("DateTime","Data","newTS")
+  } else {
+    colnames(DF_HF) = c("DateTime","var","Data","newTS")
+  }
 
   DF_HF$newTS = as.POSIXct(
     DF_HF$newTS,
@@ -117,15 +125,35 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg){
   ## end function definition ##
 
   # setDT(DF_HF) # this doesn't work in R function ... convert them manually as below
+
   DF_HF = data.table(DF_HF)
 
-  DF_LF = DF_HF[
-    ,
-    list(agg = FUN(Data)),
-    by = list(newTS)
-    ]
+  if (!multiVars){
+    DF_LF = DF_HF[
+      ,
+      list(agg = FUN(Data)),
+      by = list(newTS)
+      ]
+
+  } else {
+    DF_LF = DF_HF[
+      ,
+      list(agg = FUN(Data)),
+      by = 'newTS,var'
+      ]
+  }
+  ## return values
 
   Sys.setenv(tz = tz.src)
 
-  return(DF_LF)
+  if (outType == "LF"){
+    return(DF_LF)
+
+  } else if (outType == "HF") {
+    return(DF_HF)
+
+  } else {
+    return(list(DF_HF,DF_LF))
+
+  }
 }
