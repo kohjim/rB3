@@ -32,6 +32,8 @@ shinyrB3 <- function(rB3in, startDate, endDate){
 
   isPlotSrc <- FALSE
 
+  tmpFName <- format(Sys.time(), "%Y%m%d-%H%M%S")
+
   ######## end defaults ########
 
 
@@ -90,14 +92,20 @@ shinyrB3 <- function(rB3in, startDate, endDate){
   ######## Shiny ########
 
   ui <- shinydashboard::dashboardPage(
+
+    skin = "purple",
+
     shinydashboard::dashboardHeader(
       title = "rB3"
     ),
+
     shinydashboard::dashboardSidebar(
 
     ),
+
     shinydashboard::dashboardBody(
-      ### main shiny ui
+
+      ### main shiny ui ##
 
       shiny::fluidRow(
 
@@ -338,7 +346,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
           input$actionItem,
           "\n"
         ),
-        file="rB3_ToDo.txt",
+        file = paste0("rB3_",tmpFName,".R"),
         append=TRUE
       )
     )
