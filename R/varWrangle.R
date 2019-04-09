@@ -59,10 +59,7 @@ varWrangle <- function(rB3in, varNames, task, loc) {
       task <- "rm"
       print('Caution: task was automatically set as rm')
       
-    } else if (task == "add") {
-      stop("Some or all of the specified varNames already exist.")
-      
-    }
+    } 
   }
   
   ######## end defaults ########
