@@ -169,7 +169,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
         2,
         shiny::actionButton(
           "addThisBox",
-          "Add",
+          "Add action",
           value = FALSE
         )
       )
@@ -281,31 +281,10 @@ shinyrB3 <- function(rB3in, startDate, endDate){
                "\n")
       }
 
-      xy_example_1 <- function(e) {
-        if(is.null(e)) return("NULL\n")
-        paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
-               as.character(input$varNames),
-               "\",  \n          startDate = \"",
-               as.POSIXct(round(e$xmin, 1),
-                          origin = "1970-01-01 00:00:00",
-                          format = "%Y-%m-%d %H:%M:%S"),
-               "\", endDate = \"",
-               as.POSIXct(round(e$xmax, 1),
-                          origin = "1970-01-01 00:00:00",
-                          format = "%Y-%m-%d %H:%M:%S"),
-               "\", \n          minVal = ",
-               round(e$ymin, 1),
-               ", maxVal = ",
-               round(e$ymax, 1),
-               ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
-        )
-      }
-
       paste0(
         "Click: ", xy_str(input$plot_click),
         "Double Click: ", xy_str(input$plot_dblclick),
-        "Rectangle: \n", xy_range_str(input$plot_brush),
-        "Example 1: \n", xy_example_1(input$plot_brush)
+        "Rectangle: \n", xy_range_str(input$plot_brush)
       )
     })
 
@@ -351,37 +330,11 @@ shinyrB3 <- function(rB3in, startDate, endDate){
           input$actionItem,
           "\n"
         ),
-        file="autoTODO.txt",
+        file="rB3_ToDo.txt",
         append=TRUE
       )
     )
-    # shiny::observeEvent(
-    #   input$addThisBox,
-    #   {
-    #     makeToDo <- function(e) {
-    #       if(is.null(e)) return("NULL\n")
-    #       paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
-    #              as.character(input$varNames),
-    #              "\",  \n          startDate = \"",
-    #              as.POSIXct(round(e$xmin, 1),
-    #                         origin = "1970-01-01 00:00:00",
-    #                         format = "%Y-%m-%d %H:%M:%S"),
-    #              "\", endDate = \"",
-    #              as.POSIXct(round(e$xmax, 1),
-    #                         origin = "1970-01-01 00:00:00",
-    #                         format = "%Y-%m-%d %H:%M:%S"),
-    #              "\", \n          minVal = ",
-    #              round(e$ymin, 1),
-    #              ", maxVal = ",
-    #              round(e$ymax, 1),
-    #              ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
-    #       )
-    #     }
-    #
-    #     write(makeToDo(input$plot_brush),file="autoTODO.txt",append=TRUE)
-    #
-    #   } # end shiny::observeEvent action
-    # )
+
   }
 
   # shiny::shinyApp(ui = ui, server = server)
