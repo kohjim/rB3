@@ -89,94 +89,102 @@ shinyrB3 <- function(rB3in, startDate, endDate){
 
   ######## Shiny ########
 
-  ui <- shiny::fluidPage(
-    shiny::fluidRow(
+  ui <- shinydashboard::dashboardPage(
+    shinydashboard::dashboardHeader(
+      title = "rB3"
+    ),
+    shinydashboard::dashboardSidebar(
 
     ),
+    shinydashboard::dashboardBody(
+      ### main shiny ui
 
-    shiny::fluidRow(
-      shiny::column(
-        4,
-        shiny::selectInput(
-          "varNames",
-          NULL,
-          rownames(rB3in[['ctrls']])
+      shiny::fluidRow(
+
+      ),
+
+      shiny::fluidRow(
+        shiny::column(
+          4,
+          shiny::selectInput(
+            "varNames",
+            NULL,
+            rownames(rB3in[['ctrls']])
+          )
+        ),
+
+        shiny::column(
+          2,
+          shiny::checkboxInput(
+            "isPlotSrc",
+            "Plot src",
+            value = FALSE
+          )
         )
       ),
 
-      shiny::column(
-        2,
-        shiny::checkboxInput(
-          "isPlotSrc",
-          "Plot src",
-          value = FALSE
+      shiny::fluidRow(
+        shiny::column(
+          12,
+          shiny::plotOutput("plot1",
+                            click = "plot_click",
+                            dblclick = "plot_dblclick",
+                            hover = "plot_hover",
+                            brush = "plot_brush"
+          )
         )
-      )#,
+      ),
 
-      # shiny::column(
-      #   2,
-      #   shiny::actionButton(
-      #     "addThisBox",
-      #     "Add to-do",
-      #     value = FALSE
-      #   )
-      # )
-    ),
+      shiny::verbatimTextOutput("info"),
 
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::plotOutput("plot1",
-                          click = "plot_click",
-                          dblclick = "plot_dblclick",
-                          hover = "plot_hover",
-                          brush = "plot_brush"
+      shiny::fluidRow(
+        shiny::column(
+          12,
+          shiny::textAreaInput(
+            inputId = "actionReason",
+            label = NULL,
+            value = "",
+            placeholder = "# comments",
+            width = "900px"   # bug? cannot use 100% !!!!
+          )
         )
-      )
-    ),
+      ),
 
-    shiny::verbatimTextOutput("info"),
-
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::textAreaInput(
-          inputId = "actionReason",
-          label = NULL,
-          value = "",
-          placeholder = "# comments",
-          width = "900px"   # bug? cannot use 100% !!!!
+      shiny::fluidRow(
+        shiny::column(
+          12,
+          shiny::textAreaInput(
+            inputId = "actionItem",
+            label = NULL,
+            value = "",
+            placeholder = "Example action ..",
+            rows = 5,
+            width =  '900px'   # bug? cannot use 100% !!!!
+          )
         )
-      )
-    ),
+      ),
 
-    shiny::fluidRow(
-      shiny::column(
-        12,
-        shiny::textAreaInput(
-          inputId = "actionItem",
-          label = NULL,
-          value = "",
-          placeholder = "Example action ..",
-          rows = 5,
-          width =  '900px'   # bug? cannot use 100% !!!!
-        )
-      )
-    ),
-
-    shiny::fluidRow(
-      shiny::column(
-        2,
-        shiny::actionButton(
-          "addThisBox",
-          "Add action",
-          value = FALSE
+      shiny::fluidRow(
+        shiny::column(
+          2,
+          shiny::actionButton(
+            "addThisBox",
+            "Add action",
+            value = FALSE
+          )
         )
       )
     )
   )
 
+  ### server
+
   server <- function(input, output, session) {
+    # end session when closed
+    session$onSessionEnded(function() {
+      stopApp()
+    })
+
     ranges <- reactiveValues(x = NULL, y = NULL)
 
     output$plot1 <- shiny::renderPlot({
@@ -341,7 +349,13 @@ shinyrB3 <- function(rB3in, startDate, endDate){
 
   shinySetOut <- (list(ui,server,plotAll))
 
-  shiny::shinyApp(ui = shinySetOut[[1]], server = shinySetOut[[2]])
+  shinyObj <- shiny::shinyApp(
+    ui = shinySetOut[[1]],
+    server = shinySetOut[[2]])
 
+  runApp(
+    shinyObj,
+    launch.browser = TRUE
+  )
   ######## end Shiny ########
 }
