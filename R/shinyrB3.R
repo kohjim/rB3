@@ -54,9 +54,9 @@ shinyrB3 <- function(rB3in, startDate, endDate){
       x = DateTime,
       y = src,
       color = "Unmodified data"
-      ),
+    ),
     size = 0.2
-    )
+  )
 
   qcGeom <- ggplot2::geom_point(
     ggplot2::aes(
@@ -111,16 +111,16 @@ shinyrB3 <- function(rB3in, startDate, endDate){
           "Plot src",
           value = FALSE
         )
-      ),
+      )#,
 
-      shiny::column(
-        2,
-        shiny::actionButton(
-          "addThisBox",
-          "Add to-do",
-          value = FALSE
-        )
-      )
+      # shiny::column(
+      #   2,
+      #   shiny::actionButton(
+      #     "addThisBox",
+      #     "Add to-do",
+      #     value = FALSE
+      #   )
+      # )
     ),
 
     shiny::fluidRow(
@@ -135,10 +135,48 @@ shinyrB3 <- function(rB3in, startDate, endDate){
       )
     ),
 
-    shiny::verbatimTextOutput("info")
+    shiny::verbatimTextOutput("info"),
+
+    shiny::fluidRow(
+      shiny::column(
+        12,
+        shiny::textAreaInput(
+          inputId = "actionReason",
+          label = NULL,
+          value = "",
+          placeholder = "# comments",
+          width = "900px"   # bug? cannot use 100% !!!!
+        )
+      )
+    ),
+
+    shiny::fluidRow(
+      shiny::column(
+        12,
+        shiny::textAreaInput(
+          inputId = "actionItem",
+          label = NULL,
+          value = "",
+          placeholder = "Example action ..",
+          rows = 5,
+          width =  '900px'   # bug? cannot use 100% !!!!
+        )
+      )
+    ),
+
+    shiny::fluidRow(
+      shiny::column(
+        2,
+        shiny::actionButton(
+          "addThisBox",
+          "Add",
+          value = FALSE
+        )
+      )
+    )
   )
 
-  server <- function(input, output) {
+  server <- function(input, output, session) {
     ranges <- reactiveValues(x = NULL, y = NULL)
 
     output$plot1 <- shiny::renderPlot({
@@ -261,7 +299,7 @@ shinyrB3 <- function(rB3in, startDate, endDate){
                round(e$ymax, 1),
                ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
         )
-        }
+      }
 
       paste0(
         "Click: ", xy_str(input$plot_click),
@@ -271,33 +309,79 @@ shinyrB3 <- function(rB3in, startDate, endDate){
       )
     })
 
+
+    observe({
+
+      actionItemIn <- function(e) {
+        if(is.null(e)) return("")
+        paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
+               as.character(input$varNames),
+               "\",  \n          startDate = \"",
+               as.POSIXct(round(e$xmin, 1),
+                          origin = "1970-01-01 00:00:00",
+                          format = "%Y-%m-%d %H:%M:%S"),
+               "\", endDate = \"",
+               as.POSIXct(round(e$xmax, 1),
+                          origin = "1970-01-01 00:00:00",
+                          format = "%Y-%m-%d %H:%M:%S"),
+               "\", \n          minVal = ",
+               round(e$ymin, 1),
+               ", maxVal = ",
+               round(e$ymax, 1),
+               ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
+        )
+      }
+
+
+      shiny::updateTextInput(
+        session,
+        inputId = "actionItem",
+        value = actionItemIn(input$plot_brush)
+      )
+
+    })
+
+
     shiny::observeEvent(
       input$addThisBox,
-      {
-          makeToDo <- function(e) {
-            if(is.null(e)) return("NULL\n")
-            paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
-                   as.character(input$varNames),
-                   "\",  \n          startDate = \"",
-                   as.POSIXct(round(e$xmin, 1),
-                              origin = "1970-01-01 00:00:00",
-                              format = "%Y-%m-%d %H:%M:%S"),
-                   "\", endDate = \"",
-                   as.POSIXct(round(e$xmax, 1),
-                              origin = "1970-01-01 00:00:00",
-                              format = "%Y-%m-%d %H:%M:%S"),
-                   "\", \n          minVal = ",
-                   round(e$ymin, 1),
-                   ", maxVal = ",
-                   round(e$ymax, 1),
-                   ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
-            )
-          }
-
-          write(makeToDo(input$plot_brush),file="autoTODO.txt",append=TRUE)
-
-      } # end shiny::observeEvent action
+      write(
+        paste0(
+          input$actionReason,
+          "\n",
+          input$actionItem,
+          "\n"
+        ),
+        file="autoTODO.txt",
+        append=TRUE
+      )
     )
+    # shiny::observeEvent(
+    #   input$addThisBox,
+    #   {
+    #     makeToDo <- function(e) {
+    #       if(is.null(e)) return("NULL\n")
+    #       paste0(rB3name, " <- assignVal(", rB3name, ", varNames = \"",
+    #              as.character(input$varNames),
+    #              "\",  \n          startDate = \"",
+    #              as.POSIXct(round(e$xmin, 1),
+    #                         origin = "1970-01-01 00:00:00",
+    #                         format = "%Y-%m-%d %H:%M:%S"),
+    #              "\", endDate = \"",
+    #              as.POSIXct(round(e$xmax, 1),
+    #                         origin = "1970-01-01 00:00:00",
+    #                         format = "%Y-%m-%d %H:%M:%S"),
+    #              "\", \n          minVal = ",
+    #              round(e$ymin, 1),
+    #              ", maxVal = ",
+    #              round(e$ymax, 1),
+    #              ', newVal = NA, logID = "Shiny", Reason = "Manual removal") #, showPlot = T)'
+    #       )
+    #     }
+    #
+    #     write(makeToDo(input$plot_brush),file="autoTODO.txt",append=TRUE)
+    #
+    #   } # end shiny::observeEvent action
+    # )
   }
 
   # shiny::shinyApp(ui = ui, server = server)
