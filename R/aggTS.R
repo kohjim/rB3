@@ -4,12 +4,12 @@
 #'
 #' @export
 #' @param dataIn data frame object
-#' @param timestep new timestep used in the aggregation results
+#' @param timestep new timestep used in the aggregation results in sec
 #' @param FUN aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
 #' @param outType output data. "LF" for low resolution data frame, "HF" for original resolution data with bin, and "both" for both formats in the list
 #' @keywords wrangling
-#' @examples LF = aggTS(dataIn = myDF, timestep = 60*4, FUN = "mean", pullAgg = "center", outType = "LF")
+#' @examples LF = aggTS(dataIn = myDF, timestep = 60*60*4, FUN = "mean", pullAgg = "center", outType = "LF")
 #'
 #'
 
@@ -28,7 +28,7 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg, outType){
   }
 
   if (missing(timestep)){
-    timestep <- 60*24
+    timestep <- 60*60*24
   }
 
   if (missing(FUN)){
@@ -45,7 +45,7 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg, outType){
 
   ######## end defaults ########
   ## ts conversion rate
-  ts_convRate = timestep * 60 # sec
+  ts_convRate = timestep # sec
 
   ## making aggregation TS index
   if (pullAgg == "left") {
@@ -142,6 +142,9 @@ aggTS <- function(dataIn, timestep, FUN, pullAgg, outType){
       by = 'newTS,var'
       ]
   }
+
+  DF_LF$agg[is.infinite(DF_LF$agg)] = NA
+
   ## return values
 
   Sys.setenv(tz = tz.src)

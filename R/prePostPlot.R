@@ -66,7 +66,7 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
 
   ######## find rows & cols to plot ########
-  outs.idElToModify <- idElToModify(rB3in,
+  outs.idElToModify <- rB3::idElToModify(rB3in,
                                     startDate = startDate,
                                     endDate = endDate,
                                     varNames = varNames)
@@ -113,42 +113,115 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
   ### aggregating for faster plots
   ### using data table now ###
-  
-  aggTimestep =
-    floor(
-      ((as.numeric(tail(plotQC[,1], n=1)) - as.numeric(plotQC[1,1])) / 1280) /
-        (as.numeric(plotQC[2,1]) - as.numeric(plotQC[1,1]))) *
-    (as.numeric(plotQC[2,1]) - as.numeric(plotQC[1,1]))
+  if (length(plotQC[,1]) > 2000){ # when data size is big, discretize for fast plotting
 
-  plotQC_agg <- aggTS(
-    dataIn = plotQC,
-    timestep = aggTimestep / 60,
-    FUN = "mean",
-    pullAgg = "left",
-    outType = "LF"
-  )
+    aggTimestep =
+      floor(
+        ((as.numeric(tail(plotQC[,1], n=1)) - as.numeric(plotQC[1,1])) / 1280) / # 1280 = number of data points to plot
+          (as.numeric(plotQC[2,1]) - as.numeric(plotQC[1,1]))) *
+      (as.numeric(plotQC[2,1]) - as.numeric(plotQC[1,1]))
 
-  plotHl_agg <- aggTS(
-    dataIn = plotHl,
-    timestep = aggTimestep / 60,
-    FUN = "mean",
-    pullAgg = "left",
-    outType = "LF"
-  )
+    # plotQC_agg <- rB3::aggTS(
+    #   dataIn = plotQC,
+    #   timestep = aggTimestep,
+    #   FUN = "mean",
+    #   pullAgg = "left",
+    #   outType = "LF"
+    # )
+    #
+    # plotHl_agg <- rB3::aggTS(
+    #   dataIn = plotHl,
+    #   timestep = aggTimestep,
+    #   FUN = "mean",
+    #   pullAgg = "left",
+    #   outType = "LF"
+    # )
+    #
+    # plotSrc_agg <- rB3::aggTS(
+    #   dataIn = plotSrc,
+    #   timestep = aggTimestep,
+    #   FUN = "mean",
+    #   pullAgg = "left",
+    #   outType = "LF"
+    # )
 
-  plotSrc_agg <- aggTS(
-    dataIn = plotSrc,
-    timestep = aggTimestep / 60,
-    FUN = "mean",
-    pullAgg = "left",
-    outType = "LF"
-  )
+    plotQC_agg <- base::rbind(
+      rB3::aggTS(
+        dataIn = plotQC,
+        timestep = aggTimestep,
+        FUN = "max",
+        pullAgg = "left",
+        outType = "LF"
+      ),
+      rB3::aggTS(
+        dataIn = plotQC,
+        timestep = aggTimestep,
+        FUN = "min",
+        pullAgg = "left",
+        outType = "LF"
+      )
+    )
+
+    plotHl_agg <- base::rbind(
+      rB3::aggTS(
+        dataIn = plotHl,
+        timestep = aggTimestep,
+        FUN = "max",
+        pullAgg = "left",
+        outType = "LF"
+      ),
+      rB3::aggTS(
+        dataIn = plotHl,
+        timestep = aggTimestep,
+        FUN = "min",
+        pullAgg = "left",
+        outType = "LF"
+      )
+    )
+
+    plotSrc_agg <- base::rbind(
+      rB3::aggTS(
+        dataIn = plotSrc,
+        timestep = aggTimestep,
+        FUN = "max",
+        pullAgg = "left",
+        outType = "LF"
+      ),
+      rB3::aggTS(
+        dataIn = plotSrc,
+        timestep = aggTimestep,
+        FUN = "min",
+        pullAgg = "left",
+        outType = "LF"
+      )
+    )
+
+    plotAll <- plotQC_agg
+    colnames(plotAll) = c("DateTime","var","qc")
+    plotAll$hl <- plotHl_agg[,3]
+    plotAll$src <- plotSrc_agg[,3]
 
 
-  plotAll <- plotQC_agg
-  colnames(plotAll) = c("DateTime","var","qc")
-  plotAll$hl <- plotHl_agg[,3]
-  plotAll$src <- plotSrc_agg[,3]
+  } else {
+
+    plotQC <- rB3in[["qcDF"]][,c(1,colLocsNums)]
+    colnames(plotQC) <- c("DateTime",plotLabels[colLocsNums - 1])
+    plotAll <- tidyr::gather(plotQC,var, qc, 2:ncol(plotQC))
+
+
+    plotHl <- rB3in[["hlDF"]][,c(1,colLocsNums)]
+    colnames(plotHl) <- c("DateTime",plotLabels[colLocsNums - 1])
+    plotHl <- tidyr::gather(plotHl,var, hl, 2:ncol(plotHl))
+
+
+    plotSrc <- rB3in[["srcDF"]][,c(1,colLocsNums)]
+    colnames(plotSrc) <- c("DateTime",plotLabels[colLocsNums - 1])
+    plotSrc <- tidyr::gather(plotSrc,var, src, 2:ncol(plotSrc))
+
+    plotAll$hl <- plotHl$hl
+    plotAll$src <- plotSrc$src
+
+  }
   ###
 
   # generate plot
@@ -156,23 +229,50 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
     ggplot2::ggplot(plotAll) +
 
-      ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"), size = 0.2, na.rm = T) +
-      ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "QC data"), size = 0.2, na.rm = T) +
-      ggplot2::geom_line(ggplot2::aes(x = DateTime, y = hl, color = "Data to be modified"), size = 0.2, na.rm = T) +
+      ggplot2::geom_point(
+        ggplot2::aes(x = DateTime, y = src, color = "Unmodified source data"),
+        size = 0.2,
+        na.rm = T
+        ) +
+
+      ggplot2::geom_point(
+        ggplot2::aes(x = DateTime, y = qc, color = "QC data"),
+        size = 0.2,
+        na.rm = T
+        ) +
+
+      ggplot2::geom_point(
+        ggplot2::aes(x = DateTime, y = hl, color = "Data to be modified"),
+        size = 0.2,
+        na.rm = T
+        ) +
 
       ggplot2::ylab("Value") +
-      ggplot2::xlab(NULL) +
-      ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m"),
-                                # breaks = scales::date_breaks("1 years"),
-                                limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
-                                expand = c(0, 0)) +
-      ggplot2::scale_colour_manual("",values = c("Unmodified source data"=srcColour,
-                                                 "QC data" = qcColour,
-                                                 "Data to be modified"=hlColour)) +
 
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
+      ggplot2::xlab(NULL) +
+
+      ggplot2::scale_x_datetime(
+        labels = scales::date_format("%Y-%m"),
+        # breaks = scales::date_breaks("1 years"),
+        limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
+        expand = c(0, 0)
+        ) +
+
+      ggplot2::scale_colour_manual(
+        "",
+        values = c("Unmodified source data"=srcColour,
+                   "QC data" = qcColour,
+                   "Data to be modified"=hlColour)
+        ) +
+
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)
+        ) +
+
       ggplot2::theme_bw() +
+
       ggplot2::theme(legend.position = "bottom") +
+
       ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y')
 
   )
