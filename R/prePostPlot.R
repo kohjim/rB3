@@ -112,7 +112,8 @@ prePostPlot <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColo
 
 
   ### aggregating for faster plots
-
+  ### using data table now ###
+  
   aggTimestep =
     floor(
       ((as.numeric(tail(plotQC[,1], n=1)) - as.numeric(plotQC[1,1])) / 1280) /
