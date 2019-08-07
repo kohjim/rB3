@@ -3,7 +3,7 @@
 #' Imports a csv file to rB3
 #'
 #' Creates a list of dataframes, including: \cr
-#'      1. 'srcDF'  ; the unmodified data\cr
+#'      1. 'srcDF'  ; the unmodified data \cr
 #'      2. 'qcDF'   ; a copy of the data, which will be modified by rB3\cr
 #'      3. 'logDF'  ; a 'log' file with similar structure to srcDF and qcDF, to store QC operations log\cr
 #'      4. 'logKey' ; control key with logIDs and explanatory columns
