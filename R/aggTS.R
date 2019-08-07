@@ -9,7 +9,7 @@
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
 #' @param outType output data. "LF" for low resolution data frame, "HF" for original resolution data with bin, and "both" for both formats in the list
 #' @keywords wrangling
-#' @examples LF = aggTS(dataIn = myDF, timestep = 60*60*4, FUN = "mean", pullAgg = "center", outType = "LF")
+#' @examples LF = aggTS(dataIn = myDF, timestep = 60x60x4, FUN = "mean", pullAgg = "center", outType = "LF")
 #'
 #'
 
