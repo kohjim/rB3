@@ -54,7 +54,7 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
        srcDF <- srcDF[-1,]
 
 
-  # define date format
+  # define ISO date format
   srcDF$DateTime <-  as.POSIXct(srcDF$DateTime,
                        origin = "1970-01-01 00:00:00",
                        format = "%Y-%m-%d %H:%M:%S",
