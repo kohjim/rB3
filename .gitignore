@@ -55,6 +55,7 @@ Temporary Items
 *.bobs
 .Rhistory
 .zip
+.Rproj
 
 wd\
 wd/
