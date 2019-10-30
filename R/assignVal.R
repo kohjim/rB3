@@ -17,7 +17,7 @@
 
 assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVal, logID, Reason, showPlot, savePlot) {
 
-  ######## defaults ########
+  ######## defaults #########
   if (missing(startDate)){
     startDate <- rB3in[["qcDF"]]$DateTime[1]
   }
@@ -111,7 +111,7 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
       ## write newVal to highlighting DF
       df[rowsToChange,colLocsNums[i]] <- newVal
-      
+
  } else {
 
       # write to the logKey
@@ -125,10 +125,10 @@ assignVal <- function(rB3in, startDate, endDate, varNames, minVal, maxVal, newVa
 
       ## write data to highlighting DF
       hlDF[rowsToChange,colLocsNums[i]] <- df[rowsToChange,colLocsNums[i]]
-      
+
       ## write newVal to highlighting DF
       df[rowsToChange,colLocsNums[i]] <- newVal
-      
+
 
       }
 
