@@ -41,7 +41,7 @@
 csv2rB3 <- function(filePath, siteName, lat, lon, country) {
 
 
-  srcData <- read.csv(filePath, header = FALSE, stringsAsFactors = FALSE)
+  srcData <- data.table::fread(filePath)
 
   # find header row
   hRow <- which(srcData[,1] == "DateTime")
