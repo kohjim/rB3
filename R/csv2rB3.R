@@ -42,8 +42,10 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
 
 
   srcData <- data.table::fread(filePath)
+   srcData <- as.data.frame(srcData)
 
-  # find header row
+
+    # find header row
   hRow <- which(srcData[,1] == "DateTime")
 
   # find rows that begin with a POSIX date to include in the measurement data frames
