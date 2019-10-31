@@ -4,8 +4,9 @@ plotTheme <- function() {
 
   plotTheme <-
     ggplot2::theme_bw() +
+    ggplot2::labs(x = NULL, y = NULL, color = NULL) +
     ggplot2::theme(legend.position = "bottom") +
-    ggplot2::theme(text=ggplot2::element_text(family="serif", size = 24)) +
+    ggplot2::theme(text=ggplot2::element_text(family="serif", size = 18)) +
     # remove grid
     ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank()) +
     # facet labels
