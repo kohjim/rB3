@@ -5,7 +5,7 @@
 #' @param varNames aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param timeUnit aggregation window, e.g. 'days', '6 hours, 'hours'
 #' @keywords plotting
-#' @examples plotDF = aggPlotDF(dataIn = myDF, varNames = "TmpWtr", timeUnit = 'days')
+#' @examples plotDF = aggPlotData(dataIn = myDF, varNames = "TmpWtr", timeUnit = 'days')
 #'
 
 aggPlotData <- function(df_in,varNames,timeUnit) {
