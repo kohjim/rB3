@@ -22,9 +22,13 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   ## get relevant attributes for the data
   varNames <- names(dt_in[,2:ncol(dt_in)])
 
-  dtRows   <- nrow(dt_in)
-
   # only aggregate big data
+  if(nrow(dt_in) < 50000) {
+
+    return(dt_in)
+
+  } else {
+
 
   dateStart  <- min(dt_in$DateTime)
   dateEnd    <- max(dt_in$DateTime)
@@ -82,6 +86,8 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   df_out <- do.call("rbind", df_out)
 
   return(df_out)
+
+  }
 }
 
 ######## main function ########
