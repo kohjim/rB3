@@ -15,7 +15,7 @@ correspondance to cmcbride@waikato.ac.nz
 [ ]           inhinit warning message (na.rm) 
 [ ] csv2rB3   add classes to object and components. 
               Make general table read (not just csv) 
-
+[ ] rB3agg    Ctrls are lost after using this function on demo files??
 
 
 
