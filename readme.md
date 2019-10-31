@@ -1,11 +1,33 @@
 ---
-# rB3 demo for GLEON-20 pre-meeting workshop
+# rB3 development branch
 ---
 
-*prepared for GLEON 20, GSA workshop 2018-12-03*  
 
-Chris McBride & Kohji Muraoka, UoW, November 2018  
+Chris McBride & Kohji Muraoka, UoW, November 2019  
 correspondance to cmcbride@waikato.ac.nz   
+
+
+*TO DO LIST*  
+
+[ ] shinyrB3: 
+[ ] rB3stdze: too slow.. implement data table?
+[ ] rB3gg:    too slow.. implement aggregation, tidy up plot format?
+[ ]           inhinit warning message (na.rm) 
+[ ] csv2rB3   add classes to object and components. 
+              Make general table read (not just csv) 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -136,8 +136,7 @@ rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qc
                      limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
                      expand = c(0, 0)) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom")
+    plotTheme()
 
 
   if (facet == TRUE) {
@@ -153,7 +152,7 @@ rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qc
   } else if (is.null(qcColour)) {
     print(varPlot + srcGeom + srcKey)
   } else if (facet == TRUE) { print(varPlot + srcGeom + qcGeom + dualKey)
-  } else { print(varPlot + qcGeom + qcKey) 
+  } else { print(varPlot + qcGeom + qcKey)
            print("Only quality controlled data are displayed for non-faceted plots")   }
 }
 
