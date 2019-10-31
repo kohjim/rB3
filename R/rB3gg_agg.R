@@ -129,8 +129,8 @@ rB3gg_agg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour
   varPlot <-
 
    ggplot2::ggplot(plotAll) +
-    ggplot2::ylab("Value") +
-    ggplot2::xlab(NULL) +
+    # ggplot2::ylab("Value") +
+    # ggplot2::xlab(NULL) +
     ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m"),
                      # breaks = scales::date_breaks("1 years"),
                      limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
