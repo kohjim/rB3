@@ -85,6 +85,8 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   #combine into one DF
   df_out <- do.call("rbind", df_out)
 
+  df_out <- df_out[,c("DateTime","var","value")]
+
   return(df_out)
 
   }
