@@ -69,12 +69,22 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
   # sort into chronological order, just in case
   srcDF <- srcDF[order(srcDF$DateTime),]
 
+  # add S3 class object attribute
+  attr(srcDF,"class") = "src"
+
   # make copy for applying QC to
   qcDF <- srcDF
+
+  # add S3 class object attribute
+  attr(qcDF,"class") = "qc"
+
 
   # make copy for log entries
   logDF <- srcDF
   logDF[1:nrow(logDF),2:ncol(logDF)] <- NA
+
+  # add S3 class object attribute
+  attr(logDF,"class") = "log"
 
   # make dataframe of controls
 
@@ -103,6 +113,8 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
     ctrls[,y] <- as.numeric(as.character(ctrls[,y]))
   }
 
+  # add S3 class object attribute
+  attr(ctrls,"class") = "ctrls"
 
   # make metadata
 
@@ -112,6 +124,9 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
 
   logKey <- data.frame(matrix(NA, nrow = 0, ncol = 3) )
   names(logKey) <- c("logID","Function","Reason")
+
+  # add S3 class object attribute
+  attr(logKey,"class") = "logKey"
 
   ## combine into rB3object
   rB3object <- list(srcDF,qcDF,logDF,logKey, ctrls,metaD)
