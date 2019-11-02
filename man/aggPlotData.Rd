@@ -2,22 +2,20 @@
 % Please edit documentation in R/aggPlotData.R
 \name{aggPlotData}
 \alias{aggPlotData}
-\title{Aggregate a data frame for plotting large time-series quickly}
+\title{Aggregate a dataset for plotting large time-series quickly
+Wide format in, long format out}
 \usage{
-aggPlotData(df_in, varNames, timeUnit)
+aggPlotData(dt_in)
 }
 \arguments{
-\item{df_in}{data frame object}
-
-\item{varNames}{aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)}
-
-\item{timeUnit}{aggregation window, e.g. 'days', '6 hours, 'hours'}
+\item{dt_in}{data in}
 }
 \description{
-Aggregate a data frame for plotting large time-series quickly
+Aggregate a dataset for plotting large time-series quickly
+Wide format in, long format out
 }
 \examples{
-plotDF = aggPlotData(dataIn = myDF, varNames = "TmpWtr", timeUnit = 'days')
+aggPlotData(dt_in = myDT)
 
 }
 \keyword{plotting}
