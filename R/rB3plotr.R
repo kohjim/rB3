@@ -9,6 +9,7 @@
 #' @param siteName name of site for saving plot
 #' @param cols.qc vector of colours to use when plotting qc data, or choose 'auto'
 #' @param cols.src vector of colours to use when plotting source/raw data (default = 'light grey')
+#' @param geom 'line' or 'dot' (default line)
 #' @param facet facet the plot by variable (TRUE/FALSE)
 #' @param showPlot display figure in plots window (TRUE/FALSE)
 #' @param savePlot save figure to this path ('folder/start_of_file_name')
@@ -16,7 +17,7 @@
 #' @keywords plotting
 #' @examples rB3plotr(dt_in, siteName = 'Test_site', savePlot = 'figures/testPlot')
 #'
-rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
+rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
 
 ######## set defaults ########
 
@@ -34,18 +35,22 @@ if (missing(siteName)){
 }
 
   if (missing(cols.qc)){
-    cols.qc <- 'blue'
+    cols.qc <- 'auto'
   }
 
   if (missing(cols.src)){
-    cols.src <- 'lightgrey'
+    cols.src <- 'auto'
   }
 
   if (missing(cols.hl)){
-    cols.hl <- 'red'
+    cols.hl <- 'auto'
   }
 
-  if (missing(facet)){
+  if (missing(geom)){
+    geom <- 'line'
+  }
+
+    if (missing(facet)){
     facet <- FALSE
   }
 
@@ -64,115 +69,160 @@ if (missing(siteName)){
 ####### MAKE FACETED GGPLOT ################
 
   # scan headings to see which ones to plot..
-  plotDF <- dt_in
-
-  if ('src' %in% names(plotDF) == T) {plotSrc == T}
-  if ('hl' %in% names(plotDF)  == T) {plotHl == T}
+  plotSrc <- FALSE
+  if ('src' %in% names(plotDF) == TRUE) {plotSrc <- TRUE}
+  plotHl <- FALSE
+  if ('hl' %in% names(plotDF)  == TRUE) {plotHl <- TRUE}
 
 # define path for saving plot
   plotPath <- paste0(savePlot, '_', siteName,".png")
 
+# number of variables for plotting
+varLength <- length(unique(dt_in$var))
 
+  qcData <- dt_in
   #### define plotting colours
 
   # if not enough colours, then use first only
-  if (cols.qc == 'auto' & plotHl != T) {
+  if (cols.qc == 'auto') {
 
-    cols.qc <- unname(randomcoloR::distinctColorPalette(25))
+    cols.qc <- unname(randomcoloR::distinctColorPalette(varLength))
 
     # set colour label for legend
-    plotDF$col <- ifelse(plotHl == TRUE, "Quality controlled data", plotDF$var)
+    plotDF$col <- plotDF$var
 
-  } else if (length(cols.qc) < length(unique(plotDF$var)) ) {
+  } else if (length(cols.qc) < length(varLength) {
 
     print('Not enough colours provided for QC data, using first colour only')
 
+  # pad out to length of vars plotted
+  cols.qc <- cols.qc[1]
+
   # set colour label for legend
   plotDF$col <- "Quality controlled data"
-
-  # pad out to length of vars plotted
-  cols.qc <- rep(cols.qc[1], length(unique(plotDF$var) ) )
 
     # otherwise use individual colours
   } else {
 
     cols.qc <- cols.qc[1: length(unique(plotDF$var) )]
     # set colour label for legend
-    plotDF$col <- ifelse(plotHl == TRUE, "Quality controlled data", plotDF$var)
+    plotDF$col <- plotDF$var
 
   }
 
   # set final colours to modified cols.qc
-  cols <- col.qc
+  cols <- cols.qc
 
 
 
   ##### add source data if specified
   if (plotSrc == TRUE) {
 
-    srcData <- plotDF[,c(1:2,"src","col")]
+    srcData <- plotDF[,c("DateTime","var","src","col")]
       names(srcData) <- c('DateTime','var','value','col')
 
-    #### set src colours to light versions of qc colours, unless specifically specified
 
-    # if not enough colours for src provided..
-    if (length(cols.src) < length(unique(plotDF$var)) ) {
+  ## define colours
+  if (cols.src == 'auto') {
 
-      print('Not enough colours provided for source/raw data, choosing them for you')
+    #..lighten the qc colours to use as src
+    cols.src <- colorspace::lighten(cols, 0.5, fixup = T)
 
-      # set colour label for legend
-      srcData$col <- "Source/raw data"
+    # set colour label for legend
+    srcData$col <- ifelse( length(unique(plotDF$col)) > 1,
+                           paste0(srcData$var,'.raw'),
+                           "Unmodified/source data" )
 
-      # set colour label for legend
-      srcData$col <- ifelse(plotHl == TRUE | length(unique(cols.qc)) == 1,
-                            "Quality controlled data",
-                            srcData$var)
+  } else if (length(cols.src) < length(unique(srcData$var)) ) {
 
-      #..and lighten the qc colours to use as src
-      cols.src <- colorspace::lighten(cols, 0.5, fixup = T)
+    print('Not enough colours provided for source/raw data, using first colour only')
 
-      # pad out to length of vars plotted
-      cols.src <- rep(cols.src[1], length(unique(srcData$var) ) )
+    # pad out to length of vars plotted
+    cols.src <- cols.src[1]
 
-      # add source/raw colours to the vector
-      cols <- c(matrix(c(cols, cols.src), 2, byrow = T))
+    # set colour label for legend
+    srcData$col <- "Unmodified/source data"
 
-      ### BIND the qc and src data together for plotting
-      plotDF <- rbind(plotDF[,c(1:3,5)],srcData)
+    # otherwise use individual colours
+  } else {
 
-      }
-
-
+    cols.src <- cols.src[1: length(unique(srcData$var) )]
+    # set colour label for legend
+    srcData$col <- srcData$var
 
   }
 
-  ## add source data if specified
-  if (plotHl != FALSE) {
+      # add the source/raw colours to the vector
+      cols <- c(cols, cols.src)
 
-    hlData <- plotDF[,c(1:2,"hl","col")]
+
+      ### BIND the qc and src data together for plotting
+      plotDF <- rbind(plotDF[,c("DateTime","var","value","col")],srcData)
+
+# end src data add
+}
+
+
+  ##### add highlighting data if specified
+  if (plotHl == TRUE) {
+
+    # trim to original data length, keep cols needed
+    hlData <- dt_in[,c("DateTime","var","hl","col")]
        names(hlData) <- c('DateTime','var','value','col')
 
-    cols.hl <- rep('red',length())
+       ## define colours
+       if (cols.hl == 'auto') {
+
+         #..set to red
+         cols.hl <- 'red'
+
+         # set colour label for legend
+         hlData$col <- 'Data to be modified'
+
+       } else if (length(cols.hl) < length(unique(hlData$var)) ) {
+
+         print('Not enough colours provided for highlighting data, using first colour only')
+
+         # pad out to length of vars plotted
+         cols.hl <- cols.hl[1]
+
+         # set colour label for legend
+         hlData$col <- "Data to be modified"
+
+         # otherwise use individual colours
+       } else {
+
+         cols.hl <- cols.hl[1: length(unique(hlData$var) )]
+         # set colour label for legend
+         hlData$col <- paste0(hlData$var,'.mod')
+
+       }
+
+       # add the highlighting colours to the vector
+       # cols <- c(matrix(c(cols, cols.hl), 3, byrow = T))
+       cols <- c(cols, cols.hl)
+
+       ### BIND the qc and src data together for plotting
+       plotDF <- rbind(plotDF,hlData)
+
 
     }
 
-    # add the source/raw colours to the vector
-    cols <- c(matrix(c(cols, cols.src), 2, byrow = T))
 
+# set geometry
 
-    ### BIND the qc and src data together for plotting
-    plotDF <- rbind(plotDF[,c(1:3,5)],srcData)
+if (geom == 'dot') {
 
-  }
+  geom <- ggplot2::geom_point(ggplot2::aes(x = DateTime, y = value, color = col), size = 0.3)
 
-
+} else { geom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = value, color = col), size = 0.5) }
 
 
 
-# define the basic plot
+  # define the basic plot
 varPlot <-
 ggplot2::ggplot(plotDF) +
-  ggplot2::geom_line(ggplot2::aes(x = DateTime, y = value, color = col), size = 0.2) +
+  geom +
   ggplot2::scale_colour_manual(values = cols) +
   ggplot2::scale_x_datetime(#labels = scales::date_format("%Y-%m"),
                             #limits = c(min(dt_in$DateTime),max(dt_in$DateTime)),
@@ -193,7 +243,7 @@ if (facet == TRUE) {
 
 } else {
 
-  saveHeight = 3
+  saveHeight = 4
 
 }
 

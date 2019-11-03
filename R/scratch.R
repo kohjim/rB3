@@ -9,10 +9,11 @@ dt_in$DateTime <-  as.POSIXct(dt_in$DateTime,
 
 test <- aggPlotData(dt_in[,1:10])
 
-library(rB3)
+# library(rB3)
 
 
 test$src <- test$value / 2
+test$hl <- test$value * 2
 
 
-rB3plotr(test, plotSrc = TRUE,  cols.src = c('purple','blue','red'), siteName = 'Test_site', facet = T, savePlot = '') # cols.qc = c('purple','red'),
+rB3plotr(test,  cols.qc = 'blue', cols.src = 'auto', cols.hl = 'red', siteName = 'Test_site', facet = F, savePlot = '') # cols.qc = c('purple','red'),
