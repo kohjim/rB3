@@ -40,25 +40,28 @@
 
 csv2rB3 <- function(filePath, siteName, lat, lon, country) {
 
-
+  # import as data.table as it is faster
   srcData <- data.table::fread(filePath)
-   srcData <- as.data.frame(srcData)
+
+  # convert back to data frame for compatibility
+  # future update may use data.frame as the main object class
+  srcData <- as.data.frame(srcData)
 
 
-    # find header row
+  # find header row
   hRow <- which(srcData[,1] == "DateTime")
 
   # find rows that begin with a POSIX date to include in the measurement data frames
   srcDF <- srcData[hRow:nrow(srcData),]
-       colnames(srcDF) <- as.character(unlist(srcDF[1,]))
-       srcDF <- srcDF[-1,]
+  colnames(srcDF) <- as.character(unlist(srcDF[1,]))
+  srcDF <- srcDF[-1,]
 
 
   # define ISO date format
   srcDF$DateTime <-  as.POSIXct(srcDF$DateTime,
-                       origin = "1970-01-01 00:00:00",
-                       format = "%Y-%m-%d %H:%M:%S",
-                       tz = "UTC")
+                                origin = "1970-01-01 00:00:00",
+                                format = "%Y-%m-%d %H:%M:%S",
+                                tz = "UTC")
 
   # remove all non-numeric characters
   srcDF[2:ncol(srcDF)] <- apply(srcDF[2:ncol(srcDF)], 2, function(y) as.numeric(gsub("[^0-9.-]", "", y)))
@@ -81,10 +84,10 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
   ctrlnames <- c("measVar","units","sensorDist","sensorLoc","plotLabels","methodAgg","pullAgg",
                  "maxVal","minVal","maxRoc","maxReps","filterWindow","filterSD")
 
-for (n in ctrlnames) {
+  for (n in ctrlnames) {
 
-  ctrls[n,] <- rep(NA,ncol(ctrls))
-  try( ctrls[n,] <- srcData[srcData[,1] == n,2:ncol(srcData)] , silent=TRUE ) }
+    ctrls[n,] <- rep(NA,ncol(ctrls))
+    try( ctrls[n,] <- srcData[srcData[,1] == n,2:ncol(srcData)] , silent=TRUE ) }
 
   ctrls <- data.frame( t(ctrls) )
 
@@ -100,7 +103,6 @@ for (n in ctrlnames) {
     ctrls[,y] <- as.numeric(as.character(ctrls[,y]))
   }
 
-
   # make metadata
 
   metaD <- list(siteName = siteName, lat = lat, lon = lon, country = country)
@@ -108,11 +110,14 @@ for (n in ctrlnames) {
   # make log Key
 
   logKey <- data.frame(matrix(NA, nrow = 0, ncol = 3) )
-   names(logKey) <- c("logID","Function","Reason")
+  names(logKey) <- c("logID","Function","Reason")
 
   ## combine into rB3object
   rB3object <- list(srcDF,qcDF,logDF,logKey, ctrls,metaD)
   names(rB3object) <- c("srcDF","qcDF","logDF","logKey","ctrls","metaD")
+
+  # add S3 class object attribute
+  attr(rB3object,"class") = "rB3object"
 
   return(rB3object)
 

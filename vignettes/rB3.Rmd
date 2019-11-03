@@ -1,0 +1,20 @@
+---
+title: "rB3"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rB3}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rB3)
+```
+

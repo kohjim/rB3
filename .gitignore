@@ -64,3 +64,4 @@ bak/
 .Rproj.user
 .Rhistory
 .RData
+inst/doc
