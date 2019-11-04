@@ -2,7 +2,7 @@
 #' Wide format in, long format out
 #'
 #' @export
-#' @param dt_in data in
+#' @param dt_in data in (data.frame?)
 #' @keywords plotting
 #' @examples aggPlotData(dt_in = myDT)
 #'

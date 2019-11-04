@@ -8,7 +8,7 @@ Wide format in, long format out}
 aggPlotData(dt_in)
 }
 \arguments{
-\item{dt_in}{data in}
+\item{dt_in}{data in (data.frame?)}
 }
 \description{
 Aggregate a dataset for plotting large time-series quickly
