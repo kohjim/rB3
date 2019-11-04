@@ -81,13 +81,10 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
 
   ######## aggregation #######
 
+
   rB3out <- rB3trim
 
   if (doAgg == TRUE) {
-
-  #create dates
-  dates <- data.frame(seq.POSIXt(from = as.POSIXct(startDate), to = as.POSIXct(endDate), by = timestep * 60))
-  names(dates) <- "DateTime"
 
   # vars to aggregate
   varList <- colnames(rB3trim[["srcDF"]][,2:ncol(rB3trim[["srcDF"]])])
@@ -102,11 +99,12 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
 
       aggDF <- rB3trim[[f]]
 
-      dt_agg <- data.table(aggDF[,c("DateTime",varList[1])])
-
      #### agg each var one by 1, adding to a df
 
      # initialise with first variable
+
+      dt_agg <- data.table(aggDF[,c("DateTime",varList[1])])
+
       dt_agg <- aggTS(dt_agg,
                       timestep = timestep,
                       FUN = methodAgg[1],
@@ -125,10 +123,8 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
 
        dt_agg <- cbind(dt_agg, aggVar)
      }
-  }
-
-
     }
+   }
 
   if (aggAll == FALSE) {
     rB3out[["srcDF"]] <- rB3out[["qcDF"]]
