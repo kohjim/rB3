@@ -14,6 +14,9 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   # tz.src = Sys.timezone()  # back up
     Sys.setenv(tz = 'UTC')
 
+  # force to data table
+  dt_in <- data.table(dt_in)
+
   ######## end defaults ########
 
 
@@ -25,7 +28,7 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   # only aggregate big data
   if(nrow(dt_in) < 50000) {
 
-    return(dt_in)
+   df_out <- tidyr::gather(dt_in,var,value,2:ncol(dt_in))
 
   } else {
 
@@ -36,7 +39,7 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
 
   ## determine the best time res for efficient plotting
     # aim for max 2000 pts to render per time-series, round to logical aggregation intervals
-    timeRes <- dateSpan / 2480
+    timeRes <- dateSpan / 1024
     # aggergation windows, in seconds (from 1 min to 1 wk)
     intervals <- c(60, 60*15, 3600, 3600*3, 3600*6, 3600*12, 86400, 86400*7)
     # identify closest window
@@ -57,10 +60,10 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   dt_in$DateTime <- plyr::round_any(dt_in$DateTime, accuracy = timeRes, f = round)
 
   # function to aggregate one var, using data table
-  aggTS <- function(varName) {
+  aggForPlot <- function(varName) {
 
     # trim to the varName of interest, as data table
-    stats <- dt_in[!is.na(dt_in[,get(varName)]),mget(c("DateTime",varName))]
+    stats <- dt_in[!is.na(dt_in[,get(varName)]), mget(c("DateTime",varName))]
 
     # find stats, bookend with means so that lines render to the means rather than extremes
     stats <- setDT(stats)[,
@@ -87,16 +90,17 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
   }
 
   # loop over all vars needed
-  df_out <- lapply(varNames, function(x) aggTS(varName = x))
+  df_out <- lapply(varNames, function(x) aggForPlot(varName = x))
 
   #combine into one DF
   df_out <- do.call("rbind", df_out)
 
   df_out <- df_out[,c("DateTime","var","value")]
 
-  return(df_out)
-
   }
+
+    return(df_out)
+
 }
 
 ######## main function ########

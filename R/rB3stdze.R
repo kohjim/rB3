@@ -98,7 +98,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
     for (f in DFs) {
 
       aggDF <- rB3trim[[f]]
-      aggDF$DateTime <- z_WRG_regDates(aggDF)
+      aggDF$DateTime <- z_WRG_regDates(aggDF, timestep = timestep)
      #### agg each var one by 1, adding to a df
 
      # initialise with first variable

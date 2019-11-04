@@ -3,13 +3,13 @@
 #' Produce a simple, or faceted, ggplot of variable(s)
 #'
 #' @export
-#' @param rB3in rB3 object input
+#' @param dataIn rB3 object input
 #' @param startDate measurements before this will be excluded from plot
 #' @param endDate measurements after this will be excluded from plot
 #' @param varNames variable names or keywords
 #' @param plotLabels vector of titles for each panel NB: n and order of plotLabels must be same as columns for rB3in
-#' @param srcColour colour of the unmodified data (leave out to plot only quality controlled data)
-#' @param qcColour colour of the quality controlled data (leave out to plot only unmodified/raw data)
+#' @param cols.src colour of the unmodified data (leave out to plot only quality controlled data)
+#' @param cols.qc colour of the quality controlled data (leave out to plot only unmodified/raw data)
 #' @param facet facet the plot by variable (TRUE/FALSE)
 #' @param showPlot display figure in plots window (TRUE/FALSE)
 #' @param savePlot save figure to this path ('folder/start_of_file_name')
@@ -17,45 +17,48 @@
 #' @examples newDF <- rB3gg(rB3in = stdDF, metaD = metaD, varNames = wqVars, srcColour = 'red',
 #'               qcColour = 'black', facet = TRUE, savePlot = 'figures/RAW_WQ_',  dpi = 400)
 #'
-rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qcColour, facet, showPlot, savePlot, dpi) {
+rB3gg <- function(dataIn, startDate, endDate, varNames, cols.qc, cols.src, facet, geom, showPlot, siteName, savePlot, dpi) {
 
   ######## set defaults ########
   if (missing(startDate)){
-    startDate <- rB3in[["qcDF"]]$DateTime[1]
+    startDate <- dataIn[["qcDF"]]$DateTime[1]
   }
 
   if (missing(endDate)){
-    endDate <- rB3in[["qcDF"]]$DateTime[length(rB3in[["qcDF"]]$DateTime)]
+    endDate <- dataIn[["qcDF"]]$DateTime[length(dataIn[["qcDF"]]$DateTime)]
   }
 
   if (missing(varNames)){
-    varNames$Vars <- "All"
+    varNames <- "All"
   }
 
-  if (missing(plotLabels)){
-    plotLabels <- rB3in[["ctrls"]]$plotLabels
+  # if (missing(plotLabels)){
+  #   plotLabels <- dataIn[["ctrls"]]$plotLabels
+  # }
+
+  if (missing(cols.qc)){
+    cols.qc <- NULL
   }
 
-  if (missing(qcColour)){
-    lineColour <- NULL
-  }
-
-    if (missing(srcColour)){
-      srcColour <- NULL
-  }
-
-  if (missing(qcColour)){
-    qcColour <- NULL
+  if (missing(cols.src)){
+    cols.src <- NULL
   }
 
   if (missing(facet)){
     facet <- FALSE
   }
 
+  if (missing(geom)){
+    geom <- 'line'
+  }
+
   if (missing(showPlot)){
     showPlot <- TRUE
   }
 
+  if (missing(siteName)){
+    siteName <- 'Unknown_site'
+  }
 
   if (missing(savePlot)){
     savePlot <- NULL
@@ -68,10 +71,11 @@ rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qc
   ######## end set defaults ########
 
   ######## find rows & cols to plot ########
-  outs.idElToModify <- idElToModify(rB3in,
+  outs.idElToModify <- idElToModify(dataIn,
                                     startDate = startDate,
                                     endDate = endDate,
                                     varNames = varNames)
+
   # decompose the list
   rowLocs <- outs.idElToModify[[1]]
   rowLocsNums <- which(rowLocs)
@@ -82,87 +86,51 @@ rB3gg <- function(rB3in, startDate, endDate, varNames, plotLabels, srcColour, qc
 
   # check for valid plotLabels and replace with varName if necessary
 
-  for (n in 1:length(plotLabels)){
-
-    if (is.na(plotLabels[n])) {
-      colnames(rB3in[["qcDF"]])[n + 1]
-    } else {
-      plotLabels[n]
-    }
-
-  }
-
+  # for (n in 1:length(plotLabels)){
+  #
+  #   if (is.na(plotLabels[n])) {
+  #     colnames(rB3in[["qcDF"]])[n + 1]
+  #   } else {
+  #     plotLabels[n]
+  #   }
+  #
+  # }
+  #
 
 
   ####### MAKE A FACETED GGPLOT ################
 
-  plotQC <- rB3in[["qcDF"]][rowLocsNums,c(1,colLocsNums)]
-  colnames(plotQC) <- c("DateTime",plotLabels[colLocsNums - 1])
-  plotAll <- tidyr::gather(plotQC,var, qc, 2:ncol(plotQC))
+  # quality control data
+  plotQC <- dataIn[["qcDF"]][rowLocsNums,c(1,colLocsNums)]
+     # colnames(plotQC) <- c("DateTime",plotLabels[colLocsNums - 1])
+  plotQC <- aggPlotData(plotQC)
+    names(plotQC) <- c("DateTime","var","qc")
 
-  if (!is.null(srcColour)) {
-    plotSrc <- rB3in[["srcDF"]][rowLocsNums,c(1,colLocsNums)]
-    colnames(plotSrc) <- c("DateTime",plotLabels[colLocsNums - 1])
-    plotSrc <- tidyr::gather(plotSrc,var, value, 2:ncol(plotSrc))
+  if (!is.null(cols.qc)) {
 
-    plotAll$src <- plotSrc$value
-
-  } else { plotAll$src <- NA
-  }
-
-  # colours
-  if (facet == TRUE) {
-    srcGeom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = "Unmodified data"), size = 0.2)
-    qcGeom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = "Quality cotrolled data"), size = 0.2)
-    srcKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour))
-    qcKey <- ggplot2::scale_colour_manual("",values = c("Quality cotrolled data"=qcColour))
-    dualKey <- ggplot2::scale_colour_manual("",values = c("Unmodified data"=srcColour, "Quality cotrolled data"=qcColour))
+    plotDF <- plotQC
 
   } else {
-    srcGeom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = src, color = var), size = 0.2)
-    qcGeom <- ggplot2::geom_line(ggplot2::aes(x = DateTime, y = qc, color = var), size = 0.2)
-    srcKey <- NULL
-    qcKey <- NULL
-    dualKey <- NULL
-  }
 
-  varPlot <-
-
-   ggplot2::ggplot(plotAll) +
-    ggplot2::ylab("Value") +
-    ggplot2::xlab(NULL) +
-    ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m"),
-                     # breaks = scales::date_breaks("1 years"),
-                     limits = c(min(plotAll$DateTime),max(plotAll$DateTime)),
-                     expand = c(0, 0)) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
-    plotTheme()
-
-
-  if (facet == TRUE) {
-
-  varPlot <- varPlot +  ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y')
+    plotDF <- plotQC$DateTime
 
   }
 
-  if (showPlot == TRUE) {
+  # add src data
+  if (!is.null(cols.src)) {
+  plotSrc <- dataIn[["srcDF"]][rowLocsNums,c(1,colLocsNums)]
+  # colnames(plotQC) <- c("DateTime",plotLabels[colLocsNums - 1])
+  plotSrc <- aggPlotData(plotSrc)
+     names(plotSrc) <- c("DateTime","var","src")
 
-  if (is.null(srcColour)) {
-   print(varPlot + qcGeom + qcKey)
-  } else if (is.null(qcColour)) {
-    print(varPlot + srcGeom + srcKey)
-  } else if (facet == TRUE) { print(varPlot + srcGeom + qcGeom + dualKey)
-  } else { print(varPlot + qcGeom + qcKey)
-           print("Only quality controlled data are displayed for non-faceted plots")   }
-}
 
-if (!is.null(savePlot)) {
+  plotDF <- cbind(plotDF, plotSrc[,3,drop = F])
+    names(plotSrc) <- c("DateTime","var","src")
 
-    ggplot2::ggsave(paste0(savePlot, rB3in[["metaD"]]$siteName,"_facet.png"),
-                  height = 0.5 + 1.1 * length(unique(plotAll$var)),
-                  width = 7.5,
-                  dpi = dpi)
-               }
+  }
+
+  rB3plotr(plotDF, siteName = siteName, cols.qc = cols.qc, cols.src = cols.src,
+           geom = geom,  facet = facet, showPlot = showPlot, savePlot = savePlot, dpi = dpi)
 
 }
   ######## end function ########
