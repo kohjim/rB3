@@ -36,7 +36,7 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
 
   ## determine the best time res for efficient plotting
     # aim for max 2000 pts to render per time-series, round to logical aggregation intervals
-    timeRes <- dateSpan / 2000
+    timeRes <- dateSpan / 2480
     # aggergation windows, in seconds (from 1 min to 1 wk)
     intervals <- c(60, 60*15, 3600, 3600*3, 3600*6, 3600*12, 86400, 86400*7)
     # identify closest window
@@ -61,8 +61,15 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
 
     # trim to the varName of interest, as data table
     stats <- dt_in[!is.na(dt_in[,get(varName)]),mget(c("DateTime",varName))]
+
     # find stats, bookend with means so that lines render to the means rather than extremes
-    stats <- setDT(stats)[,.(mean1 = mean(get(varName)), min = min(get(varName)), max = max(get(varName)), mean2 = mean(get(varName))), by = 'DateTime']
+    stats <- setDT(stats)[,
+                          .(mean1 = mean(get(varName)), na.rm = T,
+                            min = min(get(varName)), na.rm = T,
+                            max = max(get(varName)), na.rm = T,
+                            mean2 = mean(get(varName)), na.rm = T),
+                          by = 'DateTime']
+
     # convert to long
     stats = melt(stats, id.vars = c("DateTime"),
                  measure.vars = c("mean1","min", "max","mean2"))

@@ -7,13 +7,15 @@ dt_in$DateTime <-  as.POSIXct(dt_in$DateTime,
                               format = "%Y-%m-%d %H:%M:%S",
                               tz = "UTC")
 
-test <- aggPlotData(dt_in[,1:10])
+test <- aggPlotData(dt_in[,1:5])
 
 # library(rB3)
+
+test <- aggTS(dt_in, FUN = 'mean', pullAgg = 'centre')
 
 
 test$src <- test$value / 2
 test$hl <- test$value * 2
 
 
-rB3plotr(test,  cols.qc = 'blue', cols.src = 'auto', cols.hl = 'red', siteName = 'Test_site', facet = F, savePlot = '') # cols.qc = c('purple','red'),
+rB3plotr(test,  cols.qc = 'black', cols.src = 'pink', cols.hl = 'red', geom = 'dots', siteName = 'Test_site', facet = T, savePlot = '') # cols.qc = c('purple','red'),

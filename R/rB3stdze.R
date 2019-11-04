@@ -8,7 +8,7 @@
 #' @param startDate measurements prior to this time will be removed
 #' @param endDate measurements after this time will be removed
 #' @param varNames variables (columns) to be retained, select by full header name, key characters, or 'All'
-#' @param timestep standardise (aggregate) to a common timestep (numeric, in mins, to turn aggregation on) !! NOTE! logs will be reset to NA!!
+#' @param timestep standardise (aggregate) to a common timestep (numeric, in seconds, to turn aggregation on) !! NOTE! logs will be reset to NA!!
 #' @param aggAll TRUE: aggregate source and qc data separately, FALSE: source data = qc data.
 #' @param methodAgg aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'), either side of timestamp ('centre'), or on/after timestamp ('right')
@@ -102,35 +102,61 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
 
       aggDF <- rB3trim[[f]]
 
-      rB3out[[f]] <- dates
+      aggDT <- data.table(aggDF)
 
-      for (i in 1:length(varList)) {
+#       rB3out[[f]] <- dates
+#
 
-        aggDF <- rB3trim[[f]] [,c(1,i+1)]
 
-  # set new timestamps for all measurements
-       if (pullAgg[i] == 'left') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 60 -1), paste0(timestep,' min'))
-       }  else if (pullAgg[i] == 'centre') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 30 -1), paste0(timestep,' min'))
-       }  else if (pullAgg[i] == 'right') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 30 -1), paste0(timestep,' min'))
-       }  else {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime - (timestep * 60 + 1), paste0(timestep,' min'))
-       }
+     # agg each var one by 1, adding to a df
 
-                if (methodAgg[i] == 'mean') {  funAgg <- function(x) {mean(x)}
-                }  else if (methodAgg[i] == 'median') { funAgg <- function(x)  {median(x)}
-				}  else if (methodAgg[i] == 'sum') { funAgg <- function(x)  {sum(x)}
-                }  else if (methodAgg[i] == 'max') { funAgg <- function(x) {max(x)}
-                }  else if (methodAgg[i] == 'min') { funAgg <- function(x) {min(x)}
-                }  else if (methodAgg[i] == 'circular') { funAgg <- function(x) {mean(circular::circular(x, units = "degrees", modulo = '2pi'))}
-                }  else {funAgg <- function(x)  {mean(x)}
-                }
+     # initialise with first variable
+      dt_agg <- aggTS(aggDF[,c("DateTime",varList[i])],
+                      timestep = timestep,
+                      FUN = methodAgg[i],
+                      pullAgg = pullAgg)
 
-  aggVals <- aggregate(aggDF[,2], by = list(aggDF$DateTime), FUN = funAgg)
-     names(aggVals) <- 'DateTime'
-  aggVals <- merge(dates, aggVals, all.x = TRUE)
+  if (length(varList) > 1) {
 
-  rB3out[[f]] [,varList[i]] <- aggVals[,2]
+     for (i in 2:length(varList)) {
 
+       aggVar <- aggTS(aggDF[,c("DateTime",varList[i])],
+                       timestep = timestep,
+                       FUN = methodAgg[i],
+                       pullAgg = pullAgg)
+
+       dt_agg <- cbind(dt_agg, aggVar)
+     }
   }
+
+
+
+               #
+#         aggDF <- rB3trim[[f]] [,c(1,i+1)]
+#
+#   # set new timestamps for all measurements
+#        if (pullAgg[i] == 'left') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 60 -1), paste0(timestep,' min'))
+#        }  else if (pullAgg[i] == 'centre') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 30 -1), paste0(timestep,' min'))
+#        }  else if (pullAgg[i] == 'right') {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime + (timestep * 30 -1), paste0(timestep,' min'))
+#        }  else {aggDF$DateTime <- lubridate::floor_date(aggDF$DateTime - (timestep * 60 + 1), paste0(timestep,' min'))
+#        }
+#
+#                 if (methodAgg[i] == 'mean') {  funAgg <- function(x) {mean(x)}
+#                 }  else if (methodAgg[i] == 'median') { funAgg <- function(x)  {median(x)}
+# 				}  else if (methodAgg[i] == 'sum') { funAgg <- function(x)  {sum(x)}
+#                 }  else if (methodAgg[i] == 'max') { funAgg <- function(x) {max(x)}
+#                 }  else if (methodAgg[i] == 'min') { funAgg <- function(x) {min(x)}
+#                 }  else if (methodAgg[i] == 'circular') { funAgg <- function(x) {mean(circular::circular(x, units = "degrees", modulo = '2pi'))}
+#                 }  else {funAgg <- function(x)  {mean(x)}
+#                 }
+#
+#   aggVals <- aggregate(aggDF[,2], by = list(aggDF$DateTime), FUN = funAgg)
+#      names(aggVals) <- 'DateTime'
+#   aggVals <- merge(dates, aggVals, all.x = TRUE)
+#
+#   rB3out[[f]] [,varList[i]] <- aggVals[,2]
+#
+#   }
 
     }
 
