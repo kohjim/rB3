@@ -50,6 +50,9 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
     } else if (FUN == "median"){
       FUN <- function(d){median(d, na.rm = TRUE)}
 
+    } else if (FUN == "sum"){
+      FUN <- function(d){sum(d, na.m = TRUE)}
+
     } else if (FUN == "count"){
       FUN <- function(d){sum(!is.na(d))}
 
