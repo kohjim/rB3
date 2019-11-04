@@ -1,7 +1,7 @@
 #' Aggregate timeseries - low level function
 #'
 #' @export
-#' @param dt_in data table object
+#' @param dt_reg data table object with timestamps already set for aggregating
 #' @param timestep new timestep used in the aggregation results in sec
 #' @param FUN aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
@@ -68,38 +68,7 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
 
   ## end function definition ##
 
-  ### make timestamp series based on desired pull direction
-  if (pullAgg == "left") {
-
-    newTS =
-      as.numeric(
-        lapply(
-          as.numeric(dt_in$DateTime) / timestep,
-          floor
-        )
-      ) * timestep
-
-  } else if (pullAgg == "right") {
-
-    newTS =
-      as.numeric(
-        lapply(
-          as.numeric(dt_in$DateTime) / timestep,
-          ceiling
-        )
-      ) * timestep
-
-  } else {
-    newTS =
-      as.numeric(
-        lapply(
-          as.numeric(dt_in$DateTime) / timestep,
-          round
-        )
-      ) * timestep
-
-  }
-
+  newTS <- z_WRG_regDates(dt_in)
 
   ### make the new data table for aggregated data
   dt_agg <- dt_in
