@@ -110,7 +110,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
       dt_agg <- aggTS(dt_agg,
                       timestep = timestep,
                       FUN = methodAgg[1],
-                      pullAgg = pullAgg)
+                      pullAgg = pullAgg[1])
 
   if (length(varList) > 1) {
 
@@ -121,7 +121,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
        aggVar <- aggTS(aggVar,
                        timestep = timestep,
                        FUN = methodAgg[i],
-                       pullAgg = pullAgg)
+                       pullAgg = pullAgg[i])
 
        dt_agg <- cbind(dt_agg, aggVar)
      }

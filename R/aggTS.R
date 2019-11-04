@@ -53,6 +53,9 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
     } else if (FUN == "count"){
       FUN <- function(d){sum(!is.na(d))}
 
+    } else if (FUN == "circular"){
+      FUN <- function(d){mean(circular::circular(d, units = "degrees", modulo = '2pi'))}
+
     } else if (substr(FUN,1,1) == "p"){
       FUN <- function(d){quantile(d, probs = as.numeric(substr(FUN,2,3)) / 100, na.rm = TRUE)}
 
