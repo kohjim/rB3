@@ -113,7 +113,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
      # initialise with first variable
       dt_agg <- aggTS(aggDF[,c("DateTime",varList[i])],
                       timestep = timestep,
-                      FUN = methodAgg[i],
+                      FUN = methodAgg[1],
                       pullAgg = pullAgg)
 
   if (length(varList) > 1) {
