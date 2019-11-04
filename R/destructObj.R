@@ -1,4 +1,4 @@
-#' Decompose object structure and export desired content
+#' Get qc data - private functions
 #'
 #' @export
 #' @param dataIn
@@ -7,11 +7,12 @@
 #' 1: return specified content.
 #' 2. return specified content and object type (1: rB3obj, 2 = data.frame)
 #' @keywords system
-#' @examples LF = aggTS(dataIn = myData)
-#'
+#' @examples myData = destructObj(rB3data)
+#' @examples myData = destructObj(myDF)
+#' @examples objType = unlist(destructObj(rB3data,exportOpt = 2)[2])
 #'
 
-destructObj <- function(dataIn,exportName,exportOpt){
+.destructObj <- function(dataIn,exportName,exportOpt){
 
   if (missing(exportName)){
     exportName <- "qcDF"
@@ -22,9 +23,10 @@ destructObj <- function(dataIn,exportName,exportOpt){
   }
 
   # if rB3object, extract "exportName" object
-  if (class(dataIn) == "rB3object"){
+  if (sum(attr(a,"data.type") == "rB3obj")){
     objType = 1
 
+    # find the data in the object structure
     nameLocator = attributes(dataIn)$names == exportName
     returnObj = rB3demo[nameLocator]
 

@@ -62,19 +62,36 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
                                 origin = "1970-01-01 00:00:00",
                                 format = "%Y-%m-%d %H:%M:%S",
                                 tz = "UTC")
+  attr(srcDF, "class") =  c("rB3_src", "tbl_df", "data.frame")
 
   # remove all non-numeric characters
-  srcDF[2:ncol(srcDF)] <- apply(srcDF[2:ncol(srcDF)], 2, function(y) as.numeric(gsub("[^0-9.-]", "", y)))
+  srcDF[2:ncol(srcDF)] <- apply(
+    srcDF[2:ncol(srcDF)],
+    2,
+    function(y) as.numeric(gsub("[^0-9.-]", "", y))
+                                )
 
   # sort into chronological order, just in case
   srcDF <- srcDF[order(srcDF$DateTime),]
 
+  # add rB3_qc data,type attributes
+  attr(srcDF,"data.type") = "rB3_src"
+
+
   # make copy for applying QC to
   qcDF <- srcDF
+
+  # add data.type attributes
+  attr(qcDF,"data.type") = "rB3_qc"
+
 
   # make copy for log entries
   logDF <- srcDF
   logDF[1:nrow(logDF),2:ncol(logDF)] <- NA
+
+  # add data.type attributes
+  attr(qcDF,"data.type") = "rB3_log"
+
 
   # make dataframe of controls
 
@@ -103,21 +120,35 @@ csv2rB3 <- function(filePath, siteName, lat, lon, country) {
     ctrls[,y] <- as.numeric(as.character(ctrls[,y]))
   }
 
+  # add data.type attributes
+  attr(ctrls,"data.type") = "rB3_ctrls"
+
+
+
   # make metadata
 
   metaD <- list(siteName = siteName, lat = lat, lon = lon, country = country)
+
+  # add data.type attributes
+  attr(metaD,"data.type") = "rB3_meta"
+
 
   # make log Key
 
   logKey <- data.frame(matrix(NA, nrow = 0, ncol = 3) )
   names(logKey) <- c("logID","Function","Reason")
 
+  # add data.type attributes
+  attr(metaD,"data.type") = "rB3_logKey"
+
+
   ## combine into rB3object
   rB3object <- list(srcDF,qcDF,logDF,logKey, ctrls,metaD)
   names(rB3object) <- c("srcDF","qcDF","logDF","logKey","ctrls","metaD")
 
-  # add S3 class object attribute
-  attr(rB3object,"class") = "rB3object"
+  # add data.type attributes
+  attr(rB3object,"data.type") = "rB3obj"
+
 
   return(rB3object)
 
