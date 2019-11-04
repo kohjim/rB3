@@ -2,11 +2,13 @@
 % Please edit documentation in R/destructObj.R
 \name{.destructObj}
 \alias{.destructObj}
-\title{Get qc data}
+\title{Get qc data - private functions}
 \usage{
 .destructObj(dataIn, exportName, exportOpt)
 }
 \arguments{
+\item{dataIn}{data input}
+
 \item{exportName}{default: qcDF}
 
 \item{exportOpt}{default: 1.
@@ -14,7 +16,7 @@
 2. return specified content and object type (1: rB3obj, 2 = data.frame)}
 }
 \description{
-Get qc data
+Export qc data regardless of rB3obj or data.table
 }
 \examples{
 myData = destructObj(rB3data)

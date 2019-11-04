@@ -1,7 +1,9 @@
 #' Get qc data - private functions
 #'
+#' Export qc data regardless of rB3obj or data.table
+#'
 #' @export
-#' @param dataIn
+#' @param dataIn data input
 #' @param exportName default: qcDF
 #' @param exportOpt default: 1.
 #' 1: return specified content.
