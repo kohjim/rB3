@@ -2,6 +2,12 @@
 
 z_WRG_regDates <- function(dt_in, timestep, pullAgg) {
 
+  # default
+  if (missing(pullAgg)){
+    pullAgg <- 'left'
+  }
+
+
 ### make timestamp series based on desired pull direction
 if (pullAgg == "left") {
 
