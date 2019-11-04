@@ -111,7 +111,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
      # agg each var one by 1, adding to a df
 
      # initialise with first variable
-      dt_agg <- aggTS(aggDF[,c("DateTime",varList[i])],
+      dt_agg <- aggTS(aggDF[,c("DateTime",varList[1])],
                       timestep = timestep,
                       FUN = methodAgg[1],
                       pullAgg = pullAgg)
