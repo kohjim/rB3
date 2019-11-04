@@ -86,51 +86,49 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
   #### find plotting colours in the correct order
 
   ## find qc colours
-  if (cols.qc == 'auto') {
-
-    cols.qc <- unname(randomcoloR::distinctColorPalette(varLength))
-
-  } else if (length(cols.qc) < varLength ) {
-
-    # use first
-    cols.qc <- cols.qc[1]
-
-  } else if (length(cols.qc) >= varLength ) {
+    if (length(cols.qc) >= varLength ) {
 
     cols.qc <- cols.qc[1: varLength]
 
-  }
+    } else if (!is.null(cols.qc) & cols.qc[1] == 'auto') {
+
+      cols.qc <- unname(randomcoloR::distinctColorPalette(varLength))
+
+    } else if (!is.null(cols.qc)) {
+
+      cols.qc <- cols.qc[1]
+
+    }
 
 
-  ## find src colours if auto
-  if (cols.src == 'auto') {
+    ## find src colours
+    if (length(cols.src) >= varLength ) {
 
-    #..lighten the qc colours to use as src
-    cols.src <- colorspace::lighten(cols.qc, 0.5, fixup = T)
+      cols.src <- cols.src[1: varLength]
 
-  } else if (length(cols.src) < varLength ) {
+    } else if (!is.null(cols.src) & cols.src[1] == 'auto') {
 
-    # use first
-    cols.src <- cols.src[1]
+      cols.src <- colorspace::lighten(cols.qc, 0.5, fixup = T)
 
-  } else if (length(cols.qc) >= varLength ) {
+    } else if (!is.null(cols.src)) {
 
-    cols.src <- cols.src[1: varLength]
+      cols.src <- cols.src[1]
 
-  }
+    }
 
-  # set hl cols to red if auto
-  if (cols.hl == 'auto') {
 
-    #..set to red
-    cols.hl <- 'red'
 
-  } else if (length(cols.hl) > 0 ) {
+    # set hl cols to red if auto
+    if (length(cols.hl) >= varLength ) {
 
-    # use first
-    cols.hl <- cols.hl[1]
+      cols.src <- cols.src[1: varLength]
 
-  }
+    } else {
+
+     #..set to red
+      cols.hl <- 'red'
+
+    }
 
   # combine into one
   cols <- NULL
@@ -192,7 +190,7 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
   if ('hl' %in% names(dt_in) == TRUE) {
 
     hlData <- dt_in[,c("DateTime","var","hl")]
-    names(hlData) <- c('DateTime','var','value')
+       names(hlData) <- c('DateTime','var','value')
 
     ## set colour legend
     hlData$col <- 'Data to be modified'

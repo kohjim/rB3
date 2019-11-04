@@ -39,7 +39,7 @@ aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
 
   ## determine the best time res for efficient plotting
     # aim for max 2000 pts to render per time-series, round to logical aggregation intervals
-    timeRes <- dateSpan / 1024
+    timeRes <- dateSpan / 1500
     # aggergation windows, in seconds (from 1 min to 1 wk)
     intervals <- c(60, 60*15, 3600, 3600*3, 3600*6, 3600*12, 86400, 86400*7)
     # identify closest window
