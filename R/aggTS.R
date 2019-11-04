@@ -68,7 +68,7 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
 
   ## end function definition ##
 
-  newTS <- z_WRG_regDates(dt_in)
+  newTS <- z_WRG_regDates(dt_in, timestep = timestep)
 
   ### make the new data table for aggregated data
   dt_agg <- dt_in
