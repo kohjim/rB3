@@ -98,21 +98,14 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
     for (f in DFs) {
 
       aggDF <- rB3trim[[f]]
-
+      aggDF$DateTime <- z_WRG_regDates(aggDF)
      #### agg each var one by 1, adding to a df
 
      # initialise with first variable
 
-      dt_agg <- data.table(aggDF[,c("DateTime",varList[1])])
+      dt_agg <- unique(aggDF$DateTime)
 
-      dt_agg <- aggTS(dt_agg,
-                      timestep = timestep,
-                      FUN = methodAgg[1],
-                      pullAgg = pullAgg[1])
-
-  if (length(varList) > 1) {
-
-     for (i in 2:length(varList)) {
+      for (i in 1:length(varList)) {
 
        aggVar <- data.table(aggDF[,c("DateTime",varList[i])])
 
@@ -121,9 +114,8 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
                        FUN = methodAgg[i],
                        pullAgg = pullAgg[i])
 
-       dt_agg <- cbind(dt_agg, aggVar)
+       dt_agg <- cbind(dt_agg, aggVar[2])
      }
-    }
    }
 
   if (aggAll == FALSE) {
