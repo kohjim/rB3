@@ -116,7 +116,7 @@ rB3stdze <- function(rB3in,startDate,endDate, varNames, timestep, aggAll, method
 
      for (i in 2:length(varList)) {
 
-       aggVar <- aggDF[,c("DateTime",varList[i])]
+       aggVar <- data.table(aggDF[,c("DateTime",varList[i])])
 
        aggVar <- aggTS(aggVar,
                        timestep = timestep,
