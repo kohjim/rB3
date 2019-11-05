@@ -1,6 +1,6 @@
 ## make vector of regular timestamps for a data frame (to pass to aggregation)
 
-zWRG_reg_dates <- function(dt.in, timestep, pullAgg) {
+.AGG_regDates <- function(dt.in, timestep, pullAgg) {
 
   # default
   if (missing(pullAgg)){

@@ -10,7 +10,7 @@
 #'
 #'
 
-aggTS <- function(dt.in, timestep, FUN, pullAgg){    # , outType
+.AGG_dt <- function(dt.in, timestep, FUN, pullAgg){    # , outType
 
   ######## set defaults ########
   tz.src = Sys.timezone()  # back up
@@ -71,22 +71,22 @@ aggTS <- function(dt.in, timestep, FUN, pullAgg){    # , outType
 
   ## end function definition ##
 
-  newTS <- z_WRG_regDates(dt.in, timestep = timestep)
+  newTS <- .AGG_regDates(dt.in, timestep = timestep)
 
   ### make the new data table for aggregated data
-  dt_agg <- dt.in
+  dt.agg <- dt.in
 
   # overwrite with modified timestamps
-  dt_agg$DateTime <- as.POSIXct(newTS,
+  dt.agg$DateTime <- as.POSIXct(newTS,
                                 origin = '1970-01-01 00:00.00 UTC',
                                 tz = "UTC"
   )
 
   ### do the aggregation ###
-  dt_agg <- dt_agg[,lapply(.SD, FUN), by = 'DateTime']
+  dt.agg <- dt.agg[,lapply(.SD, FUN), by = 'DateTime']
 
   ## return values
-  return(dt_agg)
+  return(dt.agg)
 
 }
 

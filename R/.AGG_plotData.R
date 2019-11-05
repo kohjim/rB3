@@ -7,7 +7,7 @@
 #' @examples aggPlotData(dt.in = myDT)
 #'
 
-aggPlotData <- function(dt.in) {  # ,varNames,timeUnit
+.AGG_plotData <- function(dt.in) {  # ,varNames,timeUnit
 
   ######## set defaults ########
 
@@ -39,10 +39,10 @@ aggPlotData <- function(dt.in) {  # ,varNames,timeUnit
   } else {
 
   ### calculate the timestep (locked to sensible intervals)
-  timeRes <- zWRG_agg_tstep(dt.in, chunks = 1500, lock.ts = TRUE)
+  timeRes <- .AGG_tstep(dt.in, chunks = 2000, lock.ts = TRUE)
 
   # make all possible dates at the aggregated timestep
-  aggDates <- zWRG_reg_dates(dt.in, timestep = timeRes, pullAgg = 'left')
+  aggDates <- .AGG_regDates(dt.in, timestep = timeRes, pullAgg = 'left')
 
   # unique aggregate timesteps
   aggUnique <- unique(aggDates)
@@ -59,7 +59,7 @@ aggPlotData <- function(dt.in) {  # ,varNames,timeUnit
   funs <- c('mean','min','max')
 
   # apply all functions to the data using aggTS
-  aggd <- lapply(funs, aggTS, dt.in = dt.agg, timestep = timeRes, pullAgg = 'left')
+  aggd <- lapply(funs, AGG_dt, dt.in = dt.agg, timestep = timeRes, pullAgg = 'left')
 
   ### bookend the min max with means for each aggregate timestep
   aggd <- rbind(aggd[[1]], aggd[[2]], aggd[[3]], aggd[[1]] )

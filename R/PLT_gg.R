@@ -17,7 +17,7 @@
 #' @examples newDF <- rB3gg(rB3in = stdDF, metaD = metaD, varNames = wqVars, srcColour = 'red',
 #'               qcColour = 'black', facet = TRUE, savePlot = 'figures/RAW_WQ_',  dpi = 400)
 #'
-rB3gg <- function(dataIn, startDate, endDate, varNames, cols.qc, cols.src, facet, geom, showPlot, siteName, savePlot, dpi) {
+PLT_gg <- function(dataIn, startDate, endDate, varNames, cols.qc, cols.src, facet, geom, showPlot, siteName, savePlot, dpi) {
 
   ######## set defaults ########
   if (missing(startDate)){

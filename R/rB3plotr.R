@@ -61,7 +61,7 @@ rB3plotr <- function(dt.in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
   }
 
   if (missing(dpi)){
-    dpi <- 600
+    dpi <- 300
   }
 
   ####### MAKE FACETED GGPLOT ################

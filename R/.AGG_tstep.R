@@ -1,6 +1,6 @@
 ## choose a timestep for aggregation
 
-zWRG_agg_tstep <- function(dt.in, chunks, lock.ts) {
+.AGG_tstep <- function(dt.in, chunks, lock.ts) {
 
   ###### DEFAULTS ####
 
