@@ -1,9 +1,7 @@
 #' Produce a standard rB3 format ggplot
 #'
 #' @export
-#' @param dt_in data input, must be long format with DateTime, var, value and (optionally) src and/or hl
-#' @param plotSrc plot source/raw data as well as qc data
-#' @param plotHl plot highlighting
+#' @param dt.in data input, must be long format with DateTime, var, value and (optionally) src and/or hl
 #' param dateStart start date
 #' param dateEnd end date
 #' @param siteName name of site for saving plot
@@ -15,9 +13,9 @@
 #' @param savePlot save figure to this path ('folder/start_of_file_name')
 #' @param dpi dots per inch for saved plot
 #' @keywords plotting
-#' @examples rB3plotr(dt_in, siteName = 'Test_site', savePlot = 'figures/testPlot')
+#' @examples rB3plotr(dt.in, siteName = 'Test_site', savePlot = 'figures/testPlot')
 #'
-rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
+rB3plotr <- function(dt.in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
 
   ######## set defaults ########
 
@@ -67,20 +65,15 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
   }
 
   ####### MAKE FACETED GGPLOT ################
-
+  # browser()
   # define path for saving plot
   plotPath <- paste0(savePlot, '_', siteName,".png")
 
   # number of variables for plotting
-  varLength <- length(unique(dt_in$var))
+  varLength <- length(unique(dt.in$var))
 
   # initialise colours
   cols <- NULL
-
-  # intialise DT
-  plotDT <- dt_in[0,c(1:3)]
-
-
 
 
   #### find plotting colours in the correct order
@@ -92,7 +85,12 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
 
     } else if (!is.null(cols.qc) & cols.qc[1] == 'auto') {
 
-      cols.qc <- unname(randomcoloR::distinctColorPalette(varLength))
+      # a random colour pallette: unname(randomcoloR::distinctColorPalette(30))
+      cols.qc <- c("#9ECE54", "#D5934F", "#58C2D7", "#CCC8E5", "#D575E6", "#E7D73E",
+                   "#5BE57B", "#D63AE4", "#7842E7", "#DFA59D", "#96EF45", "#D7DEB5",
+                   "#DDD585", "#DF5F54", "#6FA483", "#7C63D3", "#ACE49A", "#78ACDF",
+                   "#69E5B7", "#C640AD", "#DFAEDC", "#68E7E2", "#E0DCD6", "#E17EC0",
+                   "#ABDCE9", "#CE4B7D", "#77757C", "#B0E9D4", "#6188D9", "#B691DF")
 
     } else if (!is.null(cols.qc)) {
 
@@ -121,7 +119,7 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
     # set hl cols to red if auto
     if (length(cols.hl) >= varLength ) {
 
-      cols.src <- cols.src[1: varLength]
+      cols.hl <- cols.hl[1: varLength]
 
     } else {
 
@@ -131,17 +129,22 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
     }
 
   # combine into one
-  cols <- NULL
+  cols <- c(cols.src, cols.qc, cols.hl)
 
+  ## blank data table for initialising components
+  blank.dt <- cbind(dt.in[0,c(1:2)], matrix(nrow = 0, ncol = 2) )
+      names(blank.dt) <- c("DateTime","var","value","col")
 
 
   ##### RAW/SRC DATA
-  if ('src' %in% names(dt_in) == TRUE) {
+  # intialise DT
+  srcData <- blank.dt
 
-    srcData <- dt_in[,c("DateTime","var","src")]
+  if ('src' %in% names(dt.in) == TRUE) {
+
+    srcData <- dt.in[,c("DateTime","var","src")]
     names(srcData) <- c('DateTime','var','value')
 
-    ## set colour legend
     ## set colour legend
     if (length(cols.src) > 1) {
 
@@ -153,18 +156,17 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
 
     }
 
-    ### BIND the qc and src data together for plotting
-    plotDT <- rbind(plotDT,srcData)
-
-    cols <- c(cols,cols.src)
     # end src data add
   }
 
 
   ##### QC DATA
-  if ('qc' %in% names(dt_in) == TRUE) {
+  # intialise DT
+  qcData <- blank.dt
 
-    qcData <- dt_in[,c("DateTime","var","qc")]
+  if ('qc' %in% names(dt.in) == TRUE) {
+
+    qcData <- dt.in[,c("DateTime","var","qc")]
     names(qcData) <- c('DateTime','var','value')
 
     ## set colour legend
@@ -178,29 +180,25 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
 
     }
 
-
-    ### BIND the qc and src data together for plotting
-    plotDT <- rbind(plotDT,qcData)
-
-    cols <- c(cols,cols.qc)
     # end qc data add
   }
 
   ##### Highlighting DATA
-  if ('hl' %in% names(dt_in) == TRUE) {
+  # intialise DT
+  hlData <- blank.dt
 
-    hlData <- dt_in[,c("DateTime","var","hl")]
+  if ('hl' %in% names(dt.in) == TRUE) {
+
+    hlData <- dt.in[,c("DateTime","var","hl")]
        names(hlData) <- c('DateTime','var','value')
 
     ## set colour legend
     hlData$col <- 'Data to be modified'
 
-    ### BIND the qc and src data together for plotting
-    plotDT <- rbind(plotDT,qcData)
-
-    cols <- c(cols,cols.hl)
     # end hl data add
   }
+
+  plotDT <- rbind(srcData, qcData, hlData)
 
   # ensure correct colour order
   plotDT$col <- factor(plotDT$col, levels = unique(plotDT$col))
@@ -221,7 +219,7 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
     geom2use +
     ggplot2::scale_colour_manual(values = cols) +
     ggplot2::scale_x_datetime(#labels = scales::date_format("%Y-%m"),
-      #limits = c(min(dt_in$DateTime),max(dt_in$DateTime)),
+      #limits = c(min(dt.in$DateTime),max(dt.in$DateTime)),
       expand = c(0, 0)) +
     ggplot2::labs(x = NULL, y = NULL, color = NULL) +
     # ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 0, hjust = 0)) +
@@ -242,7 +240,7 @@ rB3plotr <- function(dt_in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
       ggplot2::facet_wrap(~var, ncol = 1, scales = 'free_y')
 
     # autoscale saving dimensions
-    saveHeight = 2 + 1.3 * length(unique(dt_in$var))
+    saveHeight = 2 + 1.3 * length(unique(dt.in$var))
 
   } else {
 

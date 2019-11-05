@@ -3,21 +3,21 @@
 #' @export
 #' @param dt_reg data table object with timestamps already set for aggregating
 #' @param timestep new timestep used in the aggregation results in sec
-#' @param FUN aggregation method; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
+#' @param FUN aggregation method (chr) or vector of methods; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
 #' @keywords wrangling
 #' @examples LF = aggTS(dataIn = myDF, timestep = 60x60x4, FUN = "mean", pullAgg = "center", outType = "LF")
 #'
 #'
 
-aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
+aggTS <- function(dt.in, timestep, FUN, pullAgg){    # , outType
 
   ######## set defaults ########
   tz.src = Sys.timezone()  # back up
   Sys.setenv(tz = 'UTC')
 
   if (missing(timestep)){
-    timestep <- 60*60*24
+    timestep <- 60*60*24       # 1 day default
   }
 
   if (missing(FUN)){
@@ -29,6 +29,9 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
   }
 
   ######## end defaults ########
+
+  # force to data.table
+  dt.in <- data.table(dt.in)
 
   ### define aggregation function
   if (!is.function(FUN)){
@@ -51,7 +54,7 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
       FUN <- function(d){median(d, na.rm = TRUE)}
 
     } else if (FUN == "sum"){
-      FUN <- function(d){sum(d, na.m = TRUE)}
+      FUN <- function(d){sum(d, na.rm = TRUE)}
 
     } else if (FUN == "count"){
       FUN <- function(d){sum(!is.na(d))}
@@ -68,10 +71,11 @@ aggTS <- function(dt_in, timestep, FUN, pullAgg){    # , outType
 
   ## end function definition ##
 
-  newTS <- z_WRG_regDates(dt_in, timestep = timestep)
+  newTS <- z_WRG_regDates(dt.in, timestep = timestep)
 
   ### make the new data table for aggregated data
-  dt_agg <- dt_in
+  dt_agg <- dt.in
+
   # overwrite with modified timestamps
   dt_agg$DateTime <- as.POSIXct(newTS,
                                 origin = '1970-01-01 00:00.00 UTC',

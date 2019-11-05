@@ -2,107 +2,102 @@
 #' Wide format in, long format out
 #'
 #' @export
-#' @param dt_in data in (data.frame?)
+#' @param dt.in data in (data.frame?)
 #' @keywords plotting
-#' @examples aggPlotData(dt_in = myDT)
+#' @examples aggPlotData(dt.in = myDT)
 #'
 
-aggPlotData <- function(dt_in) {  # ,varNames,timeUnit
+aggPlotData <- function(dt.in) {  # ,varNames,timeUnit
 
   ######## set defaults ########
 
   # tz.src = Sys.timezone()  # back up
-    Sys.setenv(tz = 'UTC')
+  Sys.setenv(tz = 'UTC')
 
-  # force to data table
-  dt_in <- data.table(dt_in)
+  # force to correct formats
+  dt.in <- data.table(dt.in)
 
-  ######## end defaults ########
+  dt.in$DateTime <- as.POSIXct(dt.in$DateTime,
+                               origin = "1970-01-01 00:00:00",
+                               format = "%Y-%m-%d %H:%M:%S",
+                               tz = "UTC")
+
+  ######## END DEFAULTS ########
 
 
-  ######## main function ########
+  ######## MAIN FUNCTION ########
 
   ## get relevant attributes for the data
-  varNames <- names(dt_in[,2:ncol(dt_in)])
+  varNames <- names(dt.in[,2:ncol(dt.in)])
 
-  # only aggregate big data
-  if(nrow(dt_in) < 50000) {
 
-   df_out <- tidyr::gather(dt_in,var,value,2:ncol(dt_in))
+  ### only aggregate big data
+  if(nrow(dt.in) < 50000) {
+
+   dt.out <- tidyr::gather(dt.in,var,value,2:ncol(dt.in))
 
   } else {
 
+  ### calculate the timestep (locked to sensible intervals)
+  timeRes <- zWRG_agg_tstep(dt.in, chunks = 1500, lock.ts = TRUE)
 
-  dateStart  <- min(dt_in$DateTime)
-  dateEnd    <- max(dt_in$DateTime)
-    dateSpan   <- as.numeric(dateEnd - dateStart) * 86400
+  # make all possible dates at the aggregated timestep
+  aggDates <- zWRG_reg_dates(dt.in, timestep = timeRes, pullAgg = 'left')
 
-  ## determine the best time res for efficient plotting
-    # aim for max 2000 pts to render per time-series, round to logical aggregation intervals
-    timeRes <- dateSpan / 1500
-    # aggergation windows, in seconds (from 1 min to 1 wk)
-    intervals <- c(60, 60*15, 3600, 3600*3, 3600*6, 3600*12, 86400, 86400*7)
-    # identify closest window
-    nearest <- findInterval(timeRes,intervals)
-
-      # this will be the new timewindow
-      timeRes <- intervals[nearest]
+  # unique aggregate timesteps
+  aggUnique <- unique(aggDates)
 
 
-  # make all possible dates at the aggregated timestep, to use later to ensure missing values are rendered
-  start <- plyr::round_any(dateStart - timeRes, accuracy = timeRes, f = round)
-  end   <- plyr::round_any(dateEnd, accuracy = timeRes, f = round)
-    dates <- seq.POSIXt(start,end,timeRes)
-   nas <- data.table(dates,rep(NA,length(dates)))
-       names(nas) <- c("DateTime","value")
+  # create df for aggregating
+  dt.agg <- dt.in
 
-  ## floor the timestamp to the nearest res
-  dt_in$DateTime <- plyr::round_any(dt_in$DateTime, accuracy = timeRes, f = round)
+      # aggregate the date stamps
+      dt.agg$DateTime <- aggDates
 
-  # function to aggregate one var, using data table
-  aggForPlot <- function(varName) {
 
-    # trim to the varName of interest, as data table
-    stats <- dt_in[!is.na(dt_in[,get(varName)]), mget(c("DateTime",varName))]
+  #### aggregate the dataframe by mean, min and max to use later
+  funs <- c('mean','min','max')
 
-    # find stats, bookend with means so that lines render to the means rather than extremes
-    stats <- setDT(stats)[,
-                          .(mean1 = mean(get(varName)), na.rm = T,
-                            min = min(get(varName)), na.rm = T,
-                            max = max(get(varName)), na.rm = T,
-                            mean2 = mean(get(varName)), na.rm = T),
-                          by = 'DateTime']
+  # apply all functions to the data using aggTS
+  aggd <- lapply(funs, aggTS, dt.in = dt.agg, timestep = timeRes, pullAgg = 'left')
 
-    # convert to long
-    stats = melt(stats, id.vars = c("DateTime"),
-                 measure.vars = c("mean1","min", "max","mean2"))
+  ### bookend the min max with means for each aggregate timestep
+  aggd <- rbind(aggd[[1]], aggd[[2]], aggd[[3]], aggd[[1]] )
 
-    # only keep those nas for when we don't have any data at all (per aggregation timestep)
-    nasVar <- nas[!nas$DateTime %in% unique(stats$DateTime),]
+  # long format
+  dt.out <- tidyr::gather(aggd, var,value,2:ncol(aggd))
+  # remove non-numeric
+  dt.out <- dt.out[!is.infinite(dt.out$value),]
+  dt.out <- dt.out[!is.na(dt.out$value),]
 
-    # convert to data frame for ggplot
-    aggd <- as.data.frame(rbind(nasVar, stats[,c(1,3)]))
-    # add variable name for long merge
-    aggd$var <- varName
-    aggd <- aggd[order(aggd$DateTime),]
 
-    return(aggd)
-  }
+  ### make a dt of agg dates and NA, for use later to make sure NAs are rendered.
 
-  # loop over all vars needed
-  df_out <- lapply(varNames, function(x) aggForPlot(varName = x))
+  nas <- data.table(aggUnique,
+                    rep(varNames[1],length(aggUnique)),
+                    rep(NA,length(aggUnique))
+                    )
+       names(nas) <- c("DateTime","var","value")
 
-  #combine into one DF
-  df_out <- do.call("rbind", df_out)
+  # only keep those NAs for when we don't have any data at all (per aggregation timestep)
+  nas <- nas[!nas$DateTime %in% dt.out$DateTime,]
 
-  df_out <- df_out[,c("DateTime","var","value")]
+  # convert to data frame for ggplot
+  dt.out <- rbind(nas, dt.out)
+
+  # sort to correct order
+  dt.out <- dt.out[order(dt.out$DateTime),]
+
 
   }
 
-    return(df_out)
+
+
+  return(dt.out)
 
 }
 
-######## main function ########
+
+####### END FUNCTION ########
 
 
