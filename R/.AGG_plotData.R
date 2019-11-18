@@ -15,7 +15,7 @@
   Sys.setenv(tz = 'UTC')
 
   # force to correct formats
-  dt.in <- data.table(dt.in)
+  dt.in <- data.table::data.table(dt.in)
 
   dt.in$DateTime <- as.POSIXct(dt.in$DateTime,
                                origin = "1970-01-01 00:00:00",
@@ -39,10 +39,10 @@
   } else {
 
   ### calculate the timestep (locked to sensible intervals)
-  timeRes <- .AGG_tstep(dt.in, chunks = 2000, lock.ts = TRUE)
+  timeRes <- .AGG_tstep(dt.in$DateTime, chunks = 2000, lock.ts = TRUE)
 
   # make all possible dates at the aggregated timestep
-  aggDates <- .AGG_regDates(dt.in, timestep = timeRes, pullAgg = 'left')
+  aggDates <- .AGG_regDates(dt.in$DateTime, timestep = timeRes, pullAgg = 'left')
 
   # unique aggregate timesteps
   aggUnique <- unique(aggDates)
@@ -72,7 +72,6 @@
 
 
   ### make a dt of agg dates and NA, for use later to make sure NAs are rendered.
-
   nas <- data.table(aggUnique,
                     rep(varNames[1],length(aggUnique)),
                     rep(NA,length(aggUnique))
@@ -90,8 +89,6 @@
 
 
   }
-
-
 
   return(dt.out)
 

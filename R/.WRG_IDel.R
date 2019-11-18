@@ -10,12 +10,20 @@
 #' @examples idElToModify(rB3in, dateStart = '2015-07-01', dateEnd = '2016-06-30', varNames = 'All')
 #'
 
-IDel_toMod <- function(dt.in, dateRange, varNames){
+.WRG_IDel <- function(dt.in, dateRange, varNames){
 
   ### DEFAULTS ####
 
   if (missing(dateRange)){
     dateRange <- c(NA,NA)
+  }
+
+  if (is.na(dateRange[1])){
+    dateRange[1] <- min(dt.in$DateTime)
+  }
+
+  if (is.na(dateRange[2])){
+    dateRange[2] <- max(dt.in$DateTime)
   }
 
   if (missing(varNames)){
@@ -35,39 +43,23 @@ IDel_toMod <- function(dt.in, dateRange, varNames){
                               )
 
   # set start and end dates
-  if (is.na(dateRange[1])) {
-
-    dateStart <- min(dt.in$DateTime)
-
-  } else {
-
     dateStart <- as.POSIXct(
       dateRange[1],
       origin = "1970-01-01 00:00:00",
       tz = "UTC"
     )
-  }
 
-  if (is.na(dateRange[2])) {
+   dateEnd <- as.POSIXct(
+     dateRange[2],
+     origin = "1970-01-01 00:00:00",
+     tz = "UTC"
+     )
 
-    dateEnd <- max(dt.in$DateTime)
-
-  } else {
-
-  dateEnd <- as.POSIXct(
-    dateRange[2],
-    origin = "1970-01-01 00:00:00",
-    tz = "UTC"
-    )
-
-  }
 
   ##### find the chunk of data to be selected
-
   modRows <- (dt.in$DateTime >= dateStart & dt.in$DateTime <= dateEnd) #|
-     #     is.na(dt.in$DateTime)
 
-  modRowNums <- which(modRows)
+      modRowNums <- which(modRows)
 
   modDates <- dt.in$DateTime[modRowNums]
 
@@ -85,9 +77,10 @@ IDel_toMod <- function(dt.in, dateRange, varNames){
 
         }
 
-  modColNums <- which(modCols)
+      modColNums <- which(modCols)
 
-  modNames   <- names(dt.in[modColNums])
+
+  # modNames   <- names(dt.in[modColNums])
 
   # outList <- list(modDates,modRows,modRowNums,modCols,modColNums,modNames)
      # names(outList) <- c("DateTimes","rows","row_numbers","columns","column_numbers","column_names")

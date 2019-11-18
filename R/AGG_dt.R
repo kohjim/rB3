@@ -1,7 +1,7 @@
-#' Aggregate timeseries - low level function
+#' Aggregate timeseries using a single function - low level function
 #'
 #' @export
-#' @param dt_reg data table object with timestamps already set for aggregating
+#' @param dt.in data table with a DateTime column
 #' @param timestep new timestep used in the aggregation results in sec
 #' @param FUN aggregation method (chr) or vector of methods; mean, median, sum, min, max, or circular (for averaging direction measurements in degrees)
 #' @param pullAgg aggregate data from before/on new timestamp ('left'; default), either side of timestamp ('centre'), or on/after timestamp ('right')
@@ -71,7 +71,7 @@
 
   ## end function definition ##
 
-  newTS <- .AGG_regDates(dt.in, timestep = timestep)
+  newTS <- .AGG_regDates(dt.in$DateTime, timestep = timestep, pullAgg = pullAgg)
 
   ### make the new data table for aggregated data
   dt.agg <- dt.in

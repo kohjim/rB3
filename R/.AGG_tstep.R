@@ -1,6 +1,6 @@
 ## choose a timestep for aggregation
 
-.AGG_tstep <- function(dt.in, chunks, lock.ts) {
+.AGG_tstep <- function(DateTimes, chunks, lock.ts) {
 
   ###### DEFAULTS ####
 
@@ -15,20 +15,12 @@
   # set system to UTC
   Sys.setenv(tz = 'UTC')
 
-  # force to correct formats, in case
-  dt.in <- data.table(dt.in)
-
-  dt.in$DateTime <- as.POSIXct(dt.in$DateTime,
-                               origin = "1970-01-01 00:00:00",
-                               format = "%Y-%m-%d %H:%M:%S",
-                               tz = "UTC")
-
   #### END DEFAULTS ####
 
   #### MAIN FUNCTION ####
 
-  dateStart  <- min(dt.in$DateTime)
-  dateEnd    <- max(dt.in$DateTime)
+  dateStart  <- min(DateTimes)
+  dateEnd    <- max(DateTimes)
   dateSpan   <- as.numeric(dateEnd - dateStart) * 86400
 
   # find aggregation timestep in seconds for the number of chunks specified

@@ -15,7 +15,7 @@
 #'
 #'
 
-FUNCrB3 <- function(rB3in,startDate,endDate,varNames, FUN, eqnVars, logID, Reason, showPlot, savePlot){
+TFM_funcR <- function(rB3in,startDate,endDate,varNames, FUN, eqnVars, logID, Reason, showPlot, savePlot){
 
 
   ######## set defaults ########

@@ -2,8 +2,6 @@
 #'
 #' @export
 #' @param dt.in data input, must be long format with DateTime, var, value and (optionally) src and/or hl
-#' param dateStart start date
-#' param dateEnd end date
 #' @param siteName name of site for saving plot
 #' @param cols.qc vector of colours to use when plotting qc data, or choose 'auto'
 #' @param cols.src vector of colours to use when plotting source/raw data (default = 'light grey')
@@ -15,17 +13,9 @@
 #' @keywords plotting
 #' @examples rB3plotr(dt.in, siteName = 'Test_site', savePlot = 'figures/testPlot')
 #'
-rB3plotr <- function(dt.in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
+.PLT_plotr <- function(dt.in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, showPlot, savePlot, dpi) { # dateStart, dateEnd,
 
   ######## set defaults ########
-
-  # if (missing(dateStart)){
-  #   dateStart <- min(df_in$DateTime)
-  # }
-  #
-  # if (missing(dateEnd)){
-  #   dateEnd <- max(df_in$DateTime)
-  # }
 
   ## need to make this pull site from metaD if it exists
   if (missing(siteName)){
@@ -79,11 +69,11 @@ rB3plotr <- function(dt.in, siteName, cols.qc, cols.src, cols.hl, geom,  facet, 
   #### find plotting colours in the correct order
 
   ## find qc colours
-    if (length(cols.qc) >= varLength ) {
+  if (length(cols.qc) >= varLength ) {
 
     cols.qc <- cols.qc[1: varLength]
 
-    } else if (!is.null(cols.qc) & cols.qc[1] == 'auto') {
+  } else if (!is.null(cols.qc) & cols.qc[1] == 'auto') {
 
       # a random colour pallette: unname(randomcoloR::distinctColorPalette(30))
       cols.qc <- c("#9ECE54", "#D5934F", "#58C2D7", "#CCC8E5", "#D575E6", "#E7D73E",

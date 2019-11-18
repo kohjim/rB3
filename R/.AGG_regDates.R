@@ -1,6 +1,11 @@
-## make vector of regular timestamps for a data frame (to pass to aggregation)
+## transform a vector of POSIXct DateTimes into regular timestep (keep same length), and define direction of ts 'pull'
 
-.AGG_regDates <- function(dt.in, timestep, pullAgg) {
+#' @param dates vector of POSIXct
+#' @param timestep in seconds
+#' @param pullAgg direction in which to pull timesteps
+
+
+.AGG_regDates <- function(DateTimes, timestep, pullAgg) {
 
   # default
   if (missing(pullAgg)){
@@ -11,34 +16,17 @@
 ### make timestamp series based on desired pull direction
 if (pullAgg == "left") {
 
-  newTS =
-    as.numeric(
-      lapply(
-        as.numeric(dt.in$DateTime) / timestep,
-        floor
-      )
-    ) * timestep
+  newTS = floor(as.numeric(DateTimes)/ timestep) * timestep
 
-} else if (pullAgg == "right") {
+ } else if (pullAgg == "right") {
 
-  newTS =
-    as.numeric(
-      lapply(
-        as.numeric(dt.in$DateTime) / timestep,
-        ceiling
-      )
-    ) * timestep
+  newTS = floor(as.numeric(DateTimes) / timestep) * timestep
 
-} else {
-  newTS =
-    as.numeric(
-      lapply(
-        as.numeric(dt.in$DateTime) / timestep,
-        round
-      )
-    ) * timestep
+ } else {
 
-  }
+  newTS = round(as.numeric(DateTimes) / timestep) * timestep
+
+ }
 
   # force to POSIX
   newTS <- as.POSIXct(newTS,
